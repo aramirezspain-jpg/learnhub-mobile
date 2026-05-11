@@ -9,7 +9,11 @@ import { ContentService } from '@/services/content.service';
 import { useCoursesStore } from '@/store/courses.store';
 import { useProgressStore } from '@/store/progress.store';
 import { useUIStore } from '@/store/ui.store';
+import { useFavoritesStore } from '@/store/favorites.store';
+import { useNotesStore } from '@/store/notes.store';
 import { ProgressRepository } from '@/database/repositories/progress';
+import { FavoritesRepository } from '@/database/repositories/favorites';
+import { NotesRepository } from '@/database/repositories/notes';
 import { Colors } from '@/constants/theme';
 import { useSQLiteContext } from 'expo-sqlite';
 
@@ -23,6 +27,8 @@ function AppBootstrap({ children }: { children: React.ReactNode }) {
   const setDbReady = useUIStore(s => s.setDbReady);
   const setContentReady = useUIStore(s => s.setContentReady);
   const dbReady = useUIStore(s => s.dbReady);
+  const setFavorites = useFavoritesStore(s => s.setFavorites);
+  const setAllNotes = useNotesStore(s => s.setAllNotes);
   const scheme = useColorScheme() ?? 'dark';
 
   useEffect(() => {
@@ -32,15 +38,21 @@ function AppBootstrap({ children }: { children: React.ReactNode }) {
     setInitialized();
     setContentReady();
 
-    // Cargar progreso desde SQLite (asíncrono)
+    // Cargar datos persistentes desde SQLite (asíncrono, en paralelo)
     const loadProgress = async () => {
-      const repo = new ProgressRepository(db);
-      const [progress, lastViewed] = await Promise.all([
-        repo.getAllProgress(),
-        repo.getLastViewed(),
+      const progressRepo = new ProgressRepository(db);
+      const favRepo = new FavoritesRepository(db);
+      const notesRepo = new NotesRepository(db);
+      const [progress, lastViewed, favorites, notes] = await Promise.all([
+        progressRepo.getAllProgress(),
+        progressRepo.getLastViewed(),
+        favRepo.getAllFavorites(),
+        notesRepo.getAllNotes(),
       ]);
       setAllProgress(progress);
       if (lastViewed) setLastViewed(lastViewed);
+      setFavorites(favorites);
+      setAllNotes(notes);
       setDbReady();
     };
 
@@ -77,6 +89,14 @@ export default function RootLayout() {
           />
           <Stack.Screen
             name="quiz/[id]"
+            options={{ animation: 'slide_from_bottom' }}
+          />
+          <Stack.Screen
+            name="profile"
+            options={{ animation: 'slide_from_bottom' }}
+          />
+          <Stack.Screen
+            name="notes/[id]"
             options={{ animation: 'slide_from_bottom' }}
           />
         </Stack>

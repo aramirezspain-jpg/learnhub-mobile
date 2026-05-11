@@ -4,6 +4,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { Colors, Spacing, BorderRadius } from '@/constants/theme';
 import { Typography } from '@/components/ui/Typography';
+import { useNotesStore } from '@/store/notes.store';
 import { type Lesson } from '@/types';
 
 interface LessonItemProps {
@@ -30,6 +31,7 @@ export function LessonItem({
 }: LessonItemProps) {
   const scheme = useColorScheme() ?? 'dark';
   const theme = Colors[scheme];
+  const hasNote = useNotesStore(s => s.hasNoteForLesson(lesson.id));
 
   const iconName: React.ComponentProps<typeof Ionicons>['name'] = isCompleted
     ? 'checkmark-circle'
@@ -74,6 +76,12 @@ export function LessonItem({
               <Typography variant="caption" muted style={{ marginLeft: 3 }}>
                 {lesson.quiz.preguntas.length} preguntas
               </Typography>
+            </>
+          )}
+          {hasNote && (
+            <>
+              <Typography variant="caption" muted style={{ marginHorizontal: 4 }}>·</Typography>
+              <Ionicons name="document-text" size={11} color={Colors.primary} />
             </>
           )}
         </View>

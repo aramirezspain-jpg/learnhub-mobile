@@ -15,6 +15,7 @@ import { ProgressBar } from '@/components/ui/ProgressBar';
 import { Button } from '@/components/ui/Button';
 import { ContentService } from '@/services/content.service';
 import { useProgress } from '@/hooks/useProgress';
+import { useNotesStore } from '@/store/notes.store';
 
 export default function LessonScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -22,6 +23,7 @@ export default function LessonScreen() {
   const scheme = useColorScheme() ?? 'dark';
   const theme = Colors[scheme];
   const { isLessonComplete, markLessonComplete, recordLastViewed } = useProgress();
+  const hasNote = useNotesStore(s => s.hasNoteForLesson(id));
   const [completing, setCompleting] = useState(false);
 
   const found = ContentService.getLessonById(id);
@@ -62,6 +64,10 @@ export default function LessonScreen() {
   function handleQuiz() {
     if (!lesson.quiz) return;
     router.push({ pathname: '/quiz/[id]', params: { id: lesson.id } });
+  }
+
+  function handleNotes() {
+    router.push({ pathname: '/notes/[id]' as never, params: { id: lesson.id, courseId: course.id } });
   }
 
   return (
@@ -216,15 +222,26 @@ export default function LessonScreen() {
       <View style={[styles.bottomBar, { backgroundColor: theme.surface, borderTopColor: theme.border }]}>
         {lesson.quiz && (
           <TouchableOpacity
-            style={[styles.quizBtn, { backgroundColor: `${Colors.accent}18`, borderColor: `${Colors.accent}40` }]}
+            style={[styles.iconBtn, { backgroundColor: `${Colors.accent}18`, borderColor: `${Colors.accent}40` }]}
             onPress={handleQuiz}
           >
             <Ionicons name="help-circle-outline" size={20} color={Colors.accent} />
             <Typography variant="label" color={Colors.accent}>Quiz</Typography>
           </TouchableOpacity>
         )}
+        <TouchableOpacity
+          style={[styles.iconBtn, { backgroundColor: hasNote ? `${Colors.primary}20` : `${Colors.primary}10`, borderColor: hasNote ? `${Colors.primary}50` : `${Colors.primary}25` }]}
+          onPress={handleNotes}
+        >
+          <Ionicons
+            name={hasNote ? 'document-text' : 'document-text-outline'}
+            size={20}
+            color={Colors.primary}
+          />
+          <Typography variant="label" color={Colors.primary}>Notas</Typography>
+        </TouchableOpacity>
         <Button
-          label={completed ? '✓ Completada' : 'Marcar completada'}
+          label={completed ? '✓ Completada' : 'Completar'}
           onPress={handleComplete}
           loading={completing}
           variant={completed ? 'secondary' : 'primary'}
@@ -326,12 +343,12 @@ const styles = StyleSheet.create({
     borderTopWidth: StyleSheet.hairlineWidth,
     gap: 10,
   },
-  quizBtn: {
+  iconBtn: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
-    paddingHorizontal: 14,
-    paddingVertical: 13,
+    paddingHorizontal: 12,
+    paddingVertical: 12,
     borderRadius: BorderRadius.md,
     borderWidth: 1,
   },

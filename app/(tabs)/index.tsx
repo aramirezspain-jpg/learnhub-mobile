@@ -4,7 +4,6 @@ import {
   ScrollView,
   TouchableOpacity,
   StyleSheet,
-  Alert,
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
@@ -114,7 +113,7 @@ export default function HomeScreen() {
           </View>
           <TouchableOpacity
             style={[styles.avatarWrap, { backgroundColor: `${Colors.primary}20` }]}
-            onPress={() => Alert.alert('Perfil', 'La sección de perfil estará disponible en la siguiente versión.')}
+            onPress={() => router.push('/profile' as never)}
             activeOpacity={0.7}
           >
             <Ionicons name="person-outline" size={22} color={Colors.primary} />

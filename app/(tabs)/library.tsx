@@ -1,146 +1,411 @@
-import React from 'react';
-import { View, ScrollView, StyleSheet, TouchableOpacity, Alert } from 'react-native';
+import React, { useState } from 'react';
+import { View, ScrollView, StyleSheet, TouchableOpacity } from 'react-native';
+import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useColorScheme } from '@/hooks/use-color-scheme';
-import { Colors, Spacing, BorderRadius, Shadows } from '@/constants/theme';
+import { Colors, Spacing, BorderRadius, Shadows, FontSizes } from '@/constants/theme';
 import { Typography } from '@/components/ui/Typography';
+import { ProgressBar } from '@/components/ui/ProgressBar';
+import { EmptyState } from '@/components/ui/EmptyState';
+import { useFavoritesStore } from '@/store/favorites.store';
+import { useNotesStore } from '@/store/notes.store';
+import { useFavorites } from '@/hooks/useFavorites';
+import { useCourses } from '@/hooks/useCourses';
+import { useProgressStore } from '@/store/progress.store';
+import { ContentService } from '@/services/content.service';
+import { type Note, type Favorite } from '@/types';
 
-function LibrarySection({
-  icon,
-  title,
-  subtitle,
-  color,
-  onPress,
-}: {
-  icon: React.ComponentProps<typeof Ionicons>['name'];
-  title: string;
-  subtitle: string;
-  color: string;
-  onPress?: () => void;
-}) {
-  const scheme = useColorScheme() ?? 'dark';
-  const theme = Colors[scheme];
-  return (
-    <TouchableOpacity
-      style={[styles.section, { backgroundColor: theme.card }, Shadows.sm]}
-      onPress={onPress}
-      activeOpacity={0.8}
-    >
-      <View style={[styles.sectionIcon, { backgroundColor: `${color}20` }]}>
-        <Ionicons name={icon} size={26} color={color} />
-      </View>
-      <View style={styles.sectionText}>
-        <Typography variant="h4" style={{ color: theme.text }}>{title}</Typography>
-        <Typography variant="body" secondary>{subtitle}</Typography>
-      </View>
-      <Ionicons name="chevron-forward" size={18} color={theme.textMuted} />
-    </TouchableOpacity>
-  );
+type LibraryTab = 'favoritos' | 'notas' | 'completados';
+
+function formatDate(dateStr: string): string {
+  const d = new Date(dateStr);
+  return d.toLocaleDateString('es-ES', { day: 'numeric', month: 'short' });
 }
 
-function ComingSoonFeature({ icon, title }: {
-  icon: React.ComponentProps<typeof Ionicons>['name'];
-  title: string;
+// ── Tab switcher ────────────────────────────────────────────────
+
+function TabSwitcher({
+  active,
+  onChange,
+  tabs,
+}: {
+  active: LibraryTab;
+  onChange: (t: LibraryTab) => void;
+  tabs: { key: LibraryTab; label: string; count: number }[];
 }) {
   const scheme = useColorScheme() ?? 'dark';
   const theme = Colors[scheme];
   return (
-    <View style={[styles.feature, { backgroundColor: theme.card }]}>
-      <View style={[styles.featureIcon, { backgroundColor: theme.border }]}>
-        <Ionicons name={icon} size={20} color={theme.textMuted} />
-      </View>
-      <View style={{ flex: 1 }}>
-        <Typography variant="label" muted>{title}</Typography>
-        <Typography variant="caption" muted>Próximamente</Typography>
-      </View>
-      <View style={[styles.soon, { backgroundColor: `${Colors.accent}20` }]}>
-        <Typography variant="caption" color={Colors.accent} style={{ fontWeight: '700' }}>
-          Pronto
-        </Typography>
-      </View>
+    <View style={[tabStyles.container, { backgroundColor: theme.surface, borderColor: theme.border }]}>
+      {tabs.map(tab => {
+        const isActive = active === tab.key;
+        return (
+          <TouchableOpacity
+            key={tab.key}
+            style={[
+              tabStyles.tab,
+              isActive && { backgroundColor: Colors.primary },
+            ]}
+            onPress={() => onChange(tab.key)}
+            activeOpacity={0.75}
+          >
+            <Typography
+              variant="label"
+              color={isActive ? '#FFF' : theme.textSecondary}
+              style={{ fontSize: FontSizes.xs }}
+            >
+              {tab.label}
+            </Typography>
+            {tab.count > 0 && (
+              <View
+                style={[
+                  tabStyles.badge,
+                  { backgroundColor: isActive ? 'rgba(255,255,255,0.3)' : `${Colors.primary}20` },
+                ]}
+              >
+                <Typography
+                  variant="caption"
+                  color={isActive ? '#FFF' : Colors.primary}
+                  style={{ fontSize: 10, fontWeight: '700' }}
+                >
+                  {tab.count}
+                </Typography>
+              </View>
+            )}
+          </TouchableOpacity>
+        );
+      })}
     </View>
   );
 }
 
+const tabStyles = StyleSheet.create({
+  container: {
+    flexDirection: 'row',
+    marginHorizontal: Spacing.lg,
+    marginBottom: Spacing.md,
+    borderRadius: BorderRadius.lg,
+    borderWidth: 1,
+    padding: 4,
+    gap: 4,
+  },
+  tab: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 8,
+    borderRadius: BorderRadius.md,
+    gap: 5,
+  },
+  badge: {
+    paddingHorizontal: 6,
+    paddingVertical: 1,
+    borderRadius: BorderRadius.full,
+  },
+});
+
+// ── Favoritos Tab ───────────────────────────────────────────────
+
+function FavoritosTab() {
+  const router = useRouter();
+  const scheme = useColorScheme() ?? 'dark';
+  const theme = Colors[scheme];
+  const { toggleFavorite } = useFavorites();
+  const courseFavs = useFavoritesStore(s => s.getFavoritesByType('course'));
+  const { courses } = useCourses();
+  const getCourseProgress = useProgressStore(s => s.getCourseProgress);
+  const getCompletedCount = useProgressStore(s => s.getCompletedCountForCourse);
+
+  if (courseFavs.length === 0) {
+    return (
+      <EmptyState
+        icon="heart-outline"
+        title="Sin favoritos"
+        subtitle="Marca cursos como favoritos para encontrarlos aquí rápidamente."
+        color={Colors.error}
+      />
+    );
+  }
+
+  return (
+    <View style={listStyles.container}>
+      {courseFavs.map((fav: Favorite) => {
+        const course = courses.find(c => c.id === fav.content_id);
+        if (!course) return null;
+        const total = ContentService.getTotalLessons(course.id);
+        const prog = getCourseProgress(course.id, total);
+        const completed = getCompletedCount(course.id);
+        return (
+          <TouchableOpacity
+            key={fav.id}
+            style={[listStyles.card, { backgroundColor: theme.card }, Shadows.sm]}
+            onPress={() => router.push({ pathname: '/course/[id]', params: { id: course.id } })}
+            activeOpacity={0.85}
+          >
+            <View style={[listStyles.accent, { backgroundColor: course.banner_color }]}>
+              <Ionicons name="book-outline" size={22} color="rgba(255,255,255,0.9)" />
+            </View>
+            <View style={listStyles.cardContent}>
+              <Typography variant="label" style={{ color: theme.text }} numberOfLines={1}>
+                {course.titulo}
+              </Typography>
+              <ProgressBar progress={prog.progress_percent} color={course.banner_color} height={3} />
+              <Typography variant="caption" secondary>
+                {completed}/{total} lecciones
+              </Typography>
+            </View>
+            <TouchableOpacity
+              style={listStyles.heartBtn}
+              onPress={() => toggleFavorite(course.id, 'course', course.id)}
+              hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+            >
+              <Ionicons name="heart" size={18} color={Colors.error} />
+            </TouchableOpacity>
+          </TouchableOpacity>
+        );
+      })}
+    </View>
+  );
+}
+
+// ── Notas Tab ───────────────────────────────────────────────────
+
+function NotasTab() {
+  const router = useRouter();
+  const scheme = useColorScheme() ?? 'dark';
+  const theme = Colors[scheme];
+  const notes = useNotesStore(s => s.notes);
+
+  if (notes.length === 0) {
+    return (
+      <EmptyState
+        icon="document-text-outline"
+        title="Sin notas"
+        subtitle="Crea notas en cualquier lección para tener tus apuntes organizados aquí."
+        color={Colors.primary}
+      />
+    );
+  }
+
+  return (
+    <View style={listStyles.container}>
+      {notes.map((note: Note) => {
+        const found = ContentService.getLessonById(note.lesson_id);
+        return (
+          <TouchableOpacity
+            key={note.id}
+            style={[listStyles.noteCard, { backgroundColor: theme.card }, Shadows.sm]}
+            onPress={() =>
+              router.push({ pathname: '/notes/[id]' as never, params: { id: note.lesson_id, courseId: note.course_id } })
+            }
+            activeOpacity={0.85}
+          >
+            <View style={[listStyles.noteAccent, { backgroundColor: Colors.primary }]} />
+            <View style={listStyles.noteContent}>
+              {found && (
+                <Typography variant="overline" color={Colors.primary} numberOfLines={1}>
+                  {found.lesson.titulo}
+                </Typography>
+              )}
+              <Typography
+                variant="body"
+                style={{ color: theme.text, lineHeight: 20 }}
+                numberOfLines={3}
+              >
+                {note.content}
+              </Typography>
+              <Typography variant="caption" secondary style={{ marginTop: 4 }}>
+                {formatDate(note.updated_at)}
+              </Typography>
+            </View>
+            <Ionicons name="chevron-forward" size={16} color={theme.textMuted} style={{ alignSelf: 'center', marginRight: 12 }} />
+          </TouchableOpacity>
+        );
+      })}
+    </View>
+  );
+}
+
+// ── Completados Tab ─────────────────────────────────────────────
+
+function CompletadosTab() {
+  const router = useRouter();
+  const scheme = useColorScheme() ?? 'dark';
+  const theme = Colors[scheme];
+  const { courses } = useCourses();
+  const getCompletedCount = useProgressStore(s => s.getCompletedCountForCourse);
+  const getCourseProgress = useProgressStore(s => s.getCourseProgress);
+
+  const completedCourses = courses.filter(c => getCompletedCount(c.id) > 0);
+
+  if (completedCourses.length === 0) {
+    return (
+      <EmptyState
+        icon="checkmark-circle-outline"
+        title="Aún sin avance"
+        subtitle="Completa lecciones de cualquier curso para ver tu progreso aquí."
+        color={Colors.success}
+      />
+    );
+  }
+
+  const totalLessons = courses.reduce((s, c) => s + c.total_lecciones, 0);
+  const totalCompleted = courses.reduce((s, c) => s + getCompletedCount(c.id), 0);
+
+  return (
+    <View style={listStyles.container}>
+      {/* Resumen global */}
+      <View style={[listStyles.summaryCard, { backgroundColor: Colors.primary }, Shadows.primary]}>
+        <View style={listStyles.summaryRow}>
+          <View>
+            <Typography variant="h2" style={{ color: '#FFF' }}>{totalCompleted}</Typography>
+            <Typography variant="body" style={{ color: 'rgba(255,255,255,0.8)' }}>lecciones completadas</Typography>
+          </View>
+          <View style={listStyles.summaryIcon}>
+            <Ionicons name="trophy" size={28} color="rgba(255,255,255,0.9)" />
+          </View>
+        </View>
+        <ProgressBar
+          progress={totalLessons > 0 ? Math.round((totalCompleted / totalLessons) * 100) : 0}
+          color="rgba(255,255,255,0.95)"
+          trackColor="rgba(255,255,255,0.25)"
+          height={6}
+        />
+        <Typography variant="caption" style={{ color: 'rgba(255,255,255,0.75)', marginTop: 4 }}>
+          {totalCompleted}/{totalLessons} del total disponible
+        </Typography>
+      </View>
+
+      {/* Por curso */}
+      {completedCourses.map(course => {
+        const total = ContentService.getTotalLessons(course.id);
+        const prog = getCourseProgress(course.id, total);
+        const completed = getCompletedCount(course.id);
+        return (
+          <TouchableOpacity
+            key={course.id}
+            style={[listStyles.card, { backgroundColor: theme.card }, Shadows.sm]}
+            onPress={() => router.push({ pathname: '/course/[id]', params: { id: course.id } })}
+            activeOpacity={0.85}
+          >
+            <View style={[listStyles.accent, { backgroundColor: course.banner_color }]}>
+              <Ionicons name="book-outline" size={22} color="rgba(255,255,255,0.9)" />
+            </View>
+            <View style={listStyles.cardContent}>
+              <Typography variant="label" style={{ color: theme.text }} numberOfLines={1}>
+                {course.titulo}
+              </Typography>
+              <ProgressBar progress={prog.progress_percent} color={course.banner_color} height={3} />
+              <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+                <Typography variant="caption" secondary>
+                  {completed}/{total} lecciones
+                </Typography>
+                <Typography variant="caption" color={course.banner_color} style={{ fontWeight: '700' }}>
+                  {prog.progress_percent}%
+                </Typography>
+              </View>
+            </View>
+          </TouchableOpacity>
+        );
+      })}
+    </View>
+  );
+}
+
+const listStyles = StyleSheet.create({
+  container: { paddingHorizontal: Spacing.lg, gap: 10 },
+  card: {
+    flexDirection: 'row',
+    borderRadius: BorderRadius.lg,
+    overflow: 'hidden',
+    alignItems: 'center',
+  },
+  accent: {
+    width: 56,
+    alignItems: 'center',
+    justifyContent: 'center',
+    alignSelf: 'stretch',
+  },
+  cardContent: { flex: 1, paddingVertical: 12, paddingHorizontal: 12, gap: 6 },
+  heartBtn: { padding: 12 },
+  noteCard: {
+    flexDirection: 'row',
+    borderRadius: BorderRadius.lg,
+    overflow: 'hidden',
+  },
+  noteAccent: { width: 4 },
+  noteContent: { flex: 1, padding: Spacing.md, gap: 4 },
+  summaryCard: {
+    borderRadius: BorderRadius.xl,
+    padding: Spacing.lg,
+    gap: 10,
+    marginBottom: 4,
+  },
+  summaryRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
+  summaryIcon: {
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    backgroundColor: 'rgba(255,255,255,0.2)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+});
+
+// ── Pantalla principal ──────────────────────────────────────────
+
 export default function LibraryScreen() {
   const scheme = useColorScheme() ?? 'dark';
   const theme = Colors[scheme];
+  const [activeTab, setActiveTab] = useState<LibraryTab>('favoritos');
+
+  const favCount = useFavoritesStore(s => s.getFavoritesByType('course').length);
+  const noteCount = useNotesStore(s => s.notes.length);
+  const { courses } = useCourses();
+  const getCompletedCount = useProgressStore(s => s.getCompletedCountForCourse);
+  const completedCount = courses.filter(c => getCompletedCount(c.id) > 0).length;
+
+  const tabs: { key: LibraryTab; label: string; count: number }[] = [
+    { key: 'favoritos', label: 'Favoritos', count: favCount },
+    { key: 'notas', label: 'Notas', count: noteCount },
+    { key: 'completados', label: 'Completados', count: completedCount },
+  ];
 
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: theme.background }]} edges={['top']}>
-      <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scroll}>
-        {/* Header */}
-        <View style={styles.header}>
+      {/* Header */}
+      <View style={styles.header}>
+        <View>
           <Typography variant="overline" secondary>Tu espacio</Typography>
           <Typography variant="h1" style={{ color: theme.text }}>Biblioteca</Typography>
         </View>
-
-        {/* Banner info */}
-        <View style={[styles.banner, { backgroundColor: `${Colors.primary}15`, borderColor: `${Colors.primary}30` }]}>
-          <Ionicons name="information-circle-outline" size={20} color={Colors.primary} />
-          <Typography variant="body" color={Colors.primary} style={{ flex: 1 }}>
-            Tu contenido personal se almacena localmente en tu dispositivo.
-          </Typography>
+        <View style={[styles.headerIcon, { backgroundColor: `${Colors.primary}15` }]}>
+          <Ionicons name="library-outline" size={22} color={Colors.primary} />
         </View>
+      </View>
 
-        {/* Secciones */}
-        <View style={styles.sectionsContainer}>
-          <Typography variant="h3" style={{ color: theme.text, marginBottom: 12 }}>
-            Tu contenido
-          </Typography>
+      {/* Tab switcher */}
+      <TabSwitcher active={activeTab} onChange={setActiveTab} tabs={tabs} />
 
-          <LibrarySection
-            icon="heart-outline"
-            title="Favoritos"
-            subtitle="Lecciones y citas guardadas"
-            color={Colors.error}
-            onPress={() => Alert.alert('Favoritos', 'Esta función estará disponible en la siguiente versión.')}
-          />
-          <LibrarySection
-            icon="document-text-outline"
-            title="Mis Notas"
-            subtitle="Notas personales de estudio"
-            color={Colors.primary}
-            onPress={() => Alert.alert('Mis Notas', 'Esta función estará disponible en la siguiente versión.')}
-          />
-          <LibrarySection
-            icon="checkmark-done-circle-outline"
-            title="Completados"
-            subtitle="Lecciones y cursos terminados"
-            color={Colors.success}
-            onPress={() => Alert.alert('Completados', 'Esta función estará disponible en la siguiente versión.')}
-          />
-        </View>
+      {/* Contenido */}
+      <ScrollView
+        style={{ flex: 1 }}
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={styles.content}
+      >
+        {activeTab === 'favoritos' && <FavoritosTab />}
+        {activeTab === 'notas' && <NotasTab />}
+        {activeTab === 'completados' && <CompletadosTab />}
 
-        {/* Próximamente */}
-        <View style={styles.sectionsContainer}>
-          <Typography variant="h3" style={{ color: theme.text, marginBottom: 12 }}>
-            Próximamente
-          </Typography>
-
-          <ComingSoonFeature icon="download-outline" title="Contenido descargado" />
-          <ComingSoonFeature icon="reader-outline" title="PDFs y recursos" />
-          <ComingSoonFeature icon="ribbon-outline" title="Certificados" />
-          <ComingSoonFeature icon="globe-outline" title="Recursos externos" />
-        </View>
-
-        {/* Info de almacenamiento */}
+        {/* Info almacenamiento */}
         <View style={[styles.storageInfo, { backgroundColor: theme.card }]}>
-          <View style={styles.storageHeader}>
-            <Ionicons name="phone-portrait-outline" size={20} color={theme.textSecondary} />
-            <Typography variant="label" secondary>Almacenamiento local</Typography>
-          </View>
-          <Typography variant="caption" muted>
-            Todos tus datos —progreso, notas y favoritos— se guardan localmente. La app funciona 100% sin internet.
-          </Typography>
-          <View style={styles.storageFeatures}>
-            {['Offline First', 'Sin cuenta', 'Datos privados'].map(f => (
-              <View key={f} style={[styles.featureTag, { backgroundColor: `${Colors.success}20` }]}>
-                <Ionicons name="checkmark" size={12} color={Colors.success} />
-                <Typography variant="caption" color={Colors.success}>{f}</Typography>
-              </View>
-            ))}
+          <View style={styles.storageRow}>
+            <Ionicons name="shield-checkmark-outline" size={16} color={theme.textMuted} />
+            <Typography variant="caption" muted>
+              Offline First · Datos en tu dispositivo · 100% privado
+            </Typography>
           </View>
         </View>
       </ScrollView>
@@ -150,70 +415,34 @@ export default function LibraryScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1 },
-  scroll: { paddingBottom: 40 },
-  header: { paddingHorizontal: Spacing.lg, paddingTop: Spacing.md, paddingBottom: Spacing.lg },
-  banner: {
-    marginHorizontal: Spacing.lg,
-    marginBottom: Spacing.xl,
-    padding: Spacing.md,
-    borderRadius: BorderRadius.lg,
-    borderWidth: 1,
+  header: {
     flexDirection: 'row',
-    alignItems: 'flex-start',
-    gap: 10,
-  },
-  sectionsContainer: { paddingHorizontal: Spacing.lg, marginBottom: Spacing.xl },
-  section: {
-    flexDirection: 'row',
+    justifyContent: 'space-between',
     alignItems: 'center',
-    padding: Spacing.md,
-    borderRadius: BorderRadius.lg,
-    marginBottom: Spacing.sm,
-    gap: 14,
+    paddingHorizontal: Spacing.lg,
+    paddingTop: Spacing.md,
+    paddingBottom: Spacing.lg,
   },
-  sectionIcon: {
-    width: 52,
-    height: 52,
-    borderRadius: BorderRadius.md,
+  headerIcon: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  sectionText: { flex: 1 },
-  feature: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    padding: Spacing.md,
-    borderRadius: BorderRadius.md,
-    marginBottom: 6,
-    gap: 12,
-    opacity: 0.7,
-  },
-  featureIcon: {
-    width: 40,
-    height: 40,
-    borderRadius: BorderRadius.sm,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  soon: {
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderRadius: BorderRadius.full,
+  content: {
+    paddingBottom: 40,
+    gap: 0,
   },
   storageInfo: {
     marginHorizontal: Spacing.lg,
+    marginTop: Spacing.xl,
     padding: Spacing.md,
     borderRadius: BorderRadius.lg,
-    gap: 10,
   },
-  storageHeader: { flexDirection: 'row', alignItems: 'center', gap: 8 },
-  storageFeatures: { flexDirection: 'row', gap: 8, flexWrap: 'wrap' },
-  featureTag: {
+  storageRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 4,
-    paddingHorizontal: 10,
-    paddingVertical: 5,
-    borderRadius: BorderRadius.full,
+    gap: 8,
   },
 });

@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useCallback } from 'react';
 import {
   View,
   ScrollView,
@@ -18,6 +18,7 @@ import { ModuleAccordion } from '@/components/course/ModuleAccordion';
 import { ContentService } from '@/services/content.service';
 import { useProgressStore } from '@/store/progress.store';
 import { useProgress } from '@/hooks/useProgress';
+import { useFavorites } from '@/hooks/useFavorites';
 
 const DIFFICULTY_LABEL: Record<string, string> = {
   principiante: 'Principiante',
@@ -34,7 +35,14 @@ export default function CourseDetailScreen() {
   const lessonProgress = useProgressStore(s => s.lessonProgress);
   const getCourseProgress = useProgressStore(s => s.getCourseProgress);
 
+  const { isFavorite, toggleFavorite } = useFavorites();
   const course = ContentService.getCourseById(id);
+  const favorited = course ? isFavorite(course.id) : false;
+
+  const handleToggleFavorite = useCallback(async () => {
+    if (!course) return;
+    await toggleFavorite(course.id, 'course', course.id);
+  }, [course, toggleFavorite]);
 
   const completedIds = useMemo(() => {
     if (!course) return new Set<string>();
@@ -90,13 +98,22 @@ export default function CourseDetailScreen() {
       <ScrollView showsVerticalScrollIndicator={false}>
         {/* ── Hero ── */}
         <View style={[styles.hero, { backgroundColor: course.banner_color }]}>
-          {/* Back button */}
-          <TouchableOpacity
-            style={styles.backBtn}
-            onPress={() => router.back()}
-          >
-            <Ionicons name="arrow-back" size={22} color="#FFF" />
-          </TouchableOpacity>
+          {/* Navigation bar */}
+          <View style={styles.heroNav}>
+            <TouchableOpacity style={styles.backBtn} onPress={() => router.back()}>
+              <Ionicons name="arrow-back" size={22} color="#FFF" />
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={[styles.backBtn, { marginLeft: 'auto' }]}
+              onPress={handleToggleFavorite}
+            >
+              <Ionicons
+                name={favorited ? 'heart' : 'heart-outline'}
+                size={22}
+                color={favorited ? '#FF6B6B' : '#FFF'}
+              />
+            </TouchableOpacity>
+          </View>
 
           {/* Course info */}
           <View style={styles.heroContent}>
@@ -210,6 +227,11 @@ const styles = StyleSheet.create({
     paddingBottom: Spacing.xl,
     paddingHorizontal: Spacing.lg,
   },
+  heroNav: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: Spacing.lg,
+  },
   backBtn: {
     width: 40,
     height: 40,
@@ -217,7 +239,6 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0,0,0,0.2)',
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: Spacing.lg,
   },
   heroContent: { gap: 10 },
   heroTitle: {
