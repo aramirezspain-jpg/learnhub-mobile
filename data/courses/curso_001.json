@@ -1,0 +1,895 @@
+{
+  "id": "curso_001",
+  "nivel_id": "nivel_001",
+  "titulo": "Cómo leer la Biblia correctamente",
+  "subtitulo": "Principios esenciales de hermenéutica bíblica",
+  "descripcion": "Aprende los fundamentos para leer, interpretar y aplicar la Biblia de manera profunda y correcta. Este curso te dará las herramientas que todo creyente necesita.",
+  "banner_color": "#6366F1",
+  "duracion_estimada": "6 semanas",
+  "total_lecciones": 14,
+  "nivel_dificultad": "principiante",
+  "tags": ["hermenéutica", "biblia", "fundamentos", "interpretación"],
+  "instructor": "Instituto LearnHub Bíblico",
+  "modulos": [
+    {
+      "id": "mod_001_001",
+      "orden": 1,
+      "titulo": "Qué es la Biblia",
+      "descripcion": "Descubre la naturaleza única de la Biblia como Palabra de Dios",
+      "icono": "book-outline",
+      "lecciones": [
+        {
+          "id": "les_001_001_001",
+          "orden": 1,
+          "titulo": "La naturaleza de la Biblia",
+          "tipo": "lectura",
+          "duracion_minutos": 15,
+          "contenido": {
+            "introduccion": "La Biblia es el libro más vendido, traducido y estudiado en la historia de la humanidad. Pero ¿qué la hace tan diferente? No es simplemente un libro de moral o de historia antigua: es la Palabra viva de Dios dirigida a cada generación.",
+            "secciones": [
+              {
+                "subtitulo": "Un libro singular",
+                "texto": "La Biblia está compuesta por 66 libros escritos por más de 40 autores diferentes, en tres idiomas distintos —hebreo, arameo y griego— a lo largo de aproximadamente 1,500 años. Sus autores incluyen reyes, pescadores, médicos, poetas y profetas. A pesar de esta extraordinaria diversidad, la Biblia mantiene una sorprendente unidad temática y doctrinal, como si una sola mente la hubiera diseñado."
+              },
+              {
+                "subtitulo": "Origen divino",
+                "texto": "La Escritura afirma ser la Palabra de Dios. El apóstol Pablo escribió: 'Toda la Escritura es inspirada por Dios' (2 Timoteo 3:16). La palabra griega usada es theopneustos, que literalmente significa 'exhalada por Dios'. No es que Dios dictó mecánicamente, sino que el Espíritu Santo guió a cada autor a escribir exactamente lo que Él quería comunicar, usando la personalidad y el estilo de cada uno."
+              },
+              {
+                "subtitulo": "La unidad en la diversidad",
+                "texto": "Desde Génesis hasta Apocalipsis, hay un único hilo conductor: la historia de la redención de la humanidad a través de Jesucristo. El Antiguo Testamento prepara y profetiza su venida; el Nuevo Testamento la proclama y explica. Esta coherencia a través de siglos y culturas es una de las evidencias más poderosas del origen sobrenatural de la Biblia."
+              }
+            ],
+            "puntos_clave": [
+              "La Biblia tiene 66 libros: 39 en el Antiguo Testamento y 27 en el Nuevo Testamento",
+              "Fue escrita por más de 40 autores a lo largo de aproximadamente 1,500 años",
+              "A pesar de su diversidad humana, tiene una unidad narrativa y doctrinal extraordinaria",
+              "La palabra 'inspiración' (theopneustos) significa literalmente 'exhalada por Dios'"
+            ],
+            "citas_biblicas": [
+              {
+                "referencia": "2 Timoteo 3:16",
+                "texto": "Toda la Escritura es inspirada por Dios y útil para enseñar, para reprender, para corregir y para instruir en justicia."
+              },
+              {
+                "referencia": "2 Pedro 1:20-21",
+                "texto": "Ninguna profecía de la Escritura surge de la interpretación particular de nadie. Pues la profecía no tuvo su origen en la voluntad humana, sino que los profetas hablaron de parte de Dios, impulsados por el Espíritu Santo."
+              }
+            ],
+            "reflexion": "¿Cómo cambiaría tu lectura de la Biblia si la abordaras siempre con la convicción de que cada palabra fue inspirada por Dios mismo?"
+          },
+          "quiz": {
+            "id": "qz_001_001_001",
+            "preguntas": [
+              {
+                "id": "preg_001_001",
+                "pregunta": "¿Cuántos libros componen la Biblia completa?",
+                "opciones": ["39 libros", "27 libros", "66 libros", "73 libros"],
+                "respuesta_correcta": 2,
+                "explicacion": "La Biblia protestante tiene 66 libros: 39 en el Antiguo Testamento y 27 en el Nuevo Testamento."
+              },
+              {
+                "id": "preg_001_002",
+                "pregunta": "¿Qué significa la palabra griega 'theopneustos'?",
+                "opciones": ["Escrito por apóstoles", "Exhalada por Dios", "Traducida al griego", "Antigua escritura"],
+                "respuesta_correcta": 1,
+                "explicacion": "Theopneustos (2 Tim 3:16) significa literalmente 'exhalada por Dios', describiendo el origen divino de las Escrituras."
+              },
+              {
+                "id": "preg_001_003",
+                "pregunta": "¿Cuántos autores aproximadamente escribieron la Biblia?",
+                "opciones": ["Más de 10", "Más de 40", "Exactamente 12", "Más de 100"],
+                "respuesta_correcta": 1,
+                "explicacion": "Más de 40 autores distintos escribieron la Biblia a lo largo de 1,500 años, desde Moisés hasta el apóstol Juan."
+              }
+            ]
+          },
+          "recursos": []
+        },
+        {
+          "id": "les_001_001_002",
+          "orden": 2,
+          "titulo": "La inspiración bíblica",
+          "tipo": "lectura",
+          "duracion_minutos": 18,
+          "contenido": {
+            "introduccion": "Una de las doctrinas más importantes y a veces malentendidas del cristianismo es la inspiración de la Biblia. Entender correctamente qué significa que la Biblia es 'inspirada' es fundamental para saber por qué debemos confiar en ella y cómo debemos leerla.",
+            "secciones": [
+              {
+                "subtitulo": "Inspiración verbal y plenaria",
+                "texto": "Los teólogos usan la expresión 'inspiración verbal plenaria' para describir cómo Dios inspiró las Escrituras. 'Verbal' significa que la inspiración se extiende a las palabras mismas del texto —no solo a las ideas generales. 'Plenaria' significa que toda la Escritura es igualmente inspirada, no solo ciertas partes. Esto no significa dictado mecánico, sino que el Espíritu Santo guió a cada autor para que escribiera exactamente lo que Dios quería."
+              },
+              {
+                "subtitulo": "Dios usó hombres reales",
+                "texto": "Un error común es pensar que los autores bíblicos fueron simples instrumentos pasivos, como grabadoras. Pero Dios usó sus personalidades, sus estilos literarios, sus experiencias y sus vocabularios particulares. El apóstol Juan escribe de forma muy diferente a Pablo, y Pablo escribe diferente a Pedro. Sin embargo, todos escribieron exactamente lo que Dios quería comunicar. Esta es la maravilla de la inspiración: Dios habló a través de voces humanas auténticas sin comprometer la verdad divina."
+              },
+              {
+                "subtitulo": "Implicaciones prácticas",
+                "texto": "Si la Biblia es verdaderamente la Palabra inspirada de Dios, esto tiene consecuencias enormes para cómo la leemos. Primero, debemos leerla con reverencia y expectativa, sabiendo que Dios nos habla a través de ella. Segundo, debemos leerla como una unidad coherente, ya que un mismo Espíritu la inspiró toda. Tercero, cuando parece difícil o contradictoria, el problema está en nuestra comprensión, no en el texto."
+              }
+            ],
+            "puntos_clave": [
+              "'Verbal' significa que la inspiración alcanza a las palabras exactas del texto original",
+              "'Plenaria' significa que toda la Escritura, sin excepción, es igualmente inspirada",
+              "Dios usó la personalidad y el estilo real de cada autor humano",
+              "La inspiración no implica que la Biblia sea un libro caído del cielo, sino que Dios habló a través de la historia humana"
+            ],
+            "citas_biblicas": [
+              {
+                "referencia": "2 Timoteo 3:16-17",
+                "texto": "Toda la Escritura es inspirada por Dios y útil para enseñar, para reprender, para corregir y para instruir en justicia, a fin de que el siervo de Dios esté enteramente capacitado para toda buena obra."
+              },
+              {
+                "referencia": "1 Corintios 2:13",
+                "texto": "Esto es precisamente de lo que hablamos, no con palabras que la sabiduría humana nos haya enseñado, sino con las que el Espíritu nos enseña, de modo que expresamos verdades espirituales en términos espirituales."
+              }
+            ],
+            "reflexion": "Si Dios usó personas reales con sus limitaciones y estilos únicos para inspirar las Escrituras, ¿qué nos dice eso sobre cómo Dios obra a través de personas imperfectas hoy?"
+          },
+          "quiz": {
+            "id": "qz_001_001_002",
+            "preguntas": [
+              {
+                "id": "preg_002_001",
+                "pregunta": "¿Qué significa 'inspiración verbal'?",
+                "opciones": [
+                  "Solo las ideas principales son de Dios",
+                  "La inspiración se extiende a las palabras del texto",
+                  "La Biblia fue dictada mecánicamente",
+                  "Solo el Nuevo Testamento es inspirado"
+                ],
+                "respuesta_correcta": 1,
+                "explicacion": "'Verbal' indica que la inspiración alcanza a las palabras específicas del texto original, no solo a los conceptos generales."
+              },
+              {
+                "id": "preg_002_002",
+                "pregunta": "¿Cómo usó Dios a los autores bíblicos?",
+                "opciones": [
+                  "Los convirtió en robots para dictar palabras",
+                  "Solo usó a los apóstoles, no a los profetas del AT",
+                  "Usó sus personalidades y estilos reales, guiándolos por el Espíritu",
+                  "Les reveló visiones que ellos describieron libremente"
+                ],
+                "respuesta_correcta": 2,
+                "explicacion": "Dios preservó la personalidad y estilo de cada autor mientras los guiaba por el Espíritu Santo para escribir exactamente lo que Él quería."
+              },
+              {
+                "id": "preg_002_003",
+                "pregunta": "¿Qué significa 'inspiración plenaria'?",
+                "opciones": [
+                  "Solo los libros históricos son inspirados",
+                  "Los Evangelios tienen más inspiración que las epístolas",
+                  "Toda la Escritura, sin excepción, es igualmente inspirada",
+                  "La inspiración termina con el Antiguo Testamento"
+                ],
+                "respuesta_correcta": 2,
+                "explicacion": "'Plenaria' viene del latín 'plenus' (lleno, completo). Indica que toda la Escritura —cada libro, capítulo y versículo— es igualmente inspirada por Dios."
+              }
+            ]
+          },
+          "recursos": []
+        },
+        {
+          "id": "les_001_001_003",
+          "orden": 3,
+          "titulo": "La autoridad de la Biblia",
+          "tipo": "lectura",
+          "duracion_minutos": 20,
+          "contenido": {
+            "introduccion": "Si la Biblia es la Palabra de Dios, entonces su autoridad es absoluta en todos los asuntos de fe y vida. Pero vivimos en una era que cuestiona toda autoridad. Por eso es fundamental entender por qué la Biblia tiene el derecho de ser nuestra máxima autoridad.",
+            "secciones": [
+              {
+                "subtitulo": "La autoridad que se deriva de Dios",
+                "texto": "La Biblia no tiene autoridad porque la iglesia lo dice, ni porque la ciencia lo confirma, ni porque se siente bien al leerla. Su autoridad es intrínseca: viene del hecho de que es la Palabra de Dios. Así como las órdenes de un rey tienen autoridad porque el rey tiene poder, las Escrituras tienen autoridad porque provienen del Dios soberano del universo."
+              },
+              {
+                "subtitulo": "La confiabilidad histórica",
+                "texto": "La Biblia ha demostrado ser históricamente confiable. La arqueología bíblica ha confirmado repetidamente personajes, lugares y eventos mencionados en las Escrituras. Tenemos más de 5,800 manuscritos griegos del Nuevo Testamento —más que cualquier otro documento de la antigüedad— y algunos datan a menos de 50 años después de los originales. Ningún otro libro de la antigüedad tiene tal respaldo manuscrito."
+              },
+              {
+                "subtitulo": "El testimonio de Jesús",
+                "texto": "Quizás el argumento más poderoso para la autoridad de la Biblia es el propio testimonio de Jesús. Él citó el Antiguo Testamento constantemente, afirmó su cumplimiento en Él mismo, y declaró: 'La Escritura no puede ser anulada' (Juan 10:35). Si confiamos en Jesucristo, debemos confiar en lo que Él consideraba la Palabra infalible de Dios."
+              }
+            ],
+            "puntos_clave": [
+              "La autoridad de la Biblia es intrínseca, derivada de su origen divino, no de la iglesia ni la ciencia",
+              "Existen más de 5,800 manuscritos griegos del NT, más que cualquier documento antiguo",
+              "Jesús mismo trató las Escrituras del AT como la Palabra inapelable de Dios",
+              "La arqueología ha confirmado repetidamente la historicidad de los relatos bíblicos"
+            ],
+            "citas_biblicas": [
+              {
+                "referencia": "Mateo 5:17-18",
+                "texto": "No piensen que he venido a anular la ley o los profetas; no he venido a anularlos sino a darles cumplimiento. Les digo la verdad: mientras existan el cielo y la tierra, ni una letra ni una tilde de la ley desaparecerá hasta que todo se haya cumplido."
+              },
+              {
+                "referencia": "Juan 10:35",
+                "texto": "...y la Escritura no puede ser anulada..."
+              }
+            ],
+            "reflexion": "¿En qué áreas de tu vida prácticas —decisiones, relaciones, valores— necesitas someter tu opinión personal a la autoridad de las Escrituras?"
+          },
+          "quiz": {
+            "id": "qz_001_001_003",
+            "preguntas": [
+              {
+                "id": "preg_003_001",
+                "pregunta": "¿De dónde deriva la autoridad de la Biblia?",
+                "opciones": [
+                  "De la decisión de la Iglesia Católica",
+                  "De su origen divino como Palabra de Dios",
+                  "De su antigüedad como libro histórico",
+                  "De la confirmación de la ciencia moderna"
+                ],
+                "respuesta_correcta": 1,
+                "explicacion": "La autoridad de la Biblia es intrínseca: viene de que es la Palabra de Dios. No depende de ninguna institución humana para ser válida."
+              },
+              {
+                "id": "preg_003_002",
+                "pregunta": "¿Cuántos manuscritos griegos del Nuevo Testamento existen aproximadamente?",
+                "opciones": ["Menos de 100", "Alrededor de 500", "Más de 5,800", "Más de 50,000"],
+                "respuesta_correcta": 2,
+                "explicacion": "Contamos con más de 5,800 manuscritos griegos del NT, lo que lo convierte en el documento mejor atestiguado de toda la antigüedad."
+              },
+              {
+                "id": "preg_003_003",
+                "pregunta": "¿Qué dijo Jesús sobre la Escritura en Juan 10:35?",
+                "opciones": [
+                  "Que solo los profetas mayores son confiables",
+                  "Que la Escritura no puede ser anulada",
+                  "Que la ley ya no tiene validez",
+                  "Que solo el Nuevo Testamento es autoritativo"
+                ],
+                "respuesta_correcta": 1,
+                "explicacion": "Jesús afirmó que 'la Escritura no puede ser anulada', demostrando que Él mismo consideraba el AT como la Palabra inapelable e infalible de Dios."
+              }
+            ]
+          },
+          "recursos": []
+        }
+      ]
+    },
+    {
+      "id": "mod_001_002",
+      "orden": 2,
+      "titulo": "Cómo está compuesta la Biblia",
+      "descripcion": "Conoce la estructura, el canon y la transmisión del texto bíblico",
+      "icono": "layers-outline",
+      "lecciones": [
+        {
+          "id": "les_001_002_001",
+          "orden": 1,
+          "titulo": "El canon bíblico",
+          "tipo": "lectura",
+          "duracion_minutos": 16,
+          "contenido": {
+            "introduccion": "La palabra 'canon' viene del griego kanon, que significa 'regla' o 'medida'. El canon bíblico es la lista oficial de los libros que la iglesia ha reconocido como divinamente inspirados y autoritativos. Entender cómo se formó el canon es clave para confiar en la Biblia que tenemos hoy.",
+            "secciones": [
+              {
+                "subtitulo": "¿Cómo se determinó el canon?",
+                "texto": "El canon no fue decidido arbitrariamente por un concilio. Los criterios históricos incluían: (1) Apostolicidad — ¿fue escrito por un apóstol o alguien en contacto directo con los apóstoles? (2) Orthodoxia — ¿es consistente con la fe ya revelada? (3) Catolicidad — ¿fue ampliamente aceptado por las iglesias? La iglesia no 'creó' el canon; simplemente reconoció los libros que ya se comportaban como Palabra de Dios."
+              },
+              {
+                "subtitulo": "El canon del Antiguo Testamento",
+                "texto": "Los 39 libros del AT fueron reconocidos por la comunidad judía antes del tiempo de Cristo. Jesús y los apóstoles los citaron extensamente, confirmando así su autoridad. El AT está dividido en: (1) Pentateuco (5 libros de la Ley), (2) Libros Históricos (12 libros), (3) Libros Poéticos (5 libros), y (4) Libros Proféticos (17 libros)."
+              },
+              {
+                "subtitulo": "El canon del Nuevo Testamento",
+                "texto": "Los 27 libros del NT se escribieron entre aproximadamente el año 45 d.C. (Carta de Santiago) y el 95 d.C. (Apocalipsis). Para el siglo II, la mayoría de estas cartas y evangelios ya circulaban ampliamente y eran leídas en las iglesias. El Concilio de Cartago (397 d.C.) confirmó formalmente el canon que ya la iglesia había reconocido por siglos."
+              }
+            ],
+            "puntos_clave": [
+              "Canon significa 'regla o medida' y se refiere a la lista oficial de libros inspirados",
+              "Los criterios fueron: apostolicidad, ortodoxia y catolicidad",
+              "La iglesia reconoció el canon; no lo inventó ni lo decidió arbitrariamente",
+              "El AT tiene 39 libros; el NT tiene 27 libros"
+            ],
+            "citas_biblicas": [
+              {
+                "referencia": "Lucas 24:44",
+                "texto": "Esto es lo que les decía yo cuando todavía estaba con ustedes: que tenía que cumplirse todo lo que está escrito acerca de mí en la ley de Moisés, en los profetas y en los salmos."
+              }
+            ],
+            "reflexion": "Saber que el canon bíblico fue formado a través de un proceso histórico cuidadoso, ¿fortalece o debilita tu confianza en la Biblia que tienes? ¿Por qué?"
+          },
+          "quiz": {
+            "id": "qz_001_002_001",
+            "preguntas": [
+              {
+                "id": "preg_004_001",
+                "pregunta": "¿Qué significa la palabra 'canon' en su origen griego?",
+                "opciones": ["Libro sagrado", "Regla o medida", "Lista de apóstoles", "Escritura antigua"],
+                "respuesta_correcta": 1,
+                "explicacion": "Canon viene del griego 'kanon' que significa regla o medida. Aplicado a la Biblia, es la lista de libros reconocidos como divinamente inspirados."
+              },
+              {
+                "id": "preg_004_002",
+                "pregunta": "¿Cuántos libros tiene el Nuevo Testamento?",
+                "opciones": ["22", "27", "30", "39"],
+                "respuesta_correcta": 1,
+                "explicacion": "El Nuevo Testamento tiene exactamente 27 libros, escritos entre aprox. 45 d.C. y 95 d.C."
+              },
+              {
+                "id": "preg_004_003",
+                "pregunta": "¿Cuál de estos NO es un criterio para el reconocimiento del canon?",
+                "opciones": ["Apostolicidad", "Catolicidad", "Popularidad popular moderna", "Ortodoxia doctrinal"],
+                "respuesta_correcta": 2,
+                "explicacion": "Los criterios históricos fueron apostolicidad, catolicidad y ortodoxia. La popularidad moderna nunca fue un criterio para reconocer un libro como inspirado."
+              }
+            ]
+          },
+          "recursos": []
+        },
+        {
+          "id": "les_001_002_002",
+          "orden": 2,
+          "titulo": "La transmisión y confiabilidad del texto",
+          "tipo": "lectura",
+          "duracion_minutos": 18,
+          "contenido": {
+            "introduccion": "Uno de los argumentos más comunes contra la Biblia es que ha sido 'modificada a lo largo de los siglos'. Entender cómo se transmitió el texto bíblico no solo deshace este mito, sino que revela una de las evidencias más poderosas de su confiabilidad.",
+            "secciones": [
+              {
+                "subtitulo": "La evidencia manuscrita del NT",
+                "texto": "El Nuevo Testamento es, por lejos, el documento mejor atestiguado de la antigüedad. Contamos con más de 5,800 manuscritos griegos, más de 10,000 en latín y otros 9,000 en diferentes lenguas —una total de más de 24,000 copias del texto del NT. Para comparar: de las obras de Julio César solo tenemos 10 manuscritos, y del historiador Tácito, 20. Nadie duda de esas fuentes."
+              },
+              {
+                "subtitulo": "Los Rollos del Mar Muerto",
+                "texto": "Hasta 1947, los manuscritos más antiguos del AT que teníamos databan del año 1000 d.C. Ese año, un pastor beduino descubrió en Qumrán una colección de manuscritos que incluía todos los libros del AT (excepto Ester), algunos datando del siglo II a.C. Al comparar estos rollos con los manuscritos medievales, los eruditos descubrieron una fidelidad de copia del 95%. El 5% restante son diferencias menores (ortografía, orden de palabras) que no afectan ninguna doctrina."
+              },
+              {
+                "subtitulo": "La ciencia de la crítica textual",
+                "texto": "Los eruditos bíblicos utilizan la 'crítica textual' para comparar los miles de manuscritos disponibles y reconstruir el texto original con gran precisión. Este proceso es riguroso y científico. El resultado es que tenemos una Biblia extremadamente confiable. Las notas al pie en las buenas traducciones señalan las pocas variantes, mostrando la transparencia del proceso."
+              }
+            ],
+            "puntos_clave": [
+              "El NT tiene más de 24,000 copias de manuscritos — más que cualquier obra antigua",
+              "Los Rollos del Mar Muerto (1947) confirmaron la fidelidad de transmisión del AT",
+              "La crítica textual es la ciencia que compara manuscritos para reconstruir el texto original",
+              "Las variantes textuales existentes no afectan ninguna doctrina cristiana fundamental"
+            ],
+            "citas_biblicas": [
+              {
+                "referencia": "Isaías 40:8",
+                "texto": "La hierba se seca y la flor se marchita, pero la palabra de nuestro Dios permanece para siempre."
+              },
+              {
+                "referencia": "1 Pedro 1:25",
+                "texto": "Pero la palabra del Señor permanece para siempre. Y esta es la palabra del evangelio que se les ha anunciado a ustedes."
+              }
+            ],
+            "reflexion": "Conociendo la evidencia manuscrita extraordinaria que respalda la Biblia, ¿cómo responderías a alguien que argumenta que 'la Biblia ha sido cambiada'?"
+          },
+          "quiz": {
+            "id": "qz_001_002_002",
+            "preguntas": [
+              {
+                "id": "preg_005_001",
+                "pregunta": "¿Aproximadamente cuántas copias de manuscritos del NT existen?",
+                "opciones": ["Menos de 1,000", "Alrededor de 5,000", "Más de 24,000", "Exactamente 100"],
+                "respuesta_correcta": 2,
+                "explicacion": "Se estima que existen más de 24,000 copias de manuscritos del NT en diferentes idiomas. Es el documento mejor atestiguado de la antigüedad."
+              },
+              {
+                "id": "preg_005_002",
+                "pregunta": "¿Qué descubrimiento en 1947 confirmó la confiabilidad del AT?",
+                "opciones": [
+                  "El Códice Vaticano",
+                  "Los Rollos del Mar Muerto",
+                  "El Papiro Chester Beatty",
+                  "Los Evangelios de Nag Hammadi"
+                ],
+                "respuesta_correcta": 1,
+                "explicacion": "Los Rollos del Mar Muerto, descubiertos en Qumrán en 1947, contienen manuscritos del AT de más de 2,000 años de antigüedad que demuestran una fidelidad de copia del 95%."
+              }
+            ]
+          },
+          "recursos": []
+        }
+      ]
+    },
+    {
+      "id": "mod_001_003",
+      "orden": 3,
+      "titulo": "Hermenéutica básica",
+      "descripcion": "Aprende los principios fundamentales para interpretar correctamente la Biblia",
+      "icono": "search-outline",
+      "lecciones": [
+        {
+          "id": "les_001_003_001",
+          "orden": 1,
+          "titulo": "¿Qué es la hermenéutica?",
+          "tipo": "lectura",
+          "duracion_minutos": 14,
+          "contenido": {
+            "introduccion": "La hermenéutica es la ciencia y el arte de la interpretación. En el contexto bíblico, es el conjunto de principios y métodos que nos ayudan a entender correctamente lo que la Biblia dice y significa.",
+            "secciones": [
+              {
+                "subtitulo": "El problema de la interpretación",
+                "texto": "La Biblia fue escrita en idiomas que ya nadie habla como lengua materna (hebreo, arameo, griego koiné), en culturas radicalmente diferentes a la nuestra, hace más de 2,000 años. La distancia temporal, cultural, lingüística y geográfica crea una brecha que debemos cruzar para entender correctamente lo que el texto significaba en su contexto original."
+              },
+              {
+                "subtitulo": "El principio fundamental",
+                "texto": "La meta de la hermenéutica no es preguntarse '¿qué significa este texto para mí?' sino primero '¿qué significó este texto para sus lectores originales?'. El significado está en el texto; la aplicación puede variar. Este es el error más común en la lectura bíblica: leer el texto con nuestros propios ojos culturales en vez de entender el contexto original."
+              },
+              {
+                "subtitulo": "Exégesis vs. Eiségesis",
+                "texto": "Exégesis (del griego 'sacar') significa extraer el significado que el texto realmente tiene. Eiségesis (del griego 'llevar dentro') significa imponer en el texto nuestros propios significados, ideas o prejuicios. La buena interpretación siempre es exégesis. La eiségesis es el mayor peligro de la lectura bíblica subjetiva."
+              }
+            ],
+            "puntos_clave": [
+              "Hermenéutica es la ciencia de la interpretación bíblica",
+              "Primero pregunta: ¿qué significó para los lectores originales?",
+              "Exégesis = sacar el significado del texto; Eiségesis = imponer nuestros significados",
+              "El significado está en el texto, no en el lector"
+            ],
+            "citas_biblicas": [
+              {
+                "referencia": "2 Timoteo 2:15",
+                "texto": "Esfuérzate por presentarte a Dios aprobado, como obrero que no tiene de qué avergonzarse y que interpreta rectamente la palabra de verdad."
+              }
+            ],
+            "reflexion": "¿Has notado en alguna ocasión que interpretabas un versículo de la Biblia basándote en tu situación personal en lugar de buscar su significado original? ¿Cómo cambiaría esa lectura?"
+          },
+          "quiz": {
+            "id": "qz_001_003_001",
+            "preguntas": [
+              {
+                "id": "preg_006_001",
+                "pregunta": "¿Cuál es la primera pregunta que debemos hacernos al leer un texto bíblico?",
+                "opciones": [
+                  "¿Qué me dice este texto a mí hoy?",
+                  "¿Qué significó para sus lectores originales?",
+                  "¿Qué opinan los comentaristas modernos?",
+                  "¿Cuántas veces se cita en el NT?"
+                ],
+                "respuesta_correcta": 1,
+                "explicacion": "La hermenéutica correcta comienza por entender el significado original del texto en su contexto histórico y cultural, antes de aplicarlo a nuestro tiempo."
+              },
+              {
+                "id": "preg_006_002",
+                "pregunta": "¿Qué significa 'eiségesis'?",
+                "opciones": [
+                  "Sacar el significado del texto",
+                  "Traducción del griego al español",
+                  "Imponer nuestros propios significados al texto",
+                  "Estudiar el contexto histórico"
+                ],
+                "respuesta_correcta": 2,
+                "explicacion": "Eiségesis significa 'llevar dentro': imponer en el texto nuestros propios significados, ideas o prejuicios previos. Es el error más común en la interpretación bíblica."
+              }
+            ]
+          },
+          "recursos": []
+        },
+        {
+          "id": "les_001_003_002",
+          "orden": 2,
+          "titulo": "Principios fundamentales de interpretación",
+          "tipo": "lectura",
+          "duracion_minutos": 16,
+          "contenido": {
+            "introduccion": "La buena interpretación bíblica no es aleatoria. Existen principios establecidos y probados a lo largo de siglos que nos guían para entender correctamente la Palabra de Dios.",
+            "secciones": [
+              {
+                "subtitulo": "El contexto es rey",
+                "texto": "El principio más importante de interpretación es: siempre interpreta un texto en su contexto. El contexto incluye: (1) el versículo inmediato antes y después, (2) el párrafo, (3) el capítulo, (4) el libro completo, (5) el testamento, y (6) toda la Biblia. Un texto fuera de contexto es un pretexto. La mayoría de los errores doctrinales comienzan con sacar un versículo de su contexto."
+              },
+              {
+                "subtitulo": "El sentido literal y el sentido literal",
+                "texto": "'Interpretación literal' no significa ignorar las figuras retóricas. Significa tomar el texto en su sentido natural y normal, reconociendo cuándo usa metáforas, poesía o hipérbole. Cuando Jesús dice 'Yo soy la vid', no afirmamos que Jesús es una planta. El sentido literal reconoce el género literario y el lenguaje figurado."
+              },
+              {
+                "subtitulo": "El texto más claro interpreta al más oscuro",
+                "texto": "La Biblia tiene textos claros y textos difíciles. El principio es usar los textos claros para iluminar los oscuros, no al revés. Las doctrinas fundamentales siempre estarán respaldadas por múltiples pasajes claros, no por un versículo aislado y difícil. Si tu interpretación de un texto oscuro contradice textos claros, tu interpretación necesita revisión."
+              }
+            ],
+            "puntos_clave": [
+              "El contexto siempre determina el significado de un texto",
+              "La interpretación 'literal' reconoce el lenguaje figurado propio de cada género",
+              "Los textos claros iluminan los oscuros, nunca al revés",
+              "Ninguna doctrina debe sostenerse solo sobre un texto oscuro o aislado"
+            ],
+            "citas_biblicas": [
+              {
+                "referencia": "Hechos 17:11",
+                "texto": "Estos [los de Berea] eran de sentimientos más nobles que los de Tesalónica, de modo que recibieron el mensaje con toda avidez y todos los días examinaban las Escrituras para ver si era verdad lo que se les anunciaba."
+              }
+            ],
+            "reflexion": "Piensa en una doctrina que hayas escuchado basada en un solo versículo. ¿Cómo la evaluarías ahora aplicando el principio de contexto y múltiples textos?"
+          },
+          "quiz": {
+            "id": "qz_001_003_002",
+            "preguntas": [
+              {
+                "id": "preg_007_001",
+                "pregunta": "¿Cuál es considerado el principio más importante en la interpretación bíblica?",
+                "opciones": [
+                  "Leer siempre la versión más antigua",
+                  "Siempre interpretar en su contexto",
+                  "Consultar la tradición de la iglesia",
+                  "Basarse en sentimientos espirituales"
+                ],
+                "respuesta_correcta": 1,
+                "explicacion": "El contexto es el principio más fundamental. El texto inmediato, el párrafo, el libro y toda la Biblia forman el contexto que determina el significado de cualquier pasaje."
+              }
+            ]
+          },
+          "recursos": []
+        }
+      ]
+    },
+    {
+      "id": "mod_001_004",
+      "orden": 4,
+      "titulo": "Géneros literarios",
+      "descripcion": "Aprende a reconocer y leer los diferentes tipos de escritura en la Biblia",
+      "icono": "document-text-outline",
+      "lecciones": [
+        {
+          "id": "les_001_004_001",
+          "orden": 1,
+          "titulo": "Los géneros del Antiguo Testamento",
+          "tipo": "lectura",
+          "duracion_minutos": 15,
+          "contenido": {
+            "introduccion": "La Biblia no es un libro sino una biblioteca. Contiene poesía, historia, profecía, sabiduría, ley y apocalipsis. Reconocer el género literario de un texto es fundamental para interpretarlo correctamente.",
+            "secciones": [
+              {
+                "subtitulo": "La narrativa histórica",
+                "texto": "Gran parte del AT es narrativa: historias de personas reales, eventos históricos y el actuar de Dios en la historia. Los libros como Génesis, Éxodo, Josué, Jueces y los libros de los Reyes son principalmente narrativos. Al leer narrativa, debemos identificar al protagonista (siempre Dios), el conflicto y la resolución. La narrativa bíblica tiene propósito teológico, no solo histórico."
+              },
+              {
+                "subtitulo": "La poesía y la sabiduría",
+                "texto": "Los Salmos, Proverbios, Job, Eclesiastés y Cantar de los Cantares son literatura poética. La poesía hebrea usa el paralelismo —repetir, contrastar o completar una idea en dos líneas. Hay que tener cuidado de no tomar literalmente las hipérboles poéticas. Los Proverbios son principios generales, no promesas absolutas. La sabiduría bíblica nos enseña a vivir bien delante de Dios."
+              },
+              {
+                "subtitulo": "La profecía",
+                "texto": "Los libros proféticos (Isaías, Jeremías, Ezequiel, los 12 profetas menores) son complejos. La profecía bíblica tiene componentes históricos (mensaje al pueblo de su tiempo), éticos (llamado al arrepentimiento) y predictivos (anticipaciones del futuro). Mucha profecía del AT tiene cumplimiento en Cristo. La clave es entender a quién hablaba el profeta, en qué contexto, y cómo el NT interpreta ese texto."
+              }
+            ],
+            "puntos_clave": [
+              "Reconocer el género literario es el primer paso para una interpretación correcta",
+              "La narrativa tiene propósito teológico: siempre muestra el actuar de Dios",
+              "La poesía usa parallelismo y figuras que no deben tomarse literalmente",
+              "La profecía tiene dimensiones históricas, éticas y predictivas"
+            ],
+            "citas_biblicas": [
+              {
+                "referencia": "Salmos 119:105",
+                "texto": "Tu palabra es una lámpara a mis pies; es una luz en mi sendero."
+              }
+            ],
+            "reflexion": "Al identificar el género literario de un texto, ¿cómo cambia tu comprensión de pasajes que antes leías de forma diferente?"
+          },
+          "quiz": {
+            "id": "qz_001_004_001",
+            "preguntas": [
+              {
+                "id": "preg_008_001",
+                "pregunta": "¿Cuál es la característica principal de la poesía hebrea?",
+                "opciones": [
+                  "Siempre tiene rima",
+                  "Usa el paralelismo de ideas",
+                  "Es siempre literal",
+                  "Solo está en los Salmos"
+                ],
+                "respuesta_correcta": 1,
+                "explicacion": "La poesía hebrea no rima como la poesía española. Su característica principal es el paralelismo: repetir, contrastar o completar una idea en líneas paralelas."
+              }
+            ]
+          },
+          "recursos": []
+        },
+        {
+          "id": "les_001_004_002",
+          "orden": 2,
+          "titulo": "Los géneros del Nuevo Testamento",
+          "tipo": "lectura",
+          "duracion_minutos": 14,
+          "contenido": {
+            "introduccion": "El Nuevo Testamento también usa múltiples géneros. Los Evangelios, las Epístolas, el Libro de los Hechos y el Apocalipsis requieren enfoques interpretativos diferentes.",
+            "secciones": [
+              {
+                "subtitulo": "Los Evangelios",
+                "texto": "Los cuatro Evangelios son biografías teológicas de Jesús. No son solo historias de su vida; cada evangelista seleccionó y organizó el material para comunicar verdades específicas sobre quién es Jesús. Mateo escribe para judíos, Lucas para gentiles, Juan para mostrar la deidad de Cristo. Al leer los Evangelios, debemos preguntar: ¿por qué el autor incluyó esto y cómo muestra quién es Jesús?"
+              },
+              {
+                "subtitulo": "Las Epístolas",
+                "texto": "Las cartas del NT (Romanos, Corintios, Gálatas, etc.) son cartas reales escritas a iglesias o personas reales con problemas reales. Para entenderlas, necesitamos reconstruir el contexto: ¿a quién se escribió? ¿qué problema se estaba abordando? Las Epístolas contienen principios eternos, pero están envueltos en situaciones históricas concretas. El reto es distinguir el principio universal de la aplicación cultural específica."
+              },
+              {
+                "subtitulo": "El Apocalipsis",
+                "texto": "El Apocalipsis es literatura apocalíptica —un género que usa visiones simbólicas, números y animales para comunicar verdades espirituales. El error más común es leerlo como si fuera un noticiario del futuro. Jesús aparece como un cordero y un guerrero, no porque sea ambas cosas literalmente, sino porque el símbolo comunica algo sobre su naturaleza y obra. El simbolismo del Apocalipsis tiene raíces profundas en el AT."
+              }
+            ],
+            "puntos_clave": [
+              "Los Evangelios son biografías teológicas con propósitos específicos por autor",
+              "Las Epístolas son cartas situacionales que contienen principios eternos",
+              "El Apocalipsis usa lenguaje apocalíptico y simbólico, no literalismo periodístico",
+              "Cada género requiere un enfoque interpretativo diferente"
+            ],
+            "citas_biblicas": [
+              {
+                "referencia": "Juan 20:31",
+                "texto": "Pero estas se han escrito para que ustedes crean que Jesús es el Cristo, el Hijo de Dios, y para que al creer en su nombre tengan vida."
+              }
+            ],
+            "reflexion": "¿Cómo cambia tu forma de leer el Apocalipsis si entiendes que es literatura simbólica con raíces en el Antiguo Testamento?"
+          },
+          "quiz": {
+            "id": "qz_001_004_002",
+            "preguntas": [
+              {
+                "id": "preg_009_001",
+                "pregunta": "¿Cómo se llama el género literario del libro del Apocalipsis?",
+                "opciones": ["Profético", "Apocalíptico", "Epistolar", "Narrativo"],
+                "respuesta_correcta": 1,
+                "explicacion": "El Apocalipsis pertenece al género apocalíptico, que usa visiones simbólicas, números y figuras para comunicar realidades espirituales, no descripciones literales del futuro."
+              }
+            ]
+          },
+          "recursos": []
+        }
+      ]
+    },
+    {
+      "id": "mod_001_005",
+      "orden": 5,
+      "titulo": "La Biblia interpreta la Biblia",
+      "descripcion": "Descubre el principio de analogía de fe y el uso de textos paralelos",
+      "icono": "git-compare-outline",
+      "lecciones": [
+        {
+          "id": "les_001_005_001",
+          "orden": 1,
+          "titulo": "El principio de analogía de fe",
+          "tipo": "lectura",
+          "duracion_minutos": 13,
+          "contenido": {
+            "introduccion": "Uno de los principios más poderosos de la interpretación bíblica es que la Biblia se interpreta a sí misma. Ya que toda ella fue inspirada por el mismo Espíritu Santo, existe una coherencia interna que nos permite usar partes más claras para entender partes más oscuras.",
+            "secciones": [
+              {
+                "subtitulo": "La analogía de fe",
+                "texto": "La 'analogía de fe' (analogia fidei) es el principio de que ningún pasaje de la Escritura puede interpretarse de manera que contradiga el cuerpo general de la doctrina bíblica. Si tu interpretación de Romanos 5 contradice claramente lo que Juan 3 afirma, uno de los dos está mal interpretado. La Biblia no se contradice porque su autor último es el mismo Espíritu Santo."
+              },
+              {
+                "subtitulo": "Cómo el NT interpreta el AT",
+                "texto": "El Nuevo Testamento es el mejor comentario del Antiguo Testamento. Los autores del NT constantemente citan y reinterpretan el AT, mostrando cómo encontrar a Cristo en cada página. Cuando Jesús explica cómo 'Moisés, los profetas y los Salmos' hablan de Él (Lucas 24:44-45), nos da la clave de lectura de todo el AT."
+              },
+              {
+                "subtitulo": "Usos prácticos",
+                "texto": "Cuando encuentres un pasaje difícil: (1) Busca paralelos en otros pasajes que hablen del mismo tema. (2) Verifica si el NT cita o comenta ese pasaje. (3) Consulta cómo el pasaje encaja con la teología general de la Biblia. (4) Si tu interpretación es única en la historia de la iglesia, sospecha que algo está mal."
+              }
+            ],
+            "puntos_clave": [
+              "La Biblia es coherente porque fue inspirada por el mismo Espíritu Santo",
+              "Ningún pasaje puede interpretarse de forma que contradiga la enseñanza clara de otros pasajes",
+              "El NT es el mejor comentario del AT",
+              "Si tu interpretación es única históricamente, probablemente está equivocada"
+            ],
+            "citas_biblicas": [
+              {
+                "referencia": "Lucas 24:44-45",
+                "texto": "Luego les dijo: 'Cuando todavía estaba con ustedes, les decía que tenía que cumplirse todo lo que está escrito acerca de mí en la ley de Moisés, en los profetas y en los salmos.' Entonces les abrió el entendimiento para que comprendieran las Escrituras."
+              }
+            ],
+            "reflexion": "¿Hay algún pasaje de la Biblia que hayas interpretado de forma aislada? ¿Cómo cambia su significado cuando lo lees en relación con el resto de las Escrituras?"
+          },
+          "quiz": {
+            "id": "qz_001_005_001",
+            "preguntas": [
+              {
+                "id": "preg_010_001",
+                "pregunta": "¿Qué afirma el principio de 'analogía de fe'?",
+                "opciones": [
+                  "Que solo la fe puede interpretar la Biblia",
+                  "Que ningún texto puede contradecir el cuerpo general de la doctrina bíblica",
+                  "Que los Evangelios tienen más autoridad que las Epístolas",
+                  "Que debemos interpretar la Biblia según la tradición"
+                ],
+                "respuesta_correcta": 1,
+                "explicacion": "La analogía de fe afirma que ningún pasaje puede interpretarse de manera que contradiga el cuerpo coherente de doctrina que toda la Biblia enseña, porque su autor último es el Espíritu Santo."
+              }
+            ]
+          },
+          "recursos": []
+        },
+        {
+          "id": "les_001_005_002",
+          "orden": 2,
+          "titulo": "Textos paralelos y contexto canónico",
+          "tipo": "lectura",
+          "duracion_minutos": 12,
+          "contenido": {
+            "introduccion": "Una herramienta práctica y poderosa para la interpretación bíblica es el uso de textos paralelos: pasajes que hablan del mismo tema, usan las mismas palabras o tratan el mismo evento desde diferentes ángulos.",
+            "secciones": [
+              {
+                "subtitulo": "Tipos de paralelos",
+                "texto": "Existen varios tipos de paralelos bíblicos: (1) Paralelos verbales — donde se usan las mismas palabras o frases en diferentes libros. (2) Paralelos temáticos — donde diferentes pasajes tratan el mismo tema teológico. (3) Paralelos históricos — donde un evento se relata en más de un libro (ej: los Evangelios Sinópticos, o Crónicas y Samuel-Reyes)."
+              },
+              {
+                "subtitulo": "Cómo usar una concordancia",
+                "texto": "Una concordancia bíblica es una herramienta que lista todas las ocurrencias de una palabra o frase en la Biblia. Las concordancias digitales (Blue Letter Bible, Logos, YouVersion) hacen este trabajo automáticamente. Buscar todas las veces que la Biblia usa una palabra clave te permite entender el concepto completo de lo que esa palabra significa en el contexto bíblico."
+              },
+              {
+                "subtitulo": "El contexto canónico completo",
+                "texto": "Finalmente, todo texto debe leerse dentro del contexto de todo el canon bíblico. Un pasaje del Levítico se entiende mejor cuando sabemos cómo el NT lo interpreta en la carta a los Hebreos. El Salmo 22 cobra pleno significado a la luz de la crucifixión. Leer la Biblia como un libro completo, no como 66 libros desconectados, es la clave de la interpretación madura."
+              }
+            ],
+            "puntos_clave": [
+              "Los textos paralelos iluminan el significado de un pasaje estudiándolo con otros similares",
+              "Los paralelos pueden ser verbales, temáticos o históricos",
+              "Las concordancias bíblicas son herramientas esenciales para encontrar paralelos",
+              "Todo texto debe leerse dentro del contexto del canon completo"
+            ],
+            "citas_biblicas": [
+              {
+                "referencia": "Salmos 22:1",
+                "texto": "Dios mío, Dios mío, ¿por qué me has abandonado? Lejos estás para salvarme, lejos de mis palabras de angustia."
+              }
+            ],
+            "reflexion": "¿Conoces alguna herramienta digital para buscar paralelos bíblicos? ¿Cómo podrías incorporarla en tu estudio bíblico esta semana?"
+          },
+          "quiz": {
+            "id": "qz_001_005_002",
+            "preguntas": [
+              {
+                "id": "preg_011_001",
+                "pregunta": "¿Qué es una concordancia bíblica?",
+                "opciones": [
+                  "Una traducción moderna de la Biblia",
+                  "Un comentario que explica cada versículo",
+                  "Una herramienta que lista todas las ocurrencias de cada palabra en la Biblia",
+                  "Una armonía de los cuatro Evangelios"
+                ],
+                "respuesta_correcta": 2,
+                "explicacion": "Una concordancia bíblica es una herramienta de estudio que lista todos los versículos donde aparece cada palabra, permitiéndonos ver el uso completo de un término en toda la Escritura."
+              }
+            ]
+          },
+          "recursos": []
+        }
+      ]
+    },
+    {
+      "id": "mod_001_006",
+      "orden": 6,
+      "titulo": "Cristo como centro de la Escritura",
+      "descripcion": "Descubre cómo toda la Biblia apunta a Jesucristo como su tema central",
+      "icono": "star-outline",
+      "lecciones": [
+        {
+          "id": "les_001_006_001",
+          "orden": 1,
+          "titulo": "La Cristología en el Antiguo Testamento",
+          "tipo": "lectura",
+          "duracion_minutos": 16,
+          "contenido": {
+            "introduccion": "Uno de los descubrimientos más transformadores para un estudiante bíblico es ver que el Antiguo Testamento está lleno de Jesucristo. No solo en profecías explícitas, sino en tipos, sombras, patrones y anticipaciones que apuntan hacia Él.",
+            "secciones": [
+              {
+                "subtitulo": "Las profecías mesiánicas",
+                "texto": "El AT contiene más de 300 profecías que Jesús cumplió. Desde el lugar de nacimiento (Miqueas 5:2) hasta la forma de muerte (Salmo 22), desde la entrada triunfal (Zacarías 9:9) hasta la traición por 30 piezas de plata (Zacarías 11:12-13). La probabilidad matemática de que un hombre cumpliera incluso 8 de estas profecías por coincidencia es 1 en 10 elevado a la 17."
+              },
+              {
+                "subtitulo": "Los tipos y sombras",
+                "texto": "La teología tipológica reconoce que personas, eventos e instituciones del AT prefiguran a Cristo y su obra. Adán es 'tipo' del último Adán (1 Corintios 15:45). El cordero pascual prefigura a Cristo, nuestro Cordero (Juan 1:29). El tabernáculo prefigura a Cristo que 'habitó entre nosotros' (Juan 1:14). Melquisedec prefigura el sacerdocio de Cristo (Hebreos 7). Estos tipos no son alegorías arbitrarias; el NT mismo los establece."
+              },
+              {
+                "subtitulo": "La hermenéutica cristocéntrica",
+                "texto": "Después de la resurrección, Jesús abrió el entendimiento de sus discípulos para entender las Escrituras, 'comenzando por Moisés y por todos los profetas' y explicándoles lo que se refería a Él en toda la Escritura (Lucas 24:27). Una buena hermenéutica siempre busca cómo el texto apunta hacia Cristo, ya sea directamente o a través de tipos y temas que convergen en Él."
+              }
+            ],
+            "puntos_clave": [
+              "El AT contiene más de 300 profecías mesiánicas cumplidas por Jesús",
+              "Los tipos son personas, eventos e instituciones que prefiguran la obra de Cristo",
+              "El NT mismo establece los tipos, no son alegorías arbitrarias",
+              "La hermenéutica cristocéntrica busca cómo el texto apunta a Cristo"
+            ],
+            "citas_biblicas": [
+              {
+                "referencia": "Lucas 24:27",
+                "texto": "Entonces, comenzando por Moisés y por todos los profetas, les explicó lo que se refería a él en todas las Escrituras."
+              },
+              {
+                "referencia": "Juan 5:39",
+                "texto": "Ustedes estudian con diligencia las Escrituras porque piensan que en ellas hallan la vida eterna. ¡Y son ellas las que dan testimonio en mi favor!"
+              }
+            ],
+            "reflexion": "Al leer el AT en tu devocional personal, ¿cómo puedes comenzar a buscar activamente las conexiones con Cristo y su obra?"
+          },
+          "quiz": {
+            "id": "qz_001_006_001",
+            "preguntas": [
+              {
+                "id": "preg_012_001",
+                "pregunta": "¿Qué son los 'tipos' en la teología tipológica?",
+                "opciones": [
+                  "Errores tipográficos en los manuscritos",
+                  "Personas, eventos e instituciones del AT que prefiguran a Cristo",
+                  "Los géneros literarios del AT",
+                  "Las profecías directas sobre el Mesías"
+                ],
+                "respuesta_correcta": 1,
+                "explicacion": "Los tipos son personas (como Adán, Melquisedec), eventos (como el Éxodo) e instituciones (como el tabernáculo) del AT que prefiguran la persona y obra de Jesucristo."
+              }
+            ]
+          },
+          "recursos": []
+        },
+        {
+          "id": "les_001_006_002",
+          "orden": 2,
+          "titulo": "Todo apunta a Cristo",
+          "tipo": "lectura",
+          "duracion_minutos": 14,
+          "contenido": {
+            "introduccion": "La Biblia no es una colección de historias morales o un manual de reglas. Es la historia épica de Dios redimiendo a la humanidad a través de Jesucristo. Entender esto transforma radicalmente la forma en que lees cada página.",
+            "secciones": [
+              {
+                "subtitulo": "El arco narrativo de la redención",
+                "texto": "La Biblia tiene un arco narrativo coherente: Creación → Caída → Redención → Restauración. Génesis 1-2 muestra el mundo bueno de Dios. Génesis 3 introduce el problema: el pecado separa al ser humano de Dios. El resto de la Biblia es la historia de cómo Dios, en su gracia, resuelve ese problema a través de su Hijo. El Apocalipsis cierra el arco: la nueva creación donde Dios habita con su pueblo para siempre."
+              },
+              {
+                "subtitulo": "Cristo en cada libro",
+                "texto": "Cada libro de la Biblia contribuye a esta historia. En Génesis, Él es la semilla de la mujer (3:15). En Éxodo, el cordero pascual y la roca que da agua. En Josué, el Capitán de los ejércitos. En los Salmos, el Rey y Sumo Sacerdote. En Isaías, el Siervo Sufriente. En los Evangelios, la revelación plena y final. En Apocalipsis, el Rey de reyes que regresa. Leer la Biblia en su unidad cristológica es leerla correctamente."
+              },
+              {
+                "subtitulo": "Aplicación práctica: La pregunta de oro",
+                "texto": "Al leer cualquier pasaje de la Biblia, hazte la 'pregunta de oro': ¿Cómo este texto me lleva a Cristo? No significa que forzosamente alegorices todo, pero sí que reconozcas que cada parte de las Escrituras contribuye a la gran historia de la redención que culmina en Jesús. Esta perspectiva no solo enriquece tu lectura; transforma tu vida."
+              }
+            ],
+            "puntos_clave": [
+              "La Biblia tiene un arco narrativo único: Creación → Caída → Redención → Restauración",
+              "Cada libro contribuye a la historia de la redención que culmina en Cristo",
+              "La 'pregunta de oro': ¿Cómo este texto me lleva a Cristo?",
+              "Leer la Biblia en su unidad cristológica es leerla en su plenitud"
+            ],
+            "citas_biblicas": [
+              {
+                "referencia": "Génesis 3:15",
+                "texto": "Pondré enemistad entre tú y la mujer, y entre tu simiente y la de ella; su simiente te aplastará la cabeza, pero tú le morderás el talón."
+              },
+              {
+                "referencia": "Apocalipsis 22:13",
+                "texto": "Yo soy el Alfa y la Omega, el Primero y el Último, el Principio y el Fin."
+              }
+            ],
+            "reflexion": "Elige un libro del AT que leerás esta semana. Antes de comenzar, investiga cómo los eruditos bíblicos ven a Cristo en ese libro. ¿Cómo cambia tu lectura?"
+          },
+          "quiz": {
+            "id": "qz_001_006_002",
+            "preguntas": [
+              {
+                "id": "preg_013_001",
+                "pregunta": "¿Cuál es el arco narrativo completo de la Biblia?",
+                "opciones": [
+                  "Israel → Iglesia → Segunda venida",
+                  "Creación → Caída → Redención → Restauración",
+                  "Ley → Gracia → Gloria",
+                  "AT → NT → Apocalipsis"
+                ],
+                "respuesta_correcta": 1,
+                "explicacion": "El gran arco narrativo de toda la Escritura es: Creación (lo bueno de Dios), Caída (el problema del pecado), Redención (la solución en Cristo) y Restauración (la nueva creación)."
+              },
+              {
+                "id": "preg_013_002",
+                "pregunta": "¿Qué es la 'pregunta de oro' en la lectura bíblica cristocéntrica?",
+                "opciones": [
+                  "¿Cuándo se escribió este texto?",
+                  "¿Qué promesa económica hay aquí para mí?",
+                  "¿Cómo este texto me lleva a Cristo?",
+                  "¿Cuántas veces se menciona Dios?"
+                ],
+                "respuesta_correcta": 2,
+                "explicacion": "La 'pregunta de oro' es: ¿Cómo este texto me lleva a Cristo? Ayuda a mantener la perspectiva cristocéntrica al leer cualquier parte de la Escritura."
+              }
+            ]
+          },
+          "recursos": []
+        }
+      ]
+    }
+  ]
+}

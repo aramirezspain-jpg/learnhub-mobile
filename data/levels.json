@@ -1,0 +1,28 @@
+{
+  "levels": [
+    {
+      "id": "nivel_001",
+      "nombre": "Fundamentos",
+      "descripcion": "Bases esenciales para entender y leer la Biblia correctamente",
+      "color": "#6366F1",
+      "icono": "book-outline",
+      "orden": 1
+    },
+    {
+      "id": "nivel_002",
+      "nombre": "Formación Teológica",
+      "descripcion": "Profundiza en teología sistemática, hermenéutica y ministerio",
+      "color": "#8B5CF6",
+      "icono": "school-outline",
+      "orden": 2
+    },
+    {
+      "id": "nivel_003",
+      "nombre": "Profundización",
+      "descripcion": "Exégesis, apologética y defensa avanzada de la fe",
+      "color": "#F59E0B",
+      "icono": "shield-checkmark-outline",
+      "orden": 3
+    }
+  ]
+}
