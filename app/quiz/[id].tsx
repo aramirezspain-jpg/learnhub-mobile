@@ -216,7 +216,7 @@ export default function QuizScreen() {
         </Typography>
       </View>
 
-      <ScrollView contentContainerStyle={styles.quizScroll} showsVerticalScrollIndicator={false}>
+      <ScrollView style={{ flex: 1 }} contentContainerStyle={styles.quizScroll} showsVerticalScrollIndicator={false}>
         {/* Cabecera del quiz */}
         <View style={styles.quizHeader}>
           <View style={[styles.quizBadge, { backgroundColor: `${course.banner_color}20` }]}>

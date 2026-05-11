@@ -88,6 +88,7 @@ export default function LessonScreen() {
 
       {/* ── Contenido ── */}
       <ScrollView
+        style={{ flex: 1 }}
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.scroll}
       >

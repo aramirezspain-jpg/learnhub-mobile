@@ -1,8 +1,10 @@
 import React from 'react';
 import { Tabs } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { Colors, FontSizes, FontWeights } from '@/constants/theme';
+import { HapticTab } from '@/components/haptic-tab';
 
 type IoniconsName = React.ComponentProps<typeof Ionicons>['name'];
 
@@ -21,6 +23,9 @@ function TabIcon({
 export default function TabLayout() {
   const scheme = useColorScheme() ?? 'dark';
   const theme = Colors[scheme];
+  const insets = useSafeAreaInsets();
+  const tabBarHeight = 64 + insets.bottom;
+  const tabBarPaddingBottom = Math.max(insets.bottom, 8);
 
   return (
     <Tabs
@@ -31,8 +36,8 @@ export default function TabLayout() {
           borderTopColor: theme.tabBarBorder,
           borderTopWidth: 1,
           paddingTop: 8,
-          paddingBottom: 8,
-          height: 64,
+          paddingBottom: tabBarPaddingBottom,
+          height: tabBarHeight,
         },
         tabBarActiveTintColor: Colors.primary,
         tabBarInactiveTintColor: theme.tabIconDefault,
@@ -41,6 +46,7 @@ export default function TabLayout() {
           fontWeight: FontWeights.semibold,
           marginTop: 2,
         },
+        tabBarButton: HapticTab,
       }}
     >
       <Tabs.Screen

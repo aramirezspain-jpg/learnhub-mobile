@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, ScrollView, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, ScrollView, TouchableOpacity, StyleSheet, Alert } from 'react-native';
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
@@ -36,9 +36,13 @@ export default function CoursesScreen() {
           <Typography variant="overline" secondary>Instituto LearnHub</Typography>
           <Typography variant="h1" style={{ color: theme.text }}>Cursos</Typography>
         </View>
-        <View style={[styles.headerIcon, { backgroundColor: `${Colors.primary}15` }]}>
+        <TouchableOpacity
+          style={[styles.headerIcon, { backgroundColor: `${Colors.primary}15` }]}
+          activeOpacity={0.7}
+          onPress={() => Alert.alert('Búsqueda', 'La búsqueda de cursos estará disponible pronto.')}
+        >
           <Ionicons name="search-outline" size={22} color={Colors.primary} />
-        </View>
+        </TouchableOpacity>
       </View>
 
       {/* Filtros */}

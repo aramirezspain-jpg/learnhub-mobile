@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, ScrollView, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, ScrollView, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useColorScheme } from '@/hooks/use-color-scheme';
@@ -95,18 +95,21 @@ export default function LibraryScreen() {
             title="Favoritos"
             subtitle="Lecciones y citas guardadas"
             color={Colors.error}
+            onPress={() => Alert.alert('Favoritos', 'Esta función estará disponible en la siguiente versión.')}
           />
           <LibrarySection
             icon="document-text-outline"
             title="Mis Notas"
             subtitle="Notas personales de estudio"
             color={Colors.primary}
+            onPress={() => Alert.alert('Mis Notas', 'Esta función estará disponible en la siguiente versión.')}
           />
           <LibrarySection
             icon="checkmark-done-circle-outline"
             title="Completados"
             subtitle="Lecciones y cursos terminados"
             color={Colors.success}
+            onPress={() => Alert.alert('Completados', 'Esta función estará disponible en la siguiente versión.')}
           />
         </View>
 

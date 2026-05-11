@@ -4,6 +4,7 @@ import {
   ScrollView,
   TouchableOpacity,
   StyleSheet,
+  Alert,
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
@@ -111,9 +112,13 @@ export default function HomeScreen() {
             <Typography variant="overline" secondary>Instituto Bíblico</Typography>
             <Typography variant="h1" style={{ color: theme.text }}>LearnHub</Typography>
           </View>
-          <View style={[styles.avatarWrap, { backgroundColor: `${Colors.primary}20` }]}>
+          <TouchableOpacity
+            style={[styles.avatarWrap, { backgroundColor: `${Colors.primary}20` }]}
+            onPress={() => Alert.alert('Perfil', 'La sección de perfil estará disponible en la siguiente versión.')}
+            activeOpacity={0.7}
+          >
             <Ionicons name="person-outline" size={22} color={Colors.primary} />
-          </View>
+          </TouchableOpacity>
         </View>
 
         {/* ── Continuar aprendiendo ── */}
