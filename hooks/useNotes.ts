@@ -11,7 +11,7 @@ export function useNotes() {
     async (courseId: string, lessonId: string, content: string) => {
       const repo = new NotesRepository(db);
       const note = await repo.createNote(courseId, lessonId, content);
-      store.addNote(note);
+      if (note) store.addNote(note);
       return note;
     },
     [db, store]

@@ -56,7 +56,10 @@ function AppBootstrap({ children }: { children: React.ReactNode }) {
       setDbReady();
     };
 
-    loadProgress().catch(console.error);
+    loadProgress().catch((e) => {
+      console.error('[AppBootstrap] DB load failed:', e);
+      setDbReady();
+    });
   }, []);
 
   if (!dbReady) {

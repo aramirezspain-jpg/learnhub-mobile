@@ -77,7 +77,8 @@ export default function NotesScreen() {
   const inputRef = useRef<TextInput>(null);
 
   const { createNote, updateNote, deleteNote } = useNotes();
-  const lessonNotes = useNotesStore(s => s.getNotesByLesson(lessonId));
+  const allNotes = useNotesStore(s => s.notes);
+  const lessonNotes = allNotes.filter(n => n.lesson_id === lessonId);
 
   const [text, setText] = useState('');
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -116,7 +117,7 @@ export default function NotesScreen() {
 
   async function handleSave() {
     const trimmed = text.trim();
-    if (!trimmed || saving) return;
+    if (!trimmed || saving || !lessonId || !courseId) return;
     setSaving(true);
     try {
       if (editingId) {

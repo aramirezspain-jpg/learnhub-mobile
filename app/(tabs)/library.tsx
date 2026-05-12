@@ -113,7 +113,8 @@ function FavoritosTab() {
   const scheme = useColorScheme() ?? 'dark';
   const theme = Colors[scheme];
   const { toggleFavorite } = useFavorites();
-  const courseFavs = useFavoritesStore(s => s.getFavoritesByType('course'));
+  const allFavorites = useFavoritesStore(s => s.favorites);
+  const courseFavs = allFavorites.filter((f: Favorite) => f.content_type === 'course');
   const { courses } = useCourses();
   const getCourseProgress = useProgressStore(s => s.getCourseProgress);
   const getCompletedCount = useProgressStore(s => s.getCompletedCountForCourse);
@@ -361,7 +362,8 @@ export default function LibraryScreen() {
   const theme = Colors[scheme];
   const [activeTab, setActiveTab] = useState<LibraryTab>('favoritos');
 
-  const favCount = useFavoritesStore(s => s.getFavoritesByType('course').length);
+  const allFavs = useFavoritesStore(s => s.favorites);
+  const favCount = allFavs.filter(f => f.content_type === 'course').length;
   const noteCount = useNotesStore(s => s.notes.length);
   const { courses } = useCourses();
   const getCompletedCount = useProgressStore(s => s.getCompletedCountForCourse);
