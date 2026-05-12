@@ -1,11 +1,12 @@
 import { type Course, type Level } from '@/types';
 
-// Importación estática — agregar nuevos cursos solo requiere importarlos aquí
 import curso001 from '@/data/courses/curso_001.json';
+import cursoBiblia from '@/data/courses/curso_biblia.json';
 import levelsJson from '@/data/levels.json';
 
 const COURSE_REGISTRY: Course[] = [
   curso001 as unknown as Course,
+  cursoBiblia as unknown as Course,
 ];
 
 export const ContentService = {

@@ -1,0 +1,459 @@
+{
+  "id": "curso_biblia",
+  "nivel_id": "nivel_001",
+  "titulo": "Introducción a la Biblia",
+  "subtitulo": "Conoce el libro más importante de la historia",
+  "descripcion": "Un recorrido completo por el libro que cambió el mundo. Aprende qué es la Biblia, cómo se formó, cómo está estructurada y cómo comenzar a leerla con provecho.",
+  "banner_color": "#059669",
+  "duracion_estimada": "3 semanas",
+  "total_lecciones": 6,
+  "nivel_dificultad": "principiante",
+  "tags": ["biblia", "introducción", "fundamentos", "lectura bíblica"],
+  "instructor": "Instituto LearnHub Bíblico",
+  "modulos": [
+    {
+      "id": "mod_bib_001",
+      "orden": 1,
+      "titulo": "¿Qué es la Biblia?",
+      "descripcion": "Una visión panorámica del libro más influyente de la historia",
+      "icono": "book-outline",
+      "lecciones": [
+        {
+          "id": "les_bib_001_001",
+          "orden": 1,
+          "titulo": "Los 66 libros de la Biblia",
+          "tipo": "video",
+          "duracion_minutos": 12,
+          "video_url": "https://youtu.be/h3f4KA92xZQ?si=K8ga1bch1_4H8reU",
+          "contenido": {
+            "introduccion": "La Biblia no es un libro: es una biblioteca de 66 libros escritos a lo largo de más de 1.500 años por más de 40 autores. En este video obtendrás una visión completa de qué contiene la Biblia, cómo está organizada y por qué es única entre todos los libros del mundo.",
+            "secciones": [
+              {
+                "subtitulo": "El Antiguo Testamento: 39 libros",
+                "texto": "El AT fue escrito principalmente en hebreo (con algunas secciones en arameo) entre los siglos XV y IV a.C. Está dividido en cuatro grandes secciones: el Pentateuco (los cinco libros de Moisés: Génesis, Éxodo, Levítico, Números y Deuteronomio), los Libros Históricos (desde Josué hasta Ester), los Libros Poéticos y de Sabiduría (Job, Salmos, Proverbios, Eclesiastés y Cantar de los Cantares) y los Libros Proféticos (Isaías, Jeremías, Ezequiel, Daniel y los doce profetas menores)."
+              },
+              {
+                "subtitulo": "El Nuevo Testamento: 27 libros",
+                "texto": "El NT fue escrito en griego koiné durante el siglo I d.C. Comienza con los cuatro Evangelios (Mateo, Marcos, Lucas y Juan), que narran la vida, muerte y resurrección de Jesucristo. Le sigue el libro de los Hechos de los Apóstoles, que relata el nacimiento de la iglesia. A continuación vienen 21 Epístolas o cartas (13 de Pablo, y 8 de otros autores como Pedro, Juan y Santiago). El NT cierra con el Apocalipsis, el libro de la revelación final."
+              },
+              {
+                "subtitulo": "Una unidad extraordinaria",
+                "texto": "Lo que hace a la Biblia verdaderamente singular no es solo su extensión, sino su coherencia. 40 autores de culturas, épocas y trasfondos completamente distintos —pastores, reyes, médicos, pescadores, profetas— escribieron un relato con un único tema central: la historia de la redención de la humanidad a través de Jesucristo. Esta unidad temática a través de 1.500 años es una de las evidencias más poderosas de su origen divino."
+              }
+            ],
+            "puntos_clave": [
+              "La Biblia tiene 66 libros: 39 en el AT y 27 en el NT",
+              "Fue escrita por más de 40 autores a lo largo de aproximadamente 1.500 años",
+              "El AT fue escrito principalmente en hebreo; el NT en griego koiné",
+              "A pesar de su diversidad, tiene una unidad narrativa y temática extraordinaria"
+            ],
+            "citas_biblicas": [
+              {
+                "referencia": "2 Timoteo 3:16-17",
+                "texto": "Toda la Escritura es inspirada por Dios y útil para enseñar, para reprender, para corregir y para instruir en justicia, a fin de que el siervo de Dios esté enteramente capacitado para toda buena obra."
+              }
+            ],
+            "reflexion": "Si la Biblia fue escrita por más de 40 personas en 1.500 años y mantiene una coherencia temática perfecta, ¿qué dice eso sobre su origen? ¿Cómo afecta tu disposición al leerla?"
+          },
+          "quiz": {
+            "id": "qz_bib_001_001",
+            "preguntas": [
+              {
+                "id": "preg_bib_001_001",
+                "pregunta": "¿Cuántos libros tiene el Antiguo Testamento?",
+                "opciones": ["27 libros", "39 libros", "66 libros", "46 libros"],
+                "respuesta_correcta": 1,
+                "explicacion": "El Antiguo Testamento tiene 39 libros escritos principalmente en hebreo. Junto con los 27 del Nuevo Testamento, suman los 66 libros de la Biblia protestante."
+              },
+              {
+                "id": "preg_bib_001_002",
+                "pregunta": "¿En qué idioma fue escrito principalmente el Nuevo Testamento?",
+                "opciones": ["Hebreo", "Latín", "Arameo", "Griego koiné"],
+                "respuesta_correcta": 3,
+                "explicacion": "El Nuevo Testamento fue escrito en griego koiné, el griego común del pueblo en el siglo I d.C., el idioma más hablado en el mundo mediterráneo de esa época."
+              },
+              {
+                "id": "preg_bib_001_003",
+                "pregunta": "¿Cuántos Evangelios contiene el Nuevo Testamento?",
+                "opciones": ["Dos", "Tres", "Cuatro", "Cinco"],
+                "respuesta_correcta": 2,
+                "explicacion": "El NT tiene cuatro Evangelios: Mateo, Marcos, Lucas y Juan. Cada uno presenta la vida, muerte y resurrección de Jesús desde una perspectiva y audiencia distinta."
+              }
+            ]
+          },
+          "recursos": []
+        },
+        {
+          "id": "les_bib_001_002",
+          "orden": 2,
+          "titulo": "El Antiguo y el Nuevo Testamento",
+          "tipo": "lectura",
+          "duracion_minutos": 14,
+          "contenido": {
+            "introduccion": "Entender la diferencia y la relación entre el Antiguo y el Nuevo Testamento es fundamental para leer la Biblia correctamente. No son dos libros separados con dos dioses distintos, sino una historia coherente que avanza hacia su clímax en Jesucristo.",
+            "secciones": [
+              {
+                "subtitulo": "El Antiguo Testamento: la promesa",
+                "texto": "El AT cuenta la historia de cómo Dios creó el mundo bueno, cómo el pecado entró y rompió la relación entre Dios y la humanidad, y cómo Dios comenzó a ejecutar su plan de restauración a través de un pueblo específico: Israel. Todo el AT apunta hacia adelante, hacia alguien que vendría a resolver el problema definitivo del pecado. Los sacrificios, el sacerdocio, el templo, los profetas: todo anticipa y prefigura al Mesías que vendría."
+              },
+              {
+                "subtitulo": "El Nuevo Testamento: el cumplimiento",
+                "texto": "El NT comienza con el cumplimiento de todo lo que el AT prometió: 'En el principio era el Verbo... y el Verbo se hizo carne y habitó entre nosotros' (Juan 1:1,14). Jesús es el punto de convergencia de toda la historia bíblica. Él cumple la ley perfectamente, ofrece el sacrificio definitivo, inaugura el nuevo pacto y envía al Espíritu Santo para continuar su obra en la iglesia. El NT no cancela el AT; lo cumple y lo explica."
+              },
+              {
+                "subtitulo": "Cómo leer el AT a la luz del NT",
+                "texto": "Un principio hermenéutico fundamental es que el NT interpreta el AT. Cuando leas los Salmos, las leyes del Levítico o las profecías de Isaías, el NT te da la clave para entender su cumplimiento en Cristo. Por eso Jesús dijo: 'No piensen que vine a abolir la ley o los profetas; no vine a abolirlos sino a cumplirlos' (Mateo 5:17). Leer la Biblia como una historia unificada —no como dos libros desconectados— es la clave de la interpretación madura."
+              }
+            ],
+            "puntos_clave": [
+              "El AT es la promesa; el NT es el cumplimiento de esa promesa",
+              "Ambos testamentos cuentan una sola historia de redención",
+              "El NT interpreta y explica el AT a la luz de Cristo",
+              "Jesús no abolió el AT; lo cumplió en plenitud"
+            ],
+            "citas_biblicas": [
+              {
+                "referencia": "Mateo 5:17",
+                "texto": "No piensen que he venido a anular la ley o los profetas; no he venido a anularlos sino a darles cumplimiento."
+              },
+              {
+                "referencia": "Lucas 24:27",
+                "texto": "Entonces, comenzando por Moisés y por todos los profetas, les explicó lo que se refería a él en todas las Escrituras."
+              }
+            ],
+            "reflexion": "¿Has leído alguna vez el AT como si no tuviera relación con el NT? ¿Cómo cambia tu lectura saber que cada parte apunta hacia Jesús?"
+          },
+          "quiz": {
+            "id": "qz_bib_001_002",
+            "preguntas": [
+              {
+                "id": "preg_bib_002_001",
+                "pregunta": "¿Cuál es la relación principal entre el AT y el NT?",
+                "opciones": [
+                  "Son dos religiones distintas",
+                  "El AT es la promesa y el NT es su cumplimiento",
+                  "El NT reemplaza completamente al AT",
+                  "No hay relación entre ellos"
+                ],
+                "respuesta_correcta": 1,
+                "explicacion": "El AT y el NT forman una sola historia de redención. El AT anticipa y promete; el NT cumple y explica, con Jesucristo como el punto de convergencia de toda la narrativa bíblica."
+              },
+              {
+                "id": "preg_bib_002_002",
+                "pregunta": "¿Qué dijo Jesús sobre su relación con el AT?",
+                "opciones": [
+                  "Que lo abolía para empezar algo nuevo",
+                  "Que solo el NT tenía autoridad",
+                  "Que no vino a abolir sino a cumplir",
+                  "Que el AT solo era para Israel"
+                ],
+                "respuesta_correcta": 2,
+                "explicacion": "En Mateo 5:17 Jesús afirmó claramente: 'No vine a abolir la ley o los profetas; no vine a anularlos sino a darles cumplimiento.' El NT no cancela el AT, lo completa."
+              }
+            ]
+          },
+          "recursos": []
+        }
+      ]
+    },
+    {
+      "id": "mod_bib_002",
+      "orden": 2,
+      "titulo": "La historia y formación de la Biblia",
+      "descripcion": "Descubre cómo Dios preservó su Palabra a través de los siglos",
+      "icono": "time-outline",
+      "lecciones": [
+        {
+          "id": "les_bib_002_001",
+          "orden": 1,
+          "titulo": "Cómo se formó la Biblia",
+          "tipo": "video",
+          "duracion_minutos": 15,
+          "video_url": "https://youtu.be/YRuxUMkF7_8?si=JBGhbdENSMEtyO-a",
+          "contenido": {
+            "introduccion": "¿Cómo llegó la Biblia hasta nosotros? Este video explora el fascinante proceso histórico detrás de la formación del canon bíblico: cómo se escribieron los libros, cómo se reconocieron como inspirados y cómo sobrevivieron miles de años para llegar a tus manos.",
+            "secciones": [
+              {
+                "subtitulo": "El proceso de escritura",
+                "texto": "Los libros de la Biblia no se escribieron de una sola vez. El proceso duró más de un milenio. Moisés escribió el Pentateuco alrededor del siglo XV a.C. Los últimos libros del AT (como Malaquías) se completaron hacia el siglo V a.C. Luego hubo un período de silencio de 400 años hasta que Juan el Bautista rompió el silencio. Los libros del NT se escribieron entre aproximadamente el 45 d.C. (Santiago) y el 95 d.C. (Apocalipsis)."
+              },
+              {
+                "subtitulo": "El reconocimiento del canon",
+                "texto": "La palabra 'canon' viene del griego y significa 'regla o medida'. El canon es la lista de libros reconocidos como inspirados por Dios. La iglesia no creó el canon; lo reconoció. Los criterios principales fueron: apostolicidad (¿fue escrito por un apóstol o alguien vinculado a ellos?), ortodoxia (¿es coherente con la fe ya revelada?) y catolicidad (¿fue ampliamente recibido por las iglesias?). Para el siglo IV, los 27 libros del NT eran universalmente reconocidos."
+              },
+              {
+                "subtitulo": "La preservación milagrosa",
+                "texto": "Durante siglos, la Biblia fue copiada a mano por escribas y monjes que dedicaban su vida a ese trabajo. Contamos hoy con más de 5.800 manuscritos griegos del NT, más que cualquier otro documento de la antigüedad. Los Rollos del Mar Muerto, descubiertos en 1947, incluyen manuscritos del AT de más de 2.000 años de antigüedad que muestran una fidelidad de copia del 95%. La Biblia que tenemos hoy es esencialmente idéntica a los textos originales."
+              }
+            ],
+            "puntos_clave": [
+              "La escritura bíblica duró más de 1.500 años (siglo XV a.C. al siglo I d.C.)",
+              "El canon fue reconocido por la iglesia, no inventado por ella",
+              "Los criterios del canon: apostolicidad, ortodoxia y catolicidad",
+              "Más de 5.800 manuscritos griegos del NT respaldan su confiabilidad"
+            ],
+            "citas_biblicas": [
+              {
+                "referencia": "Isaías 40:8",
+                "texto": "La hierba se seca y la flor se marchita, pero la palabra de nuestro Dios permanece para siempre."
+              },
+              {
+                "referencia": "1 Pedro 1:25",
+                "texto": "Pero la palabra del Señor permanece para siempre. Y esta es la palabra del evangelio que se les ha anunciado a ustedes."
+              }
+            ],
+            "reflexion": "Conocer que la Biblia sobrevivió siglos de persecución, guerras y esfuerzos por destruirla, y aun así llegó completa a tus manos, ¿qué te dice sobre la fidelidad de Dios a su Palabra?"
+          },
+          "quiz": {
+            "id": "qz_bib_002_001",
+            "preguntas": [
+              {
+                "id": "preg_bib_003_001",
+                "pregunta": "¿Qué significa la palabra 'canon' en relación con la Biblia?",
+                "opciones": [
+                  "Una lista de leyes religiosas",
+                  "La lista de libros reconocidos como inspirados",
+                  "Los libros escritos solo por apóstoles",
+                  "El texto original en hebreo"
+                ],
+                "respuesta_correcta": 1,
+                "explicacion": "Canon viene del griego 'kanon' (regla, medida) y se refiere a la lista de libros reconocidos por la iglesia como divinamente inspirados y autoritativos."
+              },
+              {
+                "id": "preg_bib_003_002",
+                "pregunta": "¿Qué hallazgo arqueológico de 1947 confirmó la confiabilidad del AT?",
+                "opciones": [
+                  "El Códice Sinaítico",
+                  "El Papiro Chester Beatty",
+                  "Los Rollos del Mar Muerto",
+                  "Las tablillas de Ebla"
+                ],
+                "respuesta_correcta": 2,
+                "explicacion": "Los Rollos del Mar Muerto, descubiertos en Qumrán en 1947, contienen manuscritos del AT de más de 2.000 años de antigüedad que muestran una fidelidad de copia del 95% respecto a los manuscritos medievales."
+              },
+              {
+                "id": "preg_bib_003_003",
+                "pregunta": "¿Cuál de estos NO era un criterio para reconocer un libro como parte del canon?",
+                "opciones": [
+                  "Apostolicidad",
+                  "Ortodoxia doctrinal",
+                  "Popularidad en el siglo XXI",
+                  "Catolicidad (recepción general)"
+                ],
+                "respuesta_correcta": 2,
+                "explicacion": "Los criterios históricos del canon fueron apostolicidad, ortodoxia y catolicidad. La popularidad moderna nunca fue ni es un criterio para determinar qué libros son inspirados."
+              }
+            ]
+          },
+          "recursos": []
+        },
+        {
+          "id": "les_bib_002_002",
+          "orden": 2,
+          "titulo": "El impacto de la Biblia en la historia",
+          "tipo": "lectura",
+          "duracion_minutos": 16,
+          "contenido": {
+            "introduccion": "Ningún libro ha transformado más profundamente la historia de la humanidad que la Biblia. Desde la abolición de la esclavitud hasta el nacimiento de las universidades modernas, desde el arte renacentista hasta los movimientos de derechos civiles, la Biblia ha sido el texto más influyente de la civilización occidental y global.",
+            "secciones": [
+              {
+                "subtitulo": "La Biblia y el conocimiento",
+                "texto": "Las primeras universidades de Europa —Oxford, Cambridge, Bologna, París— fueron fundadas por la iglesia con el propósito de estudiar las Escrituras. La convicción bíblica de que el mundo fue creado por un Dios racional y ordenado dio origen al método científico moderno. Científicos como Galileo, Copérnico, Newton, Faraday y Mendel eran creyentes profundos cuya fe en la racionalidad del Creador les impulsó a estudiar la creación."
+              },
+              {
+                "subtitulo": "La Biblia y los derechos humanos",
+                "texto": "La doctrina bíblica de que cada ser humano fue creado 'a imagen de Dios' (imago Dei, Génesis 1:27) es el fundamento filosófico de la dignidad humana universal. Fue esta convicción la que llevó a William Wilberforce a combatir la esclavitud en el siglo XIX, a Martin Luther King Jr. a liderar el movimiento de derechos civiles en el siglo XX, y a innumerables reformadores sociales a luchar por los marginados a lo largo de la historia."
+              },
+              {
+                "subtitulo": "La Biblia y el arte",
+                "texto": "La Biblia ha inspirado más obras de arte, música, literatura y arquitectura que cualquier otro texto. La Capilla Sixtina de Miguel Ángel, las cantatas de Bach, los oratorios de Handel (el Mesías), la Divina Comedia de Dante, el Paraíso Perdido de Milton, los poemas de Hopkins, las novelas de Dostoievski —todos profundamente bíblicos. No se puede entender la historia del arte occidental sin entender la Biblia."
+              }
+            ],
+            "puntos_clave": [
+              "Las primeras universidades fueron fundadas por la iglesia para estudiar las Escrituras",
+              "La doctrina del imago Dei (imagen de Dios) es el fundamento filosófico de los derechos humanos",
+              "La convicción bíblica de un Creador racional impulsó el nacimiento de la ciencia moderna",
+              "No se puede comprender el arte, la literatura ni la historia occidental sin conocer la Biblia"
+            ],
+            "citas_biblicas": [
+              {
+                "referencia": "Génesis 1:27",
+                "texto": "Y Dios creó al ser humano a su imagen; lo creó a imagen de Dios. Hombre y mujer los creó."
+              },
+              {
+                "referencia": "Salmos 119:105",
+                "texto": "Tu palabra es una lámpara a mis pies; es una luz en mi sendero."
+              }
+            ],
+            "reflexion": "¿Qué aspecto de la influencia bíblica en la historia te sorprendió más? ¿Cómo cambia esto tu percepción de lo que significa estudiar este libro?"
+          },
+          "quiz": {
+            "id": "qz_bib_002_002",
+            "preguntas": [
+              {
+                "id": "preg_bib_004_001",
+                "pregunta": "¿Cuál es el fundamento bíblico de la dignidad humana universal?",
+                "opciones": [
+                  "La Declaración de Derechos Humanos de 1948",
+                  "El Sermón del Monte",
+                  "La doctrina del imago Dei (imagen de Dios en Génesis 1:27)",
+                  "Las epístolas de Pablo a los Romanos"
+                ],
+                "respuesta_correcta": 2,
+                "explicacion": "Génesis 1:27 establece que cada ser humano fue creado 'a imagen de Dios' (imago Dei). Esta convicción bíblica es el fundamento filosófico de la dignidad humana y los derechos universales."
+              }
+            ]
+          },
+          "recursos": []
+        }
+      ]
+    },
+    {
+      "id": "mod_bib_003",
+      "orden": 3,
+      "titulo": "Cómo comenzar a leer la Biblia",
+      "descripcion": "Estrategias y hábitos para una lectura bíblica transformadora",
+      "icono": "reader-outline",
+      "lecciones": [
+        {
+          "id": "les_bib_003_001",
+          "orden": 1,
+          "titulo": "Tu primer plan de lectura bíblica",
+          "tipo": "lectura",
+          "duracion_minutos": 13,
+          "contenido": {
+            "introduccion": "Muchas personas empiezan a leer la Biblia por Génesis, llegan al Levítico y se rinden. Esto no es fracaso espiritual; es falta de estrategia. Saber por dónde empezar y cómo progresar hace toda la diferencia.",
+            "secciones": [
+              {
+                "subtitulo": "¿Por dónde empezar?",
+                "texto": "Si eres nuevo en la Biblia, no empieces por Génesis 1. Empieza por los Evangelios —especialmente el Evangelio de Juan o el de Marcos. Juan muestra quién es Jesús con profundidad teológica; Marcos lo hace con ritmo y acción. Una vez que tengas una base sólida en los Evangelios, lee el libro de los Hechos para entender el origen de la iglesia, luego la carta a los Romanos para entender el Evangelio sistemáticamente. Después de eso, el AT comenzará a tener mucho más sentido."
+              },
+              {
+                "subtitulo": "Planes prácticos",
+                "texto": "Existen varios enfoques comprobados: (1) El Plan Cronológico lee la Biblia en el orden en que ocurrieron los eventos históricos. (2) El Plan en un Año divide la Biblia en 365 porciones diarias. (3) El Plan SOAP (Escritura, Observación, Aplicación, Oración) te invita a leer poco pero profundo. (4) El plan de Navegantes selecciona pasajes clave del NT para principiantes. Lo más importante no es el plan que elijas, sino la consistencia diaria."
+              },
+              {
+                "subtitulo": "La clave: la consistencia sobre la cantidad",
+                "texto": "Leer 5 minutos diarios es infinitamente mejor que leer 2 horas una vez al mes. El objetivo no es terminar la Biblia lo más rápido posible; es dejar que la Palabra de Dios transforme tu mente y corazón día a día. El Salmo 1 describe al hombre bienaventurado como aquel que medita en la ley de Dios 'de día y de noche' —no el que la leyó entera en tres meses."
+              }
+            ],
+            "puntos_clave": [
+              "Empieza por los Evangelios (Juan o Marcos), no por Génesis",
+              "Elige un plan y sé consistente: 5 minutos diarios valen más que maratones esporádicos",
+              "Herramientas útiles: YouVersion, Blue Letter Bible, Logos, concordancias impresas",
+              "El objetivo es meditación y transformación, no solo información"
+            ],
+            "citas_biblicas": [
+              {
+                "referencia": "Salmos 1:1-2",
+                "texto": "Bienaventurado el varón que no anduvo en consejo de malos, ni estuvo en camino de pecadores, ni en silla de escarnecedores se ha sentado; sino que en la ley del Señor está su delicia, y en su ley medita de día y de noche."
+              },
+              {
+                "referencia": "Josué 1:8",
+                "texto": "Nunca se apartará de tu boca este libro de la ley, sino que de día y de noche meditarás en él, para que guardes y hagas conforme a todo lo que en él está escrito; porque entonces harás prosperar tu camino, y todo te saldrá bien."
+              }
+            ],
+            "reflexion": "Si tuvieras que comprometerte con un tiempo específico cada día para leer la Biblia, ¿cuándo sería y cuántos minutos le dedicarías? La especificidad es clave para construir el hábito."
+          },
+          "quiz": {
+            "id": "qz_bib_003_001",
+            "preguntas": [
+              {
+                "id": "preg_bib_005_001",
+                "pregunta": "¿Por qué libro se recomienda empezar a un lector nuevo en la Biblia?",
+                "opciones": [
+                  "Génesis, porque es el principio",
+                  "Levítico, porque establece la ley",
+                  "Los Evangelios (Juan o Marcos)",
+                  "Apocalipsis, porque es el final"
+                ],
+                "respuesta_correcta": 2,
+                "explicacion": "Los Evangelios son el mejor punto de entrada porque presentan a Jesucristo directamente, que es el centro de toda la Biblia. El Evangelio de Juan profundiza en su identidad; Marcos lo hace con ritmo y acción."
+              },
+              {
+                "id": "preg_bib_005_002",
+                "pregunta": "¿Qué hábito de lectura es más efectivo según el Salmo 1?",
+                "opciones": [
+                  "Leer la Biblia entera una vez al año",
+                  "Memorizar capítulos completos semanalmente",
+                  "Meditar en la Palabra de día y de noche con consistencia",
+                  "Leer solo los domingos en la iglesia"
+                ],
+                "respuesta_correcta": 2,
+                "explicacion": "El Salmo 1 describe al varón bienaventurado como aquel que medita en la Palabra de Dios de día y de noche. La consistencia y la meditación profunda son más valiosas que la cantidad."
+              }
+            ]
+          },
+          "recursos": []
+        },
+        {
+          "id": "les_bib_003_002",
+          "orden": 2,
+          "titulo": "Herramientas esenciales para el estudio bíblico",
+          "tipo": "lectura",
+          "duracion_minutos": 11,
+          "contenido": {
+            "introduccion": "Nunca en la historia ha sido tan accesible estudiar la Biblia en profundidad. Hoy tenemos a disposición herramientas que los mejores teólogos del pasado solo soñaron tener. Conocerlas y usarlas bien multiplicará el fruto de tu estudio.",
+            "secciones": [
+              {
+                "subtitulo": "Traducciones recomendadas",
+                "texto": "Existen dos tipos principales de traducción: las de equivalencia formal (palabra por palabra) y las de equivalencia dinámica (pensamiento por pensamiento). Para el estudio en profundidad, usa la Nueva Biblia de las Américas (NBLA) o la Reina Valera 1960 (RV60), que son más literales. Para lectura devocional fluida, la Nueva Versión Internacional (NVI) o la Traducción en Lenguaje Actual (TLA) son excelentes. Lo ideal es comparar varias traducciones al estudiar un pasaje difícil."
+              },
+              {
+                "subtitulo": "Recursos digitales imprescindibles",
+                "texto": "YouVersion (Bible App) es gratuita y tiene cientos de traducciones en español e inglés, planes de lectura y la posibilidad de resaltar versículos. Blue Letter Bible (blueletterbible.org) permite acceder a los textos en hebreo y griego, lexicones, comentarios y concordancias. Logos Bible Software es la plataforma de estudio más completa, usada por pastores y teólogos. BibleProject (bibleproject.com/español) ofrece videos animados de alta calidad que explican cada libro de la Biblia."
+              },
+              {
+                "subtitulo": "Recursos impresos fundamentales",
+                "texto": "Una buena Biblia de estudio (como la Biblia de Estudio NVI o la MacArthur) incluye notas, mapas y tablas que enriquecen enormemente la lectura. Un comentario bíblico de autor confiable (Matthew Henry, John Stott, R.C. Sproul) proporciona contexto histórico y teológico. Y una concordancia bíblica te permite encontrar todos los versículos donde aparece una palabra específica, indispensable para el estudio temático."
+              }
+            ],
+            "puntos_clave": [
+              "Para estudio: NBLA o RV60 (más literales); para lectura: NVI o TLA",
+              "YouVersion y Blue Letter Bible son recursos digitales gratuitos y poderosos",
+              "BibleProject ofrece videos gratuitos sobre cada libro de la Biblia en español",
+              "Una Biblia de estudio y un buen comentario multiplican la comprensión"
+            ],
+            "citas_biblicas": [
+              {
+                "referencia": "Hechos 17:11",
+                "texto": "Estos eran de sentimientos más nobles que los de Tesalónica, de modo que recibieron el mensaje con toda avidez y todos los días examinaban las Escrituras para ver si era verdad lo que se les anunciaba."
+              }
+            ],
+            "reflexion": "¿Cuál de estas herramientas comenzarás a usar esta semana? Comprometerte con una herramienta concreta es más valioso que conocer muchas pero no usar ninguna."
+          },
+          "quiz": {
+            "id": "qz_bib_003_002",
+            "preguntas": [
+              {
+                "id": "preg_bib_006_001",
+                "pregunta": "¿Qué tipo de traducción es la NBLA (Nueva Biblia de las Américas)?",
+                "opciones": [
+                  "Equivalencia dinámica (pensamiento por pensamiento)",
+                  "Paráfrasis libre del texto original",
+                  "Equivalencia formal (más literal, palabra por palabra)",
+                  "Traducción directa del latín"
+                ],
+                "respuesta_correcta": 2,
+                "explicacion": "La NBLA es una traducción de equivalencia formal, es decir, busca ser lo más fiel posible a las palabras del texto original en hebreo y griego. Es ideal para el estudio bíblico en profundidad."
+              },
+              {
+                "id": "preg_bib_006_002",
+                "pregunta": "¿Qué ofrece BibleProject para el estudio bíblico?",
+                "opciones": [
+                  "Software de pago para pastores profesionales",
+                  "Videos animados gratuitos sobre cada libro de la Biblia",
+                  "Una traducción propia de la Biblia",
+                  "Cursos universitarios con créditos académicos"
+                ],
+                "respuesta_correcta": 1,
+                "explicacion": "BibleProject (bibleproject.com/español) ofrece videos animados de alta calidad completamente gratuitos que explican el trasfondo, la estructura y la teología de cada libro de la Biblia."
+              }
+            ]
+          },
+          "recursos": []
+        }
+      ]
+    }
+  ]
+}
