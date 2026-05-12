@@ -2,7 +2,7 @@ import React from 'react';
 import { View, TouchableOpacity, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useColorScheme } from '@/hooks/use-color-scheme';
-import { Colors, Spacing, BorderRadius, Shadows } from '@/constants/theme';
+import { Colors, Spacing, BorderRadius, Shadows, FontSizes, FontWeights } from '@/constants/theme';
 import { Typography } from '@/components/ui/Typography';
 import { Badge } from '@/components/ui/Badge';
 import { ProgressBar } from '@/components/ui/ProgressBar';
@@ -21,6 +21,12 @@ const DIFFICULTY_LABELS: Record<string, string> = {
   avanzado: 'Avanzado',
 };
 
+const DIFFICULTY_ICON: Record<string, React.ComponentProps<typeof Ionicons>['name']> = {
+  principiante: 'leaf-outline',
+  intermedio: 'flame-outline',
+  avanzado: 'rocket-outline',
+};
+
 export function CourseCard({
   course,
   progressPercent = 0,
@@ -30,76 +36,116 @@ export function CourseCard({
   const scheme = useColorScheme() ?? 'dark';
   const theme = Colors[scheme];
   const started = completedLessons > 0;
+  const isComplete = progressPercent >= 100;
 
   return (
     <TouchableOpacity
       style={[styles.card, { backgroundColor: theme.card }, Shadows.md]}
       onPress={onPress}
-      activeOpacity={0.85}
+      activeOpacity={0.82}
     >
-      {/* Color accent bar */}
-      <View style={[styles.accent, { backgroundColor: course.banner_color }]}>
-        <Ionicons name="book-outline" size={28} color="rgba(255,255,255,0.9)" />
-      </View>
+      {/* Banner area */}
+      <View style={[styles.banner, { backgroundColor: course.banner_color }]}>
+        {/* Decorative circles */}
+        <View
+          style={[
+            styles.deco1,
+            { backgroundColor: 'rgba(255,255,255,0.08)' },
+          ]}
+        />
+        <View
+          style={[
+            styles.deco2,
+            { backgroundColor: 'rgba(255,255,255,0.06)' },
+          ]}
+        />
+        <Ionicons name="book-outline" size={32} color="rgba(255,255,255,0.85)" />
 
-      <View style={styles.content}>
-        {/* Header */}
-        <View style={styles.header}>
-          <Badge
-            label={DIFFICULTY_LABELS[course.nivel_dificultad] ?? 'Principiante'}
-            color={course.banner_color}
-            bg={`${course.banner_color}20`}
-            size="sm"
+        {/* Difficulty badge */}
+        <View style={styles.difficultyBadge}>
+          <Ionicons
+            name={DIFFICULTY_ICON[course.nivel_dificultad] ?? 'leaf-outline'}
+            size={11}
+            color="rgba(255,255,255,0.9)"
           />
-          {started && (
-            <View style={[styles.progressPill, { backgroundColor: `${Colors.success}20` }]}>
-              <Ionicons name="checkmark-circle" size={12} color={Colors.success} />
-              <Typography variant="caption" color={Colors.success} style={styles.progressText}>
-                {progressPercent}%
-              </Typography>
-            </View>
-          )}
+          <Typography
+            variant="caption"
+            style={styles.difficultyText}
+          >
+            {DIFFICULTY_LABELS[course.nivel_dificultad] ?? 'Principiante'}
+          </Typography>
         </View>
 
-        {/* Título */}
-        <Typography variant="h4" style={[styles.title, { color: theme.text }]} numberOfLines={2}>
+        {/* Complete overlay */}
+        {isComplete && (
+          <View style={styles.completeBadge}>
+            <Ionicons name="checkmark-circle" size={14} color="#FFF" />
+          </View>
+        )}
+      </View>
+
+      {/* Content */}
+      <View style={styles.content}>
+        <Typography variant="h4" style={{ color: theme.text }} numberOfLines={2}>
           {course.titulo}
         </Typography>
-
-        <Typography variant="body" secondary numberOfLines={2} style={styles.desc}>
-          {course.descripcion}
+        <Typography variant="caption" secondary numberOfLines={2} style={styles.subtitle}>
+          {course.subtitulo}
         </Typography>
 
-        {/* Metadatos */}
+        {/* Meta row */}
         <View style={styles.meta}>
           <View style={styles.metaItem}>
-            <Ionicons name="book-outline" size={13} color={theme.textSecondary} />
-            <Typography variant="caption" secondary style={{ marginLeft: 4 }}>
+            <Ionicons name="layers-outline" size={12} color={theme.textMuted} />
+            <Typography variant="caption" muted style={{ marginLeft: 4 }}>
               {course.total_lecciones} lecciones
             </Typography>
           </View>
+          <View style={styles.metaDot} />
           <View style={styles.metaItem}>
-            <Ionicons name="time-outline" size={13} color={theme.textSecondary} />
-            <Typography variant="caption" secondary style={{ marginLeft: 4 }}>
+            <Ionicons name="time-outline" size={12} color={theme.textMuted} />
+            <Typography variant="caption" muted style={{ marginLeft: 4 }}>
               {course.duracion_estimada}
             </Typography>
           </View>
         </View>
 
-        {/* Barra de progreso */}
+        {/* Progress */}
         {started && (
-          <View style={styles.progressSection}>
-            <ProgressBar progress={progressPercent} color={course.banner_color} height={4} />
-            <Typography variant="caption" secondary style={styles.progressLabel}>
-              {completedLessons}/{course.total_lecciones} lecciones completadas
-            </Typography>
+          <View style={styles.progressBlock}>
+            <View style={styles.progressHeader}>
+              <Typography variant="caption" secondary>
+                {completedLessons}/{course.total_lecciones} completadas
+              </Typography>
+              <Typography
+                variant="caption"
+                color={isComplete ? Colors.success : course.banner_color}
+                style={{ fontWeight: FontWeights.bold }}
+              >
+                {progressPercent}%
+              </Typography>
+            </View>
+            <ProgressBar
+              progress={progressPercent}
+              color={isComplete ? Colors.success : course.banner_color}
+              trackColor={`${course.banner_color}18`}
+              height={5}
+            />
           </View>
         )}
-      </View>
 
-      {/* Flecha */}
-      <View style={styles.arrow}>
-        <Ionicons name="chevron-forward" size={18} color={theme.textMuted} />
+        {/* Tags */}
+        <View style={styles.tags}>
+          {course.tags.slice(0, 2).map(tag => (
+            <Badge
+              key={tag}
+              label={tag}
+              color={course.banner_color}
+              bg={`${course.banner_color}14`}
+              size="sm"
+            />
+          ))}
+        </View>
       </View>
     </TouchableOpacity>
   );
@@ -107,40 +153,78 @@ export function CourseCard({
 
 const styles = StyleSheet.create({
   card: {
-    borderRadius: BorderRadius.lg,
+    borderRadius: BorderRadius.xl,
     marginBottom: Spacing.md,
-    flexDirection: 'row',
     overflow: 'hidden',
   },
-  accent: {
-    width: 64,
+  banner: {
+    height: 110,
+    alignItems: 'center',
+    justifyContent: 'center',
+    overflow: 'hidden',
+  },
+  deco1: {
+    position: 'absolute',
+    width: 130,
+    height: 130,
+    borderRadius: 65,
+    right: -40,
+    top: -40,
+  },
+  deco2: {
+    position: 'absolute',
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    left: -20,
+    bottom: -25,
+  },
+  difficultyBadge: {
+    position: 'absolute',
+    top: 10,
+    left: 12,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    backgroundColor: 'rgba(0,0,0,0.28)',
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: BorderRadius.full,
+  },
+  difficultyText: {
+    color: 'rgba(255,255,255,0.92)',
+    fontSize: FontSizes.xs,
+    fontWeight: FontWeights.semibold,
+  },
+  completeBadge: {
+    position: 'absolute',
+    top: 10,
+    right: 12,
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    backgroundColor: `${Colors.success}CC`,
     alignItems: 'center',
     justifyContent: 'center',
   },
   content: {
-    flex: 1,
     padding: Spacing.md,
-    gap: 6,
+    gap: 7,
   },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-  },
-  progressPill: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 8,
-    paddingVertical: 3,
-    borderRadius: BorderRadius.full,
-    gap: 3,
-  },
-  progressText: { fontWeight: '600' },
-  title: { marginTop: 2 },
-  desc: { lineHeight: 20 },
-  meta: { flexDirection: 'row', gap: 16, marginTop: 4 },
+  subtitle: { lineHeight: 18 },
+  meta: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   metaItem: { flexDirection: 'row', alignItems: 'center' },
-  progressSection: { marginTop: 6, gap: 4 },
-  progressLabel: { marginTop: 2 },
-  arrow: { justifyContent: 'center', paddingRight: 12 },
+  metaDot: {
+    width: 3,
+    height: 3,
+    borderRadius: 2,
+    backgroundColor: '#3A3A5A',
+  },
+  progressBlock: { gap: 5, marginTop: 2 },
+  progressHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  tags: { flexDirection: 'row', gap: 6, marginTop: 2, flexWrap: 'wrap' },
 });

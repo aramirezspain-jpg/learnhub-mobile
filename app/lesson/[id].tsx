@@ -127,23 +127,27 @@ export default function LessonScreen() {
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: theme.background }]} edges={['top', 'bottom']}>
       {/* ── Barra superior ── */}
-      <View style={[styles.topBar, { borderBottomColor: theme.border }]}>
-        <TouchableOpacity style={styles.backBtn} onPress={() => router.back()}>
-          <Ionicons name="arrow-back" size={22} color={theme.text} />
+      <View style={[styles.topBar, { backgroundColor: theme.surface, borderBottomColor: theme.border }]}>
+        <TouchableOpacity style={[styles.backBtn, { backgroundColor: theme.card }]} onPress={() => router.back()}>
+          <Ionicons name="arrow-back" size={20} color={theme.text} />
         </TouchableOpacity>
         <View style={styles.topCenter}>
-          <Typography variant="caption" secondary numberOfLines={1} style={{ maxWidth: 200 }}>
-            {module.titulo}
-          </Typography>
+          <View style={styles.topMeta}>
+            <View style={[styles.topAccentDot, { backgroundColor: course.banner_color }]} />
+            <Typography variant="caption" secondary numberOfLines={1} style={{ maxWidth: 180 }}>
+              {module.titulo}
+            </Typography>
+            <Typography variant="caption" color={course.banner_color} style={{ fontWeight: '700', marginLeft: 'auto' }}>
+              {lessonIndex}/{totalLessons}
+            </Typography>
+          </View>
           <ProgressBar
             progress={(lessonIndex / totalLessons) * 100}
             height={3}
             color={course.banner_color}
+            trackColor={`${course.banner_color}20`}
           />
         </View>
-        <Typography variant="caption" secondary>
-          {lessonIndex}/{totalLessons}
-        </Typography>
       </View>
 
       {/* ── Contenido ── */}
@@ -167,16 +171,22 @@ export default function LessonScreen() {
         {/* Cabecera de lección */}
         <View style={styles.lessonHeader}>
           <View style={styles.typeRow}>
-            <Ionicons
-              name={hasVideo ? 'play-circle-outline' : 'document-text-outline'}
-              size={14}
-              color={course.banner_color}
-            />
-            <Typography variant="overline" color={course.banner_color}>
-              {lesson.tipo} · {lesson.duracion_minutos} min
-            </Typography>
+            <View style={[styles.typePill, { backgroundColor: `${course.banner_color}18` }]}>
+              <Ionicons
+                name={hasVideo ? 'play-circle-outline' : 'document-text-outline'}
+                size={12}
+                color={course.banner_color}
+              />
+              <Typography variant="overline" color={course.banner_color} style={{ fontSize: 10 }}>
+                {lesson.tipo}
+              </Typography>
+            </View>
+            <View style={styles.durationPill}>
+              <Ionicons name="time-outline" size={11} color={theme.textMuted} />
+              <Typography variant="caption" muted>{lesson.duracion_minutos} min</Typography>
+            </View>
           </View>
-          <Typography variant="h2" style={{ color: theme.text }}>
+          <Typography variant="h2" style={{ color: theme.text, lineHeight: 32 }}>
             {lesson.titulo}
           </Typography>
           {completed && (
@@ -389,13 +399,35 @@ const styles = StyleSheet.create({
     paddingHorizontal: Spacing.md,
     paddingVertical: 10,
     borderBottomWidth: StyleSheet.hairlineWidth,
-    gap: 10,
+    gap: 12,
   },
-  backBtn: { padding: 4 },
-  topCenter: { flex: 1, gap: 6 },
+  backBtn: {
+    width: 36,
+    height: 36,
+    borderRadius: 10,
+    alignItems: 'center',
+    justifyContent: 'center',
+    flexShrink: 0,
+  },
+  topCenter: { flex: 1, gap: 7 },
+  topMeta: { flexDirection: 'row', alignItems: 'center', gap: 6 },
+  topAccentDot: { width: 6, height: 6, borderRadius: 3 },
   scroll: { paddingBottom: 16 },
-  lessonHeader: { padding: Spacing.lg, gap: 10 },
-  typeRow: { flexDirection: 'row', alignItems: 'center', gap: 6 },
+  lessonHeader: { padding: Spacing.lg, gap: 12 },
+  typeRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+  typePill: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 5,
+    paddingHorizontal: 9,
+    paddingVertical: 4,
+    borderRadius: BorderRadius.full,
+  },
+  durationPill: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+  },
   videoProgressRow: { marginTop: 4 },
   completedBadge: {
     flexDirection: 'row',

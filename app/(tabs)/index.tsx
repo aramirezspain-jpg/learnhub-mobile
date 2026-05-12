@@ -9,15 +9,21 @@ import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useColorScheme } from '@/hooks/use-color-scheme';
-import { Colors, Spacing, BorderRadius, Shadows, FontSizes } from '@/constants/theme';
+import { Colors, Spacing, BorderRadius, Shadows, FontSizes, FontWeights } from '@/constants/theme';
 import { Typography } from '@/components/ui/Typography';
 import { ProgressBar } from '@/components/ui/ProgressBar';
-import { Badge } from '@/components/ui/Badge';
+import { CourseCard } from '@/components/course/CourseCard';
 import { useCourses } from '@/hooks/useCourses';
 import { useProgressStore } from '@/store/progress.store';
 import { ContentService } from '@/services/content.service';
 
-function StatCard({ icon, value, label, color }: {
+// ─── Stat card ────────────────────────────────────────────────────────────────
+function StatCard({
+  icon,
+  value,
+  label,
+  color,
+}: {
   icon: React.ComponentProps<typeof Ionicons>['name'];
   value: string | number;
   label: string;
@@ -26,66 +32,82 @@ function StatCard({ icon, value, label, color }: {
   const scheme = useColorScheme() ?? 'dark';
   const theme = Colors[scheme];
   return (
-    <View style={[styles.statCard, { backgroundColor: theme.card, flex: 1 }, Shadows.sm]}>
-      <View style={[styles.statIcon, { backgroundColor: `${color}20` }]}>
-        <Ionicons name={icon} size={20} color={color} />
+    <View style={[styles.statCard, { backgroundColor: theme.card, borderColor: `${color}20` }]}>
+      <View style={[styles.statIconWrap, { backgroundColor: `${color}18` }]}>
+        <Ionicons name={icon} size={18} color={color} />
       </View>
-      <Typography variant="h2" color={color}>{value}</Typography>
-      <Typography variant="caption" secondary>{label}</Typography>
+      <Typography variant="h2" color={color} style={styles.statValue}>
+        {value}
+      </Typography>
+      <Typography variant="caption" secondary style={styles.statLabel}>
+        {label}
+      </Typography>
     </View>
   );
 }
 
-function LevelCard({ level, courseCount, onPress }: {
-  level: { id: string; nombre: string; descripcion: string; color: string; icono: string; orden: number };
-  courseCount: number;
-  onPress: () => void;
+// ─── Section header ───────────────────────────────────────────────────────────
+function SectionHeader({
+  title,
+  action,
+  onAction,
+}: {
+  title: string;
+  action?: string;
+  onAction?: () => void;
 }) {
   const scheme = useColorScheme() ?? 'dark';
   const theme = Colors[scheme];
   return (
-    <TouchableOpacity
-      style={[styles.levelCard, { backgroundColor: theme.card }, Shadows.sm]}
-      onPress={onPress}
-      activeOpacity={0.8}
-    >
-      <View style={[styles.levelTop, { backgroundColor: level.color }]}>
-        <Ionicons name={level.icono as React.ComponentProps<typeof Ionicons>['name']} size={28} color="#FFF" />
-        <Badge label={`Nivel ${level.orden}`} color="#FFF" bg="rgba(255,255,255,0.25)" size="sm" />
-      </View>
-      <View style={styles.levelBottom}>
-        <Typography variant="h4" style={{ color: theme.text }} numberOfLines={1}>{level.nombre}</Typography>
-        <Typography variant="caption" secondary numberOfLines={2}>{level.descripcion}</Typography>
-        <Typography variant="caption" color={level.color} style={{ marginTop: 4, fontWeight: '600' }}>
-          {courseCount} {courseCount === 1 ? 'curso' : 'cursos'}
+    <View style={styles.sectionHeader}>
+      <View style={styles.sectionTitleRow}>
+        <View style={[styles.sectionDot, { backgroundColor: Colors.primary }]} />
+        <Typography variant="h3" style={{ color: theme.text }}>
+          {title}
         </Typography>
       </View>
-    </TouchableOpacity>
+      {action && onAction && (
+        <TouchableOpacity onPress={onAction} style={styles.sectionAction} activeOpacity={0.7}>
+          <Typography variant="label" color={Colors.primary}>
+            {action}
+          </Typography>
+          <Ionicons name="chevron-forward" size={14} color={Colors.primary} />
+        </TouchableOpacity>
+      )}
+    </View>
   );
 }
 
+// ─── Main screen ──────────────────────────────────────────────────────────────
 export default function HomeScreen() {
   const router = useRouter();
   const scheme = useColorScheme() ?? 'dark';
   const theme = Colors[scheme];
-  const { levels, courses, getAllCoursesWithProgress } = useCourses();
+  const { courses, getAllCoursesWithProgress } = useCourses();
   const lastViewed = useProgressStore(s => s.lastViewed);
   const getCompletedCount = useProgressStore(s => s.getCompletedCountForCourse);
 
   const coursesWithProgress = getAllCoursesWithProgress();
-  const totalCompleted = courses.reduce(
-    (sum, c) => sum + getCompletedCount(c.id),
-    0
-  );
+  const totalCompleted = courses.reduce((sum, c) => sum + getCompletedCount(c.id), 0);
   const totalLessons = courses.reduce((sum, c) => sum + c.total_lecciones, 0);
+  const inProgressCount = courses.filter(c => {
+    const n = getCompletedCount(c.id);
+    return n > 0 && n < c.total_lecciones;
+  }).length;
 
-  // Curso para "Continuar"
-  let continueCourse = null;
+  // "Continue" target
+  let continueCourse: {
+    course: ReturnType<typeof ContentService.getCourseById>;
+    module: { titulo: string };
+    lesson: { id: string; titulo: string };
+    progress?: (typeof coursesWithProgress)[number];
+  } | null = null;
+
   if (lastViewed) {
     const found = ContentService.getLessonById(lastViewed.lesson_id);
     if (found) {
-      const progress = coursesWithProgress.find(cp => cp.course.id === found.course.id);
-      continueCourse = { ...found, progress };
+      const prog = coursesWithProgress.find(cp => cp.course.id === found.course.id);
+      continueCourse = { ...found, progress: prog };
     }
   }
   if (!continueCourse && courses.length > 0) {
@@ -93,76 +115,113 @@ export default function HomeScreen() {
     if (first) {
       const found = ContentService.getLessonById(first.lessonId);
       if (found) {
-        const progress = coursesWithProgress.find(cp => cp.course.id === found.course.id);
-        continueCourse = { ...found, progress };
+        const prog = coursesWithProgress.find(cp => cp.course.id === found.course.id);
+        continueCourse = { ...found, progress: prog };
       }
     }
   }
 
+  const progressPct = continueCourse?.progress?.progress.progress_percent ?? 0;
+  const isNew = progressPct === 0;
+
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: theme.background }]} edges={['top']}>
-      <ScrollView
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={styles.scroll}
-      >
+      <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scroll}>
+
         {/* ── Header ── */}
         <View style={styles.header}>
-          <View>
-            <Typography variant="overline" secondary>Instituto Bíblico</Typography>
-            <Typography variant="h1" style={{ color: theme.text }}>LearnHub</Typography>
+          <View style={styles.headerLeft}>
+            <Typography variant="overline" secondary>
+              Instituto Bíblico
+            </Typography>
+            <Typography variant="h1" style={{ color: theme.text }}>
+              LearnHub
+            </Typography>
           </View>
           <TouchableOpacity
-            style={[styles.avatarWrap, { backgroundColor: `${Colors.primary}20` }]}
+            style={[styles.avatarBtn, { backgroundColor: `${Colors.primary}18`, borderColor: `${Colors.primary}30` }]}
             onPress={() => router.push('/profile' as never)}
             activeOpacity={0.7}
           >
-            <Ionicons name="person-outline" size={22} color={Colors.primary} />
+            <Ionicons name="person-outline" size={20} color={Colors.primary} />
           </TouchableOpacity>
         </View>
 
-        {/* ── Continuar aprendiendo ── */}
+        {/* ── Continue Learning ── */}
         {continueCourse && (
-          <View style={styles.section}>
-            <Typography variant="h3" style={{ color: theme.text, marginBottom: 12 }}>
-              {lastViewed ? 'Continuar aprendiendo' : 'Comenzar'}
-            </Typography>
+          <View style={[styles.section]}>
+            <SectionHeader
+              title={lastViewed ? 'Continuar aprendiendo' : 'Comenzar'}
+            />
             <TouchableOpacity
               style={[styles.continueCard, Shadows.primary]}
-              onPress={() => router.push({ pathname: '/lesson/[id]', params: { id: continueCourse!.lesson.id } })}
-              activeOpacity={0.85}
+              onPress={() =>
+                router.push({
+                  pathname: '/lesson/[id]',
+                  params: { id: continueCourse!.lesson.id },
+                })
+              }
+              activeOpacity={0.88}
             >
+              {/* Colored background */}
               <View
-                style={[styles.continueGradient, { backgroundColor: continueCourse.course.banner_color }]}
+                style={[
+                  styles.continueInner,
+                  { backgroundColor: continueCourse.course?.banner_color ?? Colors.primary },
+                ]}
               >
-                <View style={styles.continueMeta}>
-                  <Badge
-                    label={continueCourse.course.titulo}
-                    color="#FFF"
-                    bg="rgba(255,255,255,0.22)"
-                    size="sm"
-                  />
-                  <Typography variant="h3" style={styles.continueTitle} numberOfLines={2}>
-                    {continueCourse.lesson.titulo}
-                  </Typography>
-                  <Typography variant="caption" style={styles.continueModule}>
-                    {continueCourse.module.titulo}
-                  </Typography>
+                {/* Decorative blobs */}
+                <View style={styles.blob1} />
+                <View style={styles.blob2} />
+
+                <View style={styles.continueTop}>
+                  <View style={styles.courseChip}>
+                    <Ionicons name="book-outline" size={12} color="rgba(255,255,255,0.85)" />
+                    <Typography variant="caption" style={styles.courseChipText} numberOfLines={1}>
+                      {continueCourse.course?.titulo}
+                    </Typography>
+                  </View>
+                  {!isNew && (
+                    <View style={styles.pctBadge}>
+                      <Typography variant="caption" style={styles.pctText}>
+                        {progressPct}%
+                      </Typography>
+                    </View>
+                  )}
                 </View>
 
+                <Typography
+                  variant="h2"
+                  style={styles.continueTitle}
+                  numberOfLines={2}
+                >
+                  {continueCourse.lesson.titulo}
+                </Typography>
+                <Typography variant="caption" style={styles.continueModule}>
+                  {continueCourse.module.titulo}
+                </Typography>
+
+                {/* Progress row */}
                 <View style={styles.continueBottom}>
                   <View style={styles.continueProg}>
                     <ProgressBar
-                      progress={continueCourse.progress?.progress.progress_percent ?? 0}
-                      color="rgba(255,255,255,0.9)"
-                      trackColor="rgba(255,255,255,0.25)"
-                      height={5}
+                      progress={progressPct}
+                      color="rgba(255,255,255,0.95)"
+                      trackColor="rgba(255,255,255,0.2)"
+                      height={4}
                     />
-                    <Typography variant="caption" style={{ color: 'rgba(255,255,255,0.8)', marginTop: 4 }}>
-                      {continueCourse.progress?.progress.progress_percent ?? 0}% del curso completado
+                    <Typography variant="caption" style={styles.continueProgLabel}>
+                      {isNew
+                        ? 'Empieza tu primera lección'
+                        : `${progressPct}% del curso completado`}
                     </Typography>
                   </View>
-                  <View style={styles.continueBtn}>
-                    <Ionicons name="play" size={18} color={continueCourse.course.banner_color} />
+                  <View style={[styles.playBtn, { backgroundColor: 'rgba(255,255,255,0.95)' }]}>
+                    <Ionicons
+                      name="play"
+                      size={18}
+                      color={continueCourse.course?.banner_color ?? Colors.primary}
+                    />
                   </View>
                 </View>
               </View>
@@ -170,9 +229,9 @@ export default function HomeScreen() {
           </View>
         )}
 
-        {/* ── Estadísticas ── */}
+        {/* ── Stats ── */}
         <View style={styles.section}>
-          <Typography variant="h3" style={{ color: theme.text, marginBottom: 12 }}>Tu progreso</Typography>
+          <SectionHeader title="Tu progreso" />
           <View style={styles.statsRow}>
             <StatCard
               icon="checkmark-circle"
@@ -187,70 +246,34 @@ export default function HomeScreen() {
               color={Colors.primary}
             />
             <StatCard
-              icon="school"
-              value={courses.length}
-              label="Cursos"
+              icon="stats-chart"
+              value={inProgressCount > 0 ? inProgressCount : courses.length}
+              label={inProgressCount > 0 ? 'En curso' : 'Cursos'}
               color={Colors.accent}
             />
           </View>
         </View>
 
-        {/* ── Niveles ── */}
+        {/* ── Courses ── */}
         <View style={styles.section}>
-          <View style={styles.sectionHeader}>
-            <Typography variant="h3" style={{ color: theme.text }}>Niveles</Typography>
-            <TouchableOpacity onPress={() => router.push('/courses' as never)}>
-              <Typography variant="label" color={Colors.primary}>Ver todos</Typography>
-            </TouchableOpacity>
-          </View>
-          <ScrollView
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            contentContainerStyle={styles.levelsScroll}
-          >
-            {levels.map(level => (
-              <LevelCard
-                key={level.id}
-                level={level}
-                courseCount={courses.filter(c => c.nivel_id === level.id).length}
-                onPress={() => router.push('/courses' as never)}
-              />
-            ))}
-          </ScrollView>
-        </View>
-
-        {/* ── Cursos disponibles ── */}
-        <View style={styles.section}>
-          <View style={styles.sectionHeader}>
-            <Typography variant="h3" style={{ color: theme.text }}>Cursos disponibles</Typography>
-            <TouchableOpacity onPress={() => router.push('/courses' as never)}>
-              <Typography variant="label" color={Colors.primary}>Ver todos</Typography>
-            </TouchableOpacity>
-          </View>
-
+          <SectionHeader
+            title="Cursos disponibles"
+            action="Ver todos"
+            onAction={() => router.push('/courses' as never)}
+          />
           {coursesWithProgress.slice(0, 3).map(({ course, progress }) => (
-            <TouchableOpacity
+            <CourseCard
               key={course.id}
-              style={[styles.courseRow, { backgroundColor: theme.card }, Shadows.sm]}
-              onPress={() => router.push({ pathname: '/course/[id]', params: { id: course.id } })}
-              activeOpacity={0.8}
-            >
-              <View style={[styles.courseRowAccent, { backgroundColor: course.banner_color }]}>
-                <Ionicons name="book-outline" size={22} color="#FFF" />
-              </View>
-              <View style={styles.courseRowText}>
-                <Typography variant="label" style={{ color: theme.text }} numberOfLines={1}>
-                  {course.titulo}
-                </Typography>
-                <ProgressBar progress={progress.progress_percent} color={course.banner_color} height={3} />
-                <Typography variant="caption" secondary>
-                  {progress.completed_lessons}/{progress.total_lessons} lecciones
-                </Typography>
-              </View>
-              <Ionicons name="chevron-forward" size={16} color={theme.textMuted} />
-            </TouchableOpacity>
+              course={course}
+              progressPercent={progress.progress_percent}
+              completedLessons={progress.completed_lessons}
+              onPress={() =>
+                router.push({ pathname: '/course/[id]', params: { id: course.id } })
+              }
+            />
           ))}
         </View>
+
       </ScrollView>
     </SafeAreaView>
   );
@@ -258,7 +281,8 @@ export default function HomeScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1 },
-  scroll: { paddingBottom: 32 },
+  scroll: { paddingBottom: 40 },
+
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -267,62 +291,135 @@ const styles = StyleSheet.create({
     paddingTop: Spacing.md,
     paddingBottom: Spacing.lg,
   },
-  avatarWrap: {
+  headerLeft: { gap: 2 },
+  avatarBtn: {
     width: 44,
     height: 44,
     borderRadius: 22,
+    borderWidth: 1,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  section: { paddingHorizontal: Spacing.lg, marginBottom: Spacing.xl },
+
+  section: {
+    paddingHorizontal: Spacing.lg,
+    marginBottom: Spacing.xl,
+  },
   sectionHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 12,
+    marginBottom: 14,
   },
-  continueCard: { borderRadius: BorderRadius.xl, overflow: 'hidden' },
-  continueGradient: { padding: Spacing.lg, gap: 16 },
-  continueMeta: { gap: 8 },
-  continueTitle: { color: '#FFF', fontSize: FontSizes.xl },
-  continueModule: { color: 'rgba(255,255,255,0.75)' },
-  continueBottom: { flexDirection: 'row', alignItems: 'center', gap: 12 },
-  continueProg: { flex: 1 },
-  continueBtn: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-    backgroundColor: 'rgba(255,255,255,0.95)',
+  sectionTitleRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+  sectionDot: { width: 4, height: 16, borderRadius: 2 },
+  sectionAction: { flexDirection: 'row', alignItems: 'center', gap: 2 },
+
+  // Continue card
+  continueCard: {
+    borderRadius: BorderRadius.xl,
+    overflow: 'hidden',
+  },
+  continueInner: {
+    padding: Spacing.lg,
+    gap: 10,
+    overflow: 'hidden',
+  },
+  blob1: {
+    position: 'absolute',
+    width: 200,
+    height: 200,
+    borderRadius: 100,
+    backgroundColor: 'rgba(255,255,255,0.07)',
+    right: -60,
+    top: -60,
+  },
+  blob2: {
+    position: 'absolute',
+    width: 120,
+    height: 120,
+    borderRadius: 60,
+    backgroundColor: 'rgba(255,255,255,0.05)',
+    left: -30,
+    bottom: -40,
+  },
+  continueTop: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  courseChip: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 5,
+    backgroundColor: 'rgba(0,0,0,0.22)',
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: BorderRadius.full,
+    maxWidth: '75%',
+  },
+  courseChipText: {
+    color: 'rgba(255,255,255,0.9)',
+    fontSize: FontSizes.xs,
+    fontWeight: FontWeights.semibold,
+  },
+  pctBadge: {
+    backgroundColor: 'rgba(255,255,255,0.22)',
+    paddingHorizontal: 9,
+    paddingVertical: 3,
+    borderRadius: BorderRadius.full,
+  },
+  pctText: {
+    color: '#FFF',
+    fontSize: FontSizes.xs,
+    fontWeight: FontWeights.bold,
+  },
+  continueTitle: {
+    color: '#FFFFFF',
+    fontSize: FontSizes['2xl'],
+    fontWeight: FontWeights.extrabold,
+    lineHeight: 32,
+  },
+  continueModule: {
+    color: 'rgba(255,255,255,0.7)',
+  },
+  continueBottom: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    marginTop: 4,
+  },
+  continueProg: { flex: 1, gap: 5 },
+  continueProgLabel: {
+    color: 'rgba(255,255,255,0.75)',
+  },
+  playBtn: {
+    width: 46,
+    height: 46,
+    borderRadius: 23,
     alignItems: 'center',
     justifyContent: 'center',
+    flexShrink: 0,
   },
+
+  // Stats
   statsRow: { flexDirection: 'row', gap: Spacing.sm },
   statCard: {
-    padding: Spacing.md,
+    flex: 1,
+    padding: 14,
     borderRadius: BorderRadius.lg,
     alignItems: 'center',
     gap: 4,
+    borderWidth: 1,
   },
-  statIcon: {
-    width: 40,
-    height: 40,
+  statIconWrap: {
+    width: 38,
+    height: 38,
     borderRadius: BorderRadius.md,
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: 4,
+    marginBottom: 2,
   },
-  levelsScroll: { gap: Spacing.sm, paddingRight: Spacing.lg },
-  levelCard: { width: 180, borderRadius: BorderRadius.lg, overflow: 'hidden' },
-  levelTop: { padding: Spacing.md, gap: 8 },
-  levelBottom: { padding: Spacing.md, gap: 4 },
-  courseRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    borderRadius: BorderRadius.lg,
-    overflow: 'hidden',
-    marginBottom: Spacing.sm,
-    gap: 12,
-  },
-  courseRowAccent: { width: 56, height: 72, alignItems: 'center', justifyContent: 'center' },
-  courseRowText: { flex: 1, gap: 6, paddingVertical: 12 },
+  statValue: { lineHeight: 28 },
+  statLabel: { textAlign: 'center' },
 });
