@@ -25,6 +25,26 @@ export class ProgressRepository {
     );
   }
 
+  async updateVideoProgress(
+    courseId: string,
+    moduleId: string,
+    lessonId: string,
+    percent: number
+  ): Promise<void> {
+    await this.db.runAsync(
+      `INSERT INTO lesson_progress (id, course_id, module_id, lesson_id, completed, progress_percent, updated_at)
+       VALUES (?, ?, ?, ?, 0, ?, datetime('now'))
+       ON CONFLICT(lesson_id) DO UPDATE SET
+         progress_percent = CASE
+           WHEN ? > lesson_progress.progress_percent AND lesson_progress.completed = 0
+           THEN ?
+           ELSE lesson_progress.progress_percent
+         END,
+         updated_at = datetime('now')`,
+      [genId(), courseId, moduleId, lessonId, percent, percent, percent]
+    );
+  }
+
   async getLessonProgress(lessonId: string): Promise<LessonProgress | null> {
     return await this.db.getFirstAsync<LessonProgress>(
       'SELECT * FROM lesson_progress WHERE lesson_id = ?',

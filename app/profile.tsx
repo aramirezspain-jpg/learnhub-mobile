@@ -91,7 +91,15 @@ export default function ProfileScreen() {
   const totalCompleted = courses.reduce((sum, c) => sum + getCompletedCount(c.id), 0);
   const globalPercent = totalLessons > 0 ? Math.round((totalCompleted / totalLessons) * 100) : 0;
   const streak = useMemo(() => computeStreak(lessonProgress), [lessonProgress]);
-  const coursesStarted = courses.filter(c => getCompletedCount(c.id) > 0).length;
+  const coursesCompleted = courses.filter(c => {
+    const total = ContentService.getTotalLessons(c.id);
+    return total > 0 && getCompletedCount(c.id) >= total;
+  }).length;
+  const coursesInProgress = courses.filter(c => {
+    const cnt = getCompletedCount(c.id);
+    const total = ContentService.getTotalLessons(c.id);
+    return cnt > 0 && cnt < total;
+  }).length;
 
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: theme.background }]} edges={['top', 'bottom']}>
@@ -139,7 +147,7 @@ export default function ProfileScreen() {
             <StatCard
               icon="checkmark-circle"
               value={totalCompleted}
-              label="Completadas"
+              label="Lecciones ✓"
               color={Colors.success}
             />
             <StatCard
@@ -150,7 +158,7 @@ export default function ProfileScreen() {
             />
             <StatCard
               icon="school"
-              value={coursesStarted}
+              value={coursesInProgress}
               label="En progreso"
               color={Colors.primary}
             />
@@ -162,6 +170,14 @@ export default function ProfileScreen() {
             />
           </View>
           <View style={styles.statsFull}>
+            <StatCard
+              icon="trophy"
+              value={coursesCompleted}
+              label="Cursos completados"
+              color={Colors.accent}
+            />
+          </View>
+          <View style={[styles.statsFull, { marginTop: 10 }]}>
             <StatCard
               icon="document-text"
               value={noteCount}
@@ -196,6 +212,7 @@ export default function ProfileScreen() {
             const total = ContentService.getTotalLessons(course.id);
             const prog = getCourseProgress(course.id, total);
             const completed = getCompletedCount(course.id);
+            const done = prog.progress_percent === 100;
             return (
               <View
                 key={course.id}
@@ -203,15 +220,25 @@ export default function ProfileScreen() {
               >
                 <View style={[styles.courseAccent, { backgroundColor: course.banner_color }]} />
                 <View style={styles.courseInfo}>
-                  <Typography variant="label" style={{ color: theme.text }} numberOfLines={1}>
-                    {course.titulo}
-                  </Typography>
-                  <ProgressBar progress={prog.progress_percent} color={course.banner_color} height={5} />
+                  <View style={styles.courseTitleRow}>
+                    <Typography variant="label" style={{ color: theme.text, flex: 1 }} numberOfLines={1}>
+                      {course.titulo}
+                    </Typography>
+                    {done && (
+                      <View style={[styles.doneBadge, { backgroundColor: `${Colors.success}18` }]}>
+                        <Ionicons name="checkmark-circle" size={12} color={Colors.success} />
+                        <Typography variant="caption" color={Colors.success} style={{ fontWeight: '700' }}>
+                          Completado
+                        </Typography>
+                      </View>
+                    )}
+                  </View>
+                  <ProgressBar progress={prog.progress_percent} color={done ? Colors.success : course.banner_color} height={5} />
                   <View style={styles.courseStats}>
                     <Typography variant="caption" secondary>
                       {completed}/{total} lecciones
                     </Typography>
-                    <Typography variant="label" color={course.banner_color}>
+                    <Typography variant="label" color={done ? Colors.success : course.banner_color}>
                       {prog.progress_percent}%
                     </Typography>
                   </View>
@@ -322,6 +349,15 @@ const styles = StyleSheet.create({
   },
   courseAccent: { width: 6 },
   courseInfo: { flex: 1, padding: Spacing.md, gap: 8 },
+  courseTitleRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+  doneBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 3,
+    paddingHorizontal: 7,
+    paddingVertical: 3,
+    borderRadius: BorderRadius.full,
+  },
   courseStats: { flexDirection: 'row', justifyContent: 'space-between' },
   appInfo: {
     marginHorizontal: Spacing.lg,

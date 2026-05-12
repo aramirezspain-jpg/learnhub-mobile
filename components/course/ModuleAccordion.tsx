@@ -12,6 +12,7 @@ interface ModuleAccordionProps {
   courseId: string;
   defaultOpen?: boolean;
   completedLessonIds: Set<string>;
+  isLocked?: boolean;
   onLessonPress: (lessonId: string) => void;
 }
 
@@ -20,15 +21,37 @@ export function ModuleAccordion({
   courseId,
   defaultOpen = false,
   completedLessonIds,
+  isLocked = false,
   onLessonPress,
 }: ModuleAccordionProps) {
-  const [open, setOpen] = useState(defaultOpen);
+  const [open, setOpen] = useState(defaultOpen && !isLocked);
   const scheme = useColorScheme() ?? 'dark';
   const theme = Colors[scheme];
 
   const completed = module.lecciones.filter(l => completedLessonIds.has(l.id)).length;
   const total = module.lecciones.length;
   const allDone = completed === total && total > 0;
+
+  if (isLocked) {
+    return (
+      <View style={[styles.container, styles.lockedContainer, { backgroundColor: theme.card }, Shadows.sm]}>
+        <View style={styles.header}>
+          <View style={[styles.moduleIcon, { backgroundColor: theme.border }]}>
+            <Ionicons name="lock-closed-outline" size={20} color={theme.textMuted} />
+          </View>
+          <View style={styles.headerText}>
+            <Typography variant="h4" style={{ color: theme.textSecondary }} numberOfLines={1}>
+              {module.titulo}
+            </Typography>
+            <Typography variant="caption" muted>
+              Completa el módulo anterior para desbloquear
+            </Typography>
+          </View>
+          <Ionicons name="lock-closed" size={16} color={theme.textMuted} />
+        </View>
+      </View>
+    );
+  }
 
   return (
     <View style={[styles.container, { backgroundColor: theme.card }, Shadows.sm]}>
@@ -38,7 +61,7 @@ export function ModuleAccordion({
         onPress={() => setOpen(o => !o)}
         activeOpacity={0.8}
       >
-        <View style={[styles.moduleIcon, { backgroundColor: `${Colors.primary}20` }]}>
+        <View style={[styles.moduleIcon, { backgroundColor: allDone ? `${Colors.success}18` : `${Colors.primary}20` }]}>
           <Ionicons
             name={allDone ? 'checkmark-circle' : (module.icono as React.ComponentProps<typeof Ionicons>['name']) || 'book-outline'}
             size={20}
@@ -51,7 +74,7 @@ export function ModuleAccordion({
             {module.titulo}
           </Typography>
           <Typography variant="caption" secondary>
-            {completed}/{total} lecciones
+            {completed}/{total} lecciones{allDone ? ' · Completado' : ''}
           </Typography>
         </View>
 
@@ -85,6 +108,9 @@ const styles = StyleSheet.create({
     borderRadius: BorderRadius.lg,
     marginBottom: Spacing.sm,
     overflow: 'hidden',
+  },
+  lockedContainer: {
+    opacity: 0.55,
   },
   header: {
     flexDirection: 'row',

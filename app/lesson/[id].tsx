@@ -1,30 +1,42 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import {
   View,
   ScrollView,
   TouchableOpacity,
   StyleSheet,
+  Alert,
 } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useColorScheme } from '@/hooks/use-color-scheme';
-import { Colors, Spacing, BorderRadius, Shadows, FontSizes } from '@/constants/theme';
+import { Colors, Spacing, BorderRadius, FontSizes } from '@/constants/theme';
 import { Typography } from '@/components/ui/Typography';
 import { ProgressBar } from '@/components/ui/ProgressBar';
 import { Button } from '@/components/ui/Button';
+import { YouTubeLessonPlayer } from '@/components/lesson/YouTubeLessonPlayer';
 import { ContentService } from '@/services/content.service';
 import { useProgress } from '@/hooks/useProgress';
 import { useNotesStore } from '@/store/notes.store';
+import { useProgressStore } from '@/store/progress.store';
 
 export default function LessonScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
   const scheme = useColorScheme() ?? 'dark';
   const theme = Colors[scheme];
-  const { isLessonComplete, markLessonComplete, recordLastViewed } = useProgress();
+  const {
+    isLessonComplete,
+    markLessonComplete,
+    recordLastViewed,
+    getCompletedCountForCourse,
+    saveVideoProgress,
+  } = useProgress();
+
   const hasNote = useNotesStore(s => s.hasNoteForLesson(id));
+  const lessonProgress = useProgressStore(s => s.lessonProgress[id]);
   const [completing, setCompleting] = useState(false);
+  const autoCompletedRef = useRef(false);
 
   const found = ContentService.getLessonById(id);
   const adjacent = ContentService.getAdjacentLessons(id);
@@ -45,8 +57,8 @@ export default function LessonScreen() {
 
   const { course, module, lesson } = found;
   const completed = isLessonComplete(id);
+  const videoProgress = lessonProgress?.progress_percent ?? 0;
 
-  // Calcular el número de lección dentro del curso
   const allLessons: string[] = [];
   for (const m of course.modulos) {
     for (const l of m.lecciones) allLessons.push(l.id);
@@ -59,7 +71,47 @@ export default function LessonScreen() {
     setCompleting(true);
     await markLessonComplete(course.id, module.id, id);
     setCompleting(false);
+
+    const total = ContentService.getTotalLessons(course.id);
+    const nowCompleted = getCompletedCountForCourse(course.id);
+    if (total > 0 && nowCompleted >= total) {
+      Alert.alert(
+        '¡Curso completado! 🎉',
+        `Has completado "${course.titulo}" al 100%. ¡Excelente trabajo!`,
+        [
+          { text: 'Ver curso', onPress: () => router.back() },
+          { text: 'Continuar aquí', style: 'cancel' },
+        ]
+      );
+    }
   }
+
+  const handleVideoComplete = useCallback(async () => {
+    if (autoCompletedRef.current || completed) return;
+    autoCompletedRef.current = true;
+    await markLessonComplete(course.id, module.id, id);
+
+    const total = ContentService.getTotalLessons(course.id);
+    const nowCompleted = getCompletedCountForCourse(course.id);
+    if (total > 0 && nowCompleted >= total) {
+      Alert.alert(
+        '¡Curso completado! 🎉',
+        `Has completado "${course.titulo}" al 100%. ¡Excelente trabajo!`,
+        [
+          { text: 'Ver curso', onPress: () => router.back() },
+          { text: 'Continuar aquí', style: 'cancel' },
+        ]
+      );
+    }
+  }, [completed, course, module, id, markLessonComplete, getCompletedCountForCourse, router]);
+
+  const handleVideoProgress = useCallback(
+    (pct: number) => {
+      if (completed) return;
+      saveVideoProgress(course.id, module.id, id, pct);
+    },
+    [completed, course.id, module.id, id, saveVideoProgress]
+  );
 
   function handleQuiz() {
     if (!lesson.quiz) return;
@@ -69,6 +121,8 @@ export default function LessonScreen() {
   function handleNotes() {
     router.push({ pathname: '/notes/[id]' as never, params: { id: lesson.id, courseId: course.id } });
   }
+
+  const hasVideo = Boolean(lesson.video_url);
 
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: theme.background }]} edges={['top', 'bottom']}>
@@ -98,11 +152,23 @@ export default function LessonScreen() {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.scroll}
       >
+        {/* Reproductor YouTube */}
+        {hasVideo && lesson.video_url && (
+          <YouTubeLessonPlayer
+            videoUrl={lesson.video_url}
+            accentColor={course.banner_color}
+            isCompleted={completed}
+            lessonProgress={videoProgress}
+            onComplete={handleVideoComplete}
+            onProgress={handleVideoProgress}
+          />
+        )}
+
         {/* Cabecera de lección */}
         <View style={styles.lessonHeader}>
           <View style={styles.typeRow}>
             <Ionicons
-              name="document-text-outline"
+              name={hasVideo ? 'play-circle-outline' : 'document-text-outline'}
               size={14}
               color={course.banner_color}
             />
@@ -118,6 +184,20 @@ export default function LessonScreen() {
               <Ionicons name="checkmark-circle" size={15} color={Colors.success} />
               <Typography variant="caption" color={Colors.success} style={{ fontWeight: '700' }}>
                 Lección completada
+              </Typography>
+            </View>
+          )}
+          {/* Progress bar de video cuando hay video y no está completo */}
+          {hasVideo && !completed && videoProgress > 0 && (
+            <View style={styles.videoProgressRow}>
+              <ProgressBar
+                progress={videoProgress}
+                color={course.banner_color}
+                trackColor={`${course.banner_color}20`}
+                height={4}
+              />
+              <Typography variant="caption" color={course.banner_color} style={{ fontWeight: '600', marginTop: 4 }}>
+                {videoProgress}% visto
               </Typography>
             </View>
           )}
@@ -193,6 +273,29 @@ export default function LessonScreen() {
           </View>
         )}
 
+        {/* Recursos */}
+        {lesson.recursos.length > 0 && (
+          <View style={styles.recursos}>
+            <View style={styles.keyHeader}>
+              <Ionicons name="attach-outline" size={18} color={theme.textSecondary} />
+              <Typography variant="h4" style={{ color: theme.text }}>Recursos</Typography>
+            </View>
+            {lesson.recursos.map(rec => (
+              <View key={rec.id} style={[styles.recursoItem, { backgroundColor: theme.card, borderColor: theme.border }]}>
+                <Ionicons
+                  name={rec.tipo === 'pdf' ? 'document-outline' : rec.tipo === 'video' ? 'play-circle-outline' : 'link-outline'}
+                  size={18}
+                  color={course.banner_color}
+                />
+                <Typography variant="label" style={{ color: theme.text, flex: 1 }} numberOfLines={1}>
+                  {rec.titulo}
+                </Typography>
+                <Ionicons name="chevron-forward" size={14} color={theme.textMuted} />
+              </View>
+            ))}
+          </View>
+        )}
+
         {/* Navegación entre lecciones */}
         <View style={styles.navRow}>
           {adjacent.prev ? (
@@ -230,7 +333,13 @@ export default function LessonScreen() {
           </TouchableOpacity>
         )}
         <TouchableOpacity
-          style={[styles.iconBtn, { backgroundColor: hasNote ? `${Colors.primary}20` : `${Colors.primary}10`, borderColor: hasNote ? `${Colors.primary}50` : `${Colors.primary}25` }]}
+          style={[
+            styles.iconBtn,
+            {
+              backgroundColor: hasNote ? `${Colors.primary}20` : `${Colors.primary}10`,
+              borderColor: hasNote ? `${Colors.primary}50` : `${Colors.primary}25`,
+            },
+          ]}
           onPress={handleNotes}
         >
           <Ionicons
@@ -240,14 +349,33 @@ export default function LessonScreen() {
           />
           <Typography variant="label" color={Colors.primary}>Notas</Typography>
         </TouchableOpacity>
-        <Button
-          label={completed ? '✓ Completada' : 'Completar'}
-          onPress={handleComplete}
-          loading={completing}
-          variant={completed ? 'secondary' : 'primary'}
-          style={{ flex: 1 }}
-          disabled={completed}
-        />
+        {!hasVideo && (
+          <Button
+            label={completed ? '✓ Completada' : 'Completar'}
+            onPress={handleComplete}
+            loading={completing}
+            variant={completed ? 'secondary' : 'primary'}
+            style={{ flex: 1 }}
+            disabled={completed}
+          />
+        )}
+        {hasVideo && !completed && (
+          <Button
+            label={completing ? '…' : 'Completar'}
+            onPress={handleComplete}
+            loading={completing}
+            variant="primary"
+            style={{ flex: 1 }}
+          />
+        )}
+        {hasVideo && completed && (
+          <View style={[styles.completedChip, { backgroundColor: `${Colors.success}15` }]}>
+            <Ionicons name="checkmark-circle" size={16} color={Colors.success} />
+            <Typography variant="label" color={Colors.success} style={{ fontWeight: '700' }}>
+              Completada
+            </Typography>
+          </View>
+        )}
       </View>
     </SafeAreaView>
   );
@@ -268,6 +396,7 @@ const styles = StyleSheet.create({
   scroll: { paddingBottom: 16 },
   lessonHeader: { padding: Spacing.lg, gap: 10 },
   typeRow: { flexDirection: 'row', alignItems: 'center', gap: 6 },
+  videoProgressRow: { marginTop: 4 },
   completedBadge: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -319,6 +448,19 @@ const styles = StyleSheet.create({
     gap: 10,
   },
   reflectionHeader: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+  recursos: {
+    marginHorizontal: Spacing.lg,
+    marginBottom: Spacing.lg,
+    gap: 10,
+  },
+  recursoItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+    padding: Spacing.md,
+    borderRadius: BorderRadius.md,
+    borderWidth: StyleSheet.hairlineWidth,
+  },
   navRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -351,5 +493,14 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     borderRadius: BorderRadius.md,
     borderWidth: 1,
+  },
+  completedChip: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 6,
+    paddingVertical: 12,
+    borderRadius: BorderRadius.md,
   },
 });

@@ -58,6 +58,7 @@ export interface Lesson {
   contenido: LessonContent;
   quiz?: Quiz;
   recursos: Resource[];
+  video_url?: string;
 }
 
 export interface Module {

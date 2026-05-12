@@ -28,6 +28,15 @@ export function useProgress() {
     [db, store]
   );
 
+  const saveVideoProgress = useCallback(
+    async (courseId: string, moduleId: string, lessonId: string, percent: number) => {
+      store.updateProgress(lessonId, percent);
+      const repo = new ProgressRepository(db);
+      await repo.updateVideoProgress(courseId, moduleId, lessonId, percent);
+    },
+    [db, store]
+  );
+
   const recordLastViewed = useCallback(
     async (courseId: string, moduleId: string, lessonId: string) => {
       const repo = new ProgressRepository(db);
@@ -50,5 +59,6 @@ export function useProgress() {
     getCompletedCountForCourse: store.getCompletedCountForCourse,
     markLessonComplete,
     recordLastViewed,
+    saveVideoProgress,
   };
 }

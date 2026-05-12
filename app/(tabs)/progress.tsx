@@ -133,27 +133,38 @@ export default function ProgressScreen() {
             const total = ContentService.getTotalLessons(course.id);
             const prog = getCourseProgress(course.id, total);
             const completed = getCompletedCount(course.id);
+            const done = prog.progress_percent === 100;
 
             return (
               <View
                 key={course.id}
                 style={[styles.courseProgress, { backgroundColor: theme.card }, Shadows.sm]}
               >
-                <View style={[styles.courseAccent, { backgroundColor: course.banner_color }]} />
+                <View style={[styles.courseAccent, { backgroundColor: done ? Colors.success : course.banner_color }]} />
                 <View style={styles.courseInfo}>
-                  <Typography variant="label" style={{ color: theme.text }} numberOfLines={1}>
-                    {course.titulo}
-                  </Typography>
+                  <View style={styles.courseTitleRow}>
+                    <Typography variant="label" style={{ color: theme.text, flex: 1 }} numberOfLines={1}>
+                      {course.titulo}
+                    </Typography>
+                    {done && (
+                      <View style={[styles.doneBadge, { backgroundColor: `${Colors.success}18` }]}>
+                        <Ionicons name="checkmark-circle" size={12} color={Colors.success} />
+                        <Typography variant="caption" color={Colors.success} style={{ fontWeight: '700' }}>
+                          Completado
+                        </Typography>
+                      </View>
+                    )}
+                  </View>
                   <ProgressBar
                     progress={prog.progress_percent}
-                    color={course.banner_color}
+                    color={done ? Colors.success : course.banner_color}
                     height={5}
                   />
                   <View style={styles.courseStats}>
                     <Typography variant="caption" secondary>
                       {completed}/{total} lecciones
                     </Typography>
-                    <Typography variant="caption" color={course.banner_color} style={{ fontWeight: '700' }}>
+                    <Typography variant="caption" color={done ? Colors.success : course.banner_color} style={{ fontWeight: '700' }}>
                       {prog.progress_percent}%
                     </Typography>
                   </View>
@@ -213,6 +224,15 @@ const styles = StyleSheet.create({
   },
   courseAccent: { width: 6 },
   courseInfo: { flex: 1, padding: Spacing.md, gap: 8 },
+  courseTitleRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+  doneBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 3,
+    paddingHorizontal: 7,
+    paddingVertical: 3,
+    borderRadius: BorderRadius.full,
+  },
   courseStats: { flexDirection: 'row', justifyContent: 'space-between' },
   achievements: { flexDirection: 'row', flexWrap: 'wrap', gap: 12 },
   achievement: {

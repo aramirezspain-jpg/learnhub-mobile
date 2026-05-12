@@ -9,6 +9,7 @@ interface ProgressState {
   // Acciones
   setAllProgress: (progress: LessonProgress[]) => void;
   markComplete: (lessonId: string, progress: LessonProgress) => void;
+  updateProgress: (lessonId: string, percent: number) => void;
   setLastViewed: (data: LastViewed) => void;
   setQuizScore: (quizId: string, score: number) => void;
 
@@ -16,6 +17,7 @@ interface ProgressState {
   isLessonComplete: (lessonId: string) => boolean;
   getCourseProgress: (courseId: string, totalLessons: number) => CourseProgress;
   getCompletedCountForCourse: (courseId: string) => number;
+  getCompletedCountForModule: (moduleId: string) => number;
 }
 
 export const useProgressStore = create<ProgressState>((set, get) => ({
@@ -35,6 +37,27 @@ export const useProgressStore = create<ProgressState>((set, get) => ({
     set(state => ({
       lessonProgress: { ...state.lessonProgress, [lessonId]: progress },
     }));
+  },
+
+  updateProgress: (lessonId, percent) => {
+    set(state => {
+      const existing = state.lessonProgress[lessonId];
+      if (existing?.completed === 1) return state;
+      const updated: LessonProgress = existing
+        ? { ...existing, progress_percent: Math.max(existing.progress_percent, percent), updated_at: new Date().toISOString() }
+        : {
+            id: lessonId,
+            course_id: '',
+            module_id: '',
+            lesson_id: lessonId,
+            completed: 0,
+            progress_percent: percent,
+            completed_at: null,
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
+          };
+      return { lessonProgress: { ...state.lessonProgress, [lessonId]: updated } };
+    });
   },
 
   setLastViewed: (data) => set({ lastViewed: data }),
@@ -65,5 +88,11 @@ export const useProgressStore = create<ProgressState>((set, get) => ({
       completed_lessons: completed,
       progress_percent: percent,
     };
+  },
+
+  getCompletedCountForModule: (moduleId) => {
+    return Object.values(get().lessonProgress).filter(
+      p => p.module_id === moduleId && p.completed === 1
+    ).length;
   },
 }));

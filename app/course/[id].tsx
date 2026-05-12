@@ -34,8 +34,10 @@ export default function CourseDetailScreen() {
   const { recordLastViewed } = useProgress();
   const lessonProgress = useProgressStore(s => s.lessonProgress);
   const getCourseProgress = useProgressStore(s => s.getCourseProgress);
+  const lastViewed = useProgressStore(s => s.lastViewed);
 
   const { isFavorite, toggleFavorite } = useFavorites();
+
   const course = ContentService.getCourseById(id);
   const favorited = course ? isFavorite(course.id) : false;
 
@@ -44,6 +46,7 @@ export default function CourseDetailScreen() {
     await toggleFavorite(course.id, 'course', course.id);
   }, [course, toggleFavorite]);
 
+  // Conjunto de lecciones completadas para este curso — antes del guard
   const completedIds = useMemo(() => {
     if (!course) return new Set<string>();
     const ids = new Set<string>();
@@ -53,6 +56,36 @@ export default function CourseDetailScreen() {
     return ids;
   }, [lessonProgress, id, course]);
 
+  // Estado de desbloqueo por módulo — antes del guard
+  const moduleUnlockStatus = useMemo((): boolean[] => {
+    if (!course) return [];
+    return course.modulos.map((mod, idx) => {
+      if (idx === 0) return true;
+      const prevMod = course.modulos[idx - 1];
+      const prevCompleted = prevMod.lecciones.filter(l => completedIds.has(l.id)).length;
+      return prevCompleted >= prevMod.lecciones.length;
+    });
+  }, [completedIds, course]);
+
+  // Índice del módulo que debe estar abierto por defecto — antes del guard
+  const defaultOpenIndex = useMemo((): number => {
+    if (!course) return 0;
+    for (let i = 0; i < course.modulos.length; i++) {
+      if (!moduleUnlockStatus[i]) break;
+      const mod = course.modulos[i];
+      const hasIncomplete = mod.lecciones.some(l => !completedIds.has(l.id));
+      if (hasIncomplete) return i;
+    }
+    return 0;
+  }, [moduleUnlockStatus, completedIds, course]);
+
+  // Última lección vista en este curso — antes del guard
+  const lastActivityLesson = useMemo(() => {
+    if (!lastViewed || lastViewed.course_id !== id) return null;
+    return ContentService.getLessonById(lastViewed.lesson_id);
+  }, [lastViewed, id]);
+
+  // Guard: curso no encontrado
   if (!course) {
     return (
       <View style={[styles.container, { backgroundColor: theme.background, alignItems: 'center', justifyContent: 'center' }]}>
@@ -64,8 +97,9 @@ export default function CourseDetailScreen() {
   const total = ContentService.getTotalLessons(id);
   const progress = getCourseProgress(id, total);
   const started = progress.completed_lessons > 0;
+  const isComplete = progress.progress_percent === 100;
 
-  // Encontrar la siguiente lección sin completar
+  // Primera lección sin completar
   function getNextLesson(): { moduleId: string; lessonId: string } | undefined {
     for (const mod of course!.modulos) {
       for (const lesson of mod.lecciones) {
@@ -78,17 +112,27 @@ export default function CourseDetailScreen() {
   }
 
   const nextLesson = getNextLesson();
-  const isComplete = progress.progress_percent === 100;
 
+  // Continuar: prioriza última lección no completada, luego la siguiente
   async function handleContinue() {
-    if (!nextLesson) return;
-    await recordLastViewed(id, nextLesson.moduleId, nextLesson.lessonId);
-    router.push({ pathname: '/lesson/[id]', params: { id: nextLesson.lessonId } });
+    let target: { moduleId: string; lessonId: string } | undefined;
+
+    if (lastViewed?.course_id === id && !completedIds.has(lastViewed.lesson_id)) {
+      target = { moduleId: lastViewed.module_id, lessonId: lastViewed.lesson_id };
+    }
+
+    if (!target) target = nextLesson;
+    if (!target) return;
+
+    await recordLastViewed(id, target.moduleId, target.lessonId);
+    router.push({ pathname: '/lesson/[id]', params: { id: target.lessonId } });
   }
 
   function handleLessonPress(lessonId: string) {
     const found = ContentService.getLessonById(lessonId);
     if (!found) return;
+    const moduleIdx = course!.modulos.findIndex(m => m.id === found.module.id);
+    if (moduleIdx > 0 && !moduleUnlockStatus[moduleIdx]) return;
     recordLastViewed(id, found.module.id, lessonId);
     router.push({ pathname: '/lesson/[id]', params: { id: lessonId } });
   }
@@ -98,7 +142,6 @@ export default function CourseDetailScreen() {
       <ScrollView showsVerticalScrollIndicator={false}>
         {/* ── Hero ── */}
         <View style={[styles.hero, { backgroundColor: course.banner_color }]}>
-          {/* Navigation bar */}
           <View style={styles.heroNav}>
             <TouchableOpacity style={styles.backBtn} onPress={() => router.back()}>
               <Ionicons name="arrow-back" size={22} color="#FFF" />
@@ -115,7 +158,6 @@ export default function CourseDetailScreen() {
             </TouchableOpacity>
           </View>
 
-          {/* Course info */}
           <View style={styles.heroContent}>
             <Badge
               label={DIFFICULTY_LABEL[course.nivel_dificultad]}
@@ -129,7 +171,16 @@ export default function CourseDetailScreen() {
               {course.descripcion}
             </Typography>
 
-            {/* Stats */}
+            {/* Última actividad en este curso */}
+            {lastActivityLesson && !isComplete && (
+              <View style={styles.lastActivity}>
+                <Ionicons name="time-outline" size={13} color="rgba(255,255,255,0.75)" />
+                <Typography variant="caption" style={{ color: 'rgba(255,255,255,0.85)' }} numberOfLines={1}>
+                  Última vista: {lastActivityLesson.lesson.titulo}
+                </Typography>
+              </View>
+            )}
+
             <View style={styles.heroStats}>
               {[
                 { icon: 'book-outline' as const, value: `${total} lecciones` },
@@ -146,7 +197,6 @@ export default function CourseDetailScreen() {
             </View>
           </View>
 
-          {/* Progress */}
           {started && (
             <View style={styles.heroProgress}>
               <View style={styles.heroProgRow}>
@@ -171,8 +221,11 @@ export default function CourseDetailScreen() {
         <View style={styles.ctaRow}>
           {isComplete ? (
             <View style={[styles.completeBadge, { backgroundColor: `${Colors.success}20` }]}>
-              <Ionicons name="checkmark-circle" size={20} color={Colors.success} />
-              <Typography variant="label" color={Colors.success}>¡Curso completado!</Typography>
+              <Ionicons name="checkmark-circle" size={22} color={Colors.success} />
+              <View>
+                <Typography variant="label" color={Colors.success}>¡Curso completado!</Typography>
+                <Typography variant="caption" secondary>Puedes repasar las lecciones cuando quieras</Typography>
+              </View>
             </View>
           ) : (
             <Button
@@ -209,7 +262,8 @@ export default function CourseDetailScreen() {
               key={module.id}
               module={module}
               courseId={id}
-              defaultOpen={idx === 0}
+              defaultOpen={idx === defaultOpenIndex}
+              isLocked={!moduleUnlockStatus[idx]}
               completedLessonIds={completedIds}
               onLessonPress={handleLessonPress}
             />
@@ -251,6 +305,16 @@ const styles = StyleSheet.create({
     color: 'rgba(255,255,255,0.82)',
     lineHeight: 22,
   },
+  lastActivity: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    backgroundColor: 'rgba(0,0,0,0.15)',
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderRadius: BorderRadius.full,
+    alignSelf: 'flex-start',
+  },
   heroStats: { flexDirection: 'row', flexWrap: 'wrap', gap: 12, marginTop: 4 },
   heroStat: { flexDirection: 'row', alignItems: 'center', gap: 5 },
   heroProgress: { marginTop: Spacing.lg, gap: 8 },
@@ -259,10 +323,9 @@ const styles = StyleSheet.create({
   completeBadge: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'center',
-    gap: 8,
-    padding: 14,
-    borderRadius: BorderRadius.md,
+    gap: 12,
+    padding: 16,
+    borderRadius: BorderRadius.lg,
   },
   tags: {
     flexDirection: 'row',
