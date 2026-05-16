@@ -67,7 +67,7 @@ export default function CoursesScreen() {
               <Typography
                 variant="label"
                 color={active ? '#FFF' : f.color}
-                style={{ fontSize: 12, lineHeight: 15, letterSpacing: 0.3 }}
+                style={{ fontSize: 13, lineHeight: 17, fontWeight: FontWeights.semibold, letterSpacing: 0.2 }}
               >
                 {f.nombre}
               </Typography>
@@ -132,7 +132,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: Spacing.lg,
     paddingTop: Spacing.md,
-    paddingBottom: Spacing.md,
+    paddingBottom: Spacing.sm,
   },
   headerIcon: {
     width: 44,
@@ -143,12 +143,13 @@ const styles = StyleSheet.create({
   },
   filters: {
     paddingHorizontal: Spacing.lg,
-    paddingBottom: Spacing.md,
+    paddingTop: 4,
+    paddingBottom: Spacing.sm,
     gap: 8,
   },
   filterChip: {
-    paddingHorizontal: 12,
-    paddingVertical: 4,
+    paddingHorizontal: 11,
+    paddingVertical: 6,
     borderRadius: BorderRadius.full,
     borderWidth: 1,
     alignItems: 'center',
