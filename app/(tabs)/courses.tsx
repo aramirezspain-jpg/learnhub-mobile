@@ -49,6 +49,7 @@ export default function CoursesScreen() {
       <ScrollView
         horizontal
         showsHorizontalScrollIndicator={false}
+        style={styles.filtersScroll}
         contentContainerStyle={styles.filters}
       >
         {filters.map(f => {
@@ -141,11 +142,16 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
+  filtersScroll: {
+    flexGrow: 0,
+    flexShrink: 0,
+  },
   filters: {
     paddingHorizontal: Spacing.lg,
     paddingTop: 4,
     paddingBottom: Spacing.sm,
     gap: 8,
+    alignItems: 'center',
   },
   filterChip: {
     paddingHorizontal: 11,
