@@ -67,7 +67,7 @@ export default function CoursesScreen() {
               <Typography
                 variant="label"
                 color={active ? '#FFF' : f.color}
-                style={{ fontSize: FontSizes.sm }}
+                style={{ fontSize: 12, lineHeight: 15, letterSpacing: 0.3 }}
               >
                 {f.nombre}
               </Typography>
@@ -148,9 +148,11 @@ const styles = StyleSheet.create({
   },
   filterChip: {
     paddingHorizontal: 12,
-    paddingVertical: 5,
+    paddingVertical: 4,
     borderRadius: BorderRadius.full,
-    borderWidth: 1.5,
+    borderWidth: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   list: { flex: 1 },
   listContent: {
