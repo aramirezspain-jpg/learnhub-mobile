@@ -44,6 +44,10 @@ export function LessonItem({
   const hasNote = useNotesStore(s => s.hasNoteForLesson(lesson.id));
 
   const color = accentColor ?? Colors.primary;
+  const metaDividerStyle = React.useMemo(
+    () => [styles.metaDivider, { backgroundColor: theme.border }] as const,
+    [theme.border]
+  );
 
   const iconName: React.ComponentProps<typeof Ionicons>['name'] = isCompleted
     ? 'checkmark-circle'
@@ -98,14 +102,14 @@ export function LessonItem({
               {TYPE_LABEL[lesson.tipo] ?? lesson.tipo}
             </Typography>
           </View>
-          <View style={styles.metaDivider} />
+          <View style={metaDividerStyle} />
           <Ionicons name="time-outline" size={11} color={theme.textMuted} />
           <Typography variant="caption" muted style={styles.metaText}>
             {lesson.duracion_minutos} min
           </Typography>
           {lesson.quiz && (
             <>
-              <View style={styles.metaDivider} />
+              <View style={metaDividerStyle} />
               <Ionicons name="help-circle-outline" size={11} color={theme.textMuted} />
               <Typography variant="caption" muted style={styles.metaText}>
                 {lesson.quiz.preguntas.length} preg.
@@ -114,7 +118,7 @@ export function LessonItem({
           )}
           {hasNote && (
             <>
-              <View style={styles.metaDivider} />
+              <View style={metaDividerStyle} />
               <Ionicons name="document-text" size={11} color={color} />
             </>
           )}
@@ -169,7 +173,6 @@ const styles = StyleSheet.create({
     width: 3,
     height: 3,
     borderRadius: 2,
-    backgroundColor: '#4A4A6A',
   },
   metaText: { marginLeft: 1 },
   completedDot: {

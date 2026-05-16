@@ -101,7 +101,7 @@ export function CourseCard({
               {course.total_lecciones} lecciones
             </Typography>
           </View>
-          <View style={styles.metaDot} />
+          <View style={[styles.metaDot, { backgroundColor: theme.border }]} />
           <View style={styles.metaItem}>
             <Ionicons name="time-outline" size={12} color={theme.textMuted} />
             <Typography variant="caption" muted style={{ marginLeft: 4 }}>
@@ -218,7 +218,6 @@ const styles = StyleSheet.create({
     width: 3,
     height: 3,
     borderRadius: 2,
-    backgroundColor: '#3A3A5A',
   },
   progressBlock: { gap: 5, marginTop: 2 },
   progressHeader: {

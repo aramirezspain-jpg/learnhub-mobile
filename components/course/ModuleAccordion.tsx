@@ -166,7 +166,7 @@ const styles = StyleSheet.create({
     marginBottom: Spacing.sm,
     overflow: 'hidden',
   },
-  lockedContainer: { opacity: 0.5 },
+  lockedContainer: { opacity: 0.6 },
   header: {
     flexDirection: 'row',
     alignItems: 'center',

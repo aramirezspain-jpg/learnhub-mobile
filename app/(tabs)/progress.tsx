@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { View, ScrollView, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
@@ -56,10 +56,22 @@ export default function ProgressScreen() {
   const { courses } = useCourses();
   const getCourseProgress = useProgressStore(s => s.getCourseProgress);
   const getCompletedCount = useProgressStore(s => s.getCompletedCountForCourse);
+  const lessonProgress = useProgressStore(s => s.lessonProgress);
 
   const totalCompleted = courses.reduce((s, c) => s + getCompletedCount(c.id), 0);
   const totalLessons = courses.reduce((s, c) => s + c.total_lecciones, 0);
   const globalPercent = totalLessons > 0 ? Math.round((totalCompleted / totalLessons) * 100) : 0;
+
+  const hasCompletedAModule = useMemo(() => {
+    for (const course of courses) {
+      for (const mod of course.modulos) {
+        if (mod.lecciones.length === 0) continue;
+        const allDone = mod.lecciones.every(l => lessonProgress[l.id]?.completed === 1);
+        if (allDone) return true;
+      }
+    }
+    return false;
+  }, [courses, lessonProgress]);
 
   const achievements = [
     {
@@ -80,7 +92,7 @@ export default function ProgressScreen() {
       icon: 'trophy-outline' as const,
       title: 'Primer Módulo',
       desc: 'Completa todas las lecciones de un módulo',
-      unlocked: totalCompleted >= 3,
+      unlocked: hasCompletedAModule,
       color: Colors.nivel2,
     },
     {
@@ -105,20 +117,20 @@ export default function ProgressScreen() {
         </View>
 
         {/* Progreso global */}
-        <View style={[styles.globalCard, Shadows.md]}>
+        <View style={[styles.globalCard, Shadows.primary]}>
           <View style={styles.globalHeader}>
             <View>
-              <Typography variant="h2" color={Colors.primary}>
+              <Typography variant="h2" style={{ color: '#FFF' }}>
                 {globalPercent}%
               </Typography>
-              <Typography variant="body" secondary>progreso total</Typography>
+              <Typography variant="body" style={{ color: 'rgba(255,255,255,0.8)' }}>progreso total</Typography>
             </View>
-            <View style={[styles.globalIcon, { backgroundColor: `${Colors.primary}20` }]}>
-              <Ionicons name="bar-chart" size={32} color={Colors.primary} />
+            <View style={styles.globalIcon}>
+              <Ionicons name="bar-chart" size={32} color="rgba(255,255,255,0.9)" />
             </View>
           </View>
-          <ProgressBar progress={globalPercent} height={10} />
-          <Typography variant="caption" secondary style={{ marginTop: 8 }}>
+          <ProgressBar progress={globalPercent} color="rgba(255,255,255,0.95)" trackColor="rgba(255,255,255,0.25)" height={10} />
+          <Typography variant="caption" style={{ color: 'rgba(255,255,255,0.7)', marginTop: 8 }}>
             {totalCompleted} de {totalLessons} lecciones completadas
           </Typography>
         </View>

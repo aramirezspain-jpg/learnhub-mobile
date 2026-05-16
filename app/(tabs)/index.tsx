@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import {
   View,
   ScrollView,
@@ -86,40 +86,49 @@ export default function HomeScreen() {
   const { courses, getAllCoursesWithProgress } = useCourses();
   const lastViewed = useProgressStore(s => s.lastViewed);
   const getCompletedCount = useProgressStore(s => s.getCompletedCountForCourse);
+  const lessonProgress = useProgressStore(s => s.lessonProgress);
 
-  const coursesWithProgress = getAllCoursesWithProgress();
-  const totalCompleted = courses.reduce((sum, c) => sum + getCompletedCount(c.id), 0);
-  const totalLessons = courses.reduce((sum, c) => sum + c.total_lecciones, 0);
-  const inProgressCount = courses.filter(c => {
-    const n = getCompletedCount(c.id);
-    return n > 0 && n < c.total_lecciones;
-  }).length;
+  const coursesWithProgress = useMemo(
+    () => getAllCoursesWithProgress(),
+    [courses, lessonProgress] // getAllCoursesWithProgress reads lessonProgress internally
+  );
 
-  // "Continue" target
-  let continueCourse: {
-    course: ReturnType<typeof ContentService.getCourseById>;
-    module: { titulo: string };
-    lesson: { id: string; titulo: string };
-    progress?: (typeof coursesWithProgress)[number];
-  } | null = null;
+  const totalCompleted = useMemo(
+    () => courses.reduce((sum, c) => sum + getCompletedCount(c.id), 0),
+    [courses, lessonProgress]
+  );
+  const totalLessons = useMemo(
+    () => courses.reduce((sum, c) => sum + c.total_lecciones, 0),
+    [courses]
+  );
+  const inProgressCount = useMemo(
+    () => courses.filter(c => {
+      const n = getCompletedCount(c.id);
+      return n > 0 && n < c.total_lecciones;
+    }).length,
+    [courses, lessonProgress]
+  );
 
-  if (lastViewed) {
-    const found = ContentService.getLessonById(lastViewed.lesson_id);
-    if (found) {
-      const prog = coursesWithProgress.find(cp => cp.course.id === found.course.id);
-      continueCourse = { ...found, progress: prog };
-    }
-  }
-  if (!continueCourse && courses.length > 0) {
-    const first = ContentService.getFirstLesson(courses[0].id);
-    if (first) {
-      const found = ContentService.getLessonById(first.lessonId);
+  const continueCourse = useMemo(() => {
+    if (lastViewed) {
+      const found = ContentService.getLessonById(lastViewed.lesson_id);
       if (found) {
         const prog = coursesWithProgress.find(cp => cp.course.id === found.course.id);
-        continueCourse = { ...found, progress: prog };
+        return { ...found, progress: prog };
       }
     }
-  }
+    if (courses.length > 0) {
+      const first = ContentService.getFirstLesson(courses[0].id);
+      if (first) {
+        const found = ContentService.getLessonById(first.lessonId);
+        if (found) {
+          const prog = coursesWithProgress.find(cp => cp.course.id === found.course.id);
+          return { ...found, progress: prog };
+        }
+      }
+    }
+    return null;
+  }, [lastViewed, courses, coursesWithProgress]);
 
   const progressPct = continueCourse?.progress?.progress.progress_percent ?? 0;
   const isNew = progressPct === 0;
