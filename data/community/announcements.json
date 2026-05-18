@@ -1,0 +1,62 @@
+[
+  {
+    "id": "ann_001",
+    "titulo": "Retiro Espiritual Anual 2026",
+    "descripcion": "Los invitamos a nuestro retiro anual de renovación espiritual. Tres días de adoración, enseñanza y comunión. Transporte disponible desde el templo. Cupos limitados — inscríbase en secretaría.",
+    "fecha": "2026-06-14",
+    "categoria": "evento",
+    "prioridad": "alta",
+    "estado": "activo",
+    "created_at": "2026-05-15T08:00:00.000Z"
+  },
+  {
+    "id": "ann_002",
+    "titulo": "Cadena de Ayuno y Oración",
+    "descripcion": "21 días de ayuno y oración en comunidad. Cada familia se une al turno asignado. Inscripciones abiertas en secretaría esta semana.",
+    "fecha": "2026-06-01",
+    "categoria": "ayuno",
+    "prioridad": "alta",
+    "estado": "activo",
+    "created_at": "2026-05-16T10:00:00.000Z"
+  },
+  {
+    "id": "ann_003",
+    "titulo": "Noche de Alabanza y Adoración",
+    "descripcion": "Únete a una noche especial de adoración y alabanza con todos los ministerios de la iglesia. Traigan a sus familias. Entrada libre.",
+    "fecha": "2026-05-30",
+    "categoria": "evento",
+    "prioridad": "media",
+    "estado": "activo",
+    "created_at": "2026-05-14T09:00:00.000Z"
+  },
+  {
+    "id": "ann_004",
+    "titulo": "Brigada de Limpieza del Templo",
+    "descripcion": "Este sábado realizaremos la limpieza y mantenimiento del templo. Todos los miembros están invitados a participar. Traigan guantes y ropa cómoda.",
+    "fecha": "2026-05-24",
+    "categoria": "actividad",
+    "prioridad": "baja",
+    "estado": "activo",
+    "created_at": "2026-05-18T07:00:00.000Z"
+  },
+  {
+    "id": "ann_005",
+    "titulo": "Conferencia para Matrimonios",
+    "descripcion": "Conferencia especial «Construyendo sobre la Roca» para matrimonios. Cupos limitados. Registro previo obligatorio antes del 30 de junio.",
+    "fecha": "2026-07-05",
+    "categoria": "evento",
+    "prioridad": "alta",
+    "estado": "activo",
+    "created_at": "2026-05-13T11:00:00.000Z"
+  },
+  {
+    "id": "ann_006",
+    "titulo": "Campaña de Recolección de Alimentos",
+    "descripcion": "Recolectaremos alimentos no perecederos para familias en necesidad de nuestra comunidad. Depositen las donaciones en la entrada del templo hasta el domingo.",
+    "fecha": "2026-05-25",
+    "categoria": "campana",
+    "prioridad": "media",
+    "estado": "activo",
+    "created_at": "2026-05-17T14:00:00.000Z"
+  }
+]

@@ -1,0 +1,110 @@
+[
+  {
+    "id": "sch_001",
+    "titulo": "Culto Dominical Matutino",
+    "tipo": "culto",
+    "hora": "10:00",
+    "dia_semana": 0,
+    "ubicacion": "Templo Principal",
+    "responsable": "Pastor Roberto Martínez",
+    "descripcion": "Culto de adoración y predicación de la Palabra",
+    "es_recurrente": true,
+    "activo": true
+  },
+  {
+    "id": "sch_002",
+    "titulo": "Culto Dominical Vespertino",
+    "tipo": "culto",
+    "hora": "18:00",
+    "dia_semana": 0,
+    "ubicacion": "Templo Principal",
+    "responsable": "Pastor Roberto Martínez",
+    "descripcion": "Culto de la tarde con énfasis en alabanza y adoración",
+    "es_recurrente": true,
+    "activo": true
+  },
+  {
+    "id": "sch_003",
+    "titulo": "Escuela Bíblica",
+    "tipo": "escuela_biblica",
+    "hora": "09:00",
+    "dia_semana": 6,
+    "ubicacion": "Salón de Educación",
+    "responsable": "Hno. Carlos Vega",
+    "descripcion": "Estudio sistemático de la Biblia para toda la familia",
+    "es_recurrente": true,
+    "activo": true
+  },
+  {
+    "id": "sch_004",
+    "titulo": "Discipulado de Jóvenes",
+    "tipo": "discipulado",
+    "hora": "19:00",
+    "dia_semana": 3,
+    "ubicacion": "Salón Juvenil",
+    "responsable": "Lda. Andrea López",
+    "descripcion": "Discipulado y actividades para jóvenes de 13 a 25 años",
+    "es_recurrente": true,
+    "activo": true
+  },
+  {
+    "id": "sch_005",
+    "titulo": "Reunión de Líderes",
+    "tipo": "reunion",
+    "hora": "19:30",
+    "dia_semana": 5,
+    "ubicacion": "Sala de Juntas",
+    "responsable": "Pastor Roberto Martínez",
+    "descripcion": "Reunión semanal del equipo de liderazgo",
+    "es_recurrente": true,
+    "activo": true
+  },
+  {
+    "id": "sch_006",
+    "titulo": "Grupo de Mujeres",
+    "tipo": "reunion",
+    "hora": "17:00",
+    "dia_semana": 2,
+    "ubicacion": "Templo Principal",
+    "responsable": "Pastora María Martínez",
+    "descripcion": "Reunión semanal del ministerio de mujeres",
+    "es_recurrente": true,
+    "activo": true
+  },
+  {
+    "id": "sch_007",
+    "titulo": "Grupo de Oración Matutina",
+    "tipo": "actividad",
+    "hora": "07:00",
+    "dia_semana": 4,
+    "ubicacion": "Templo Principal",
+    "responsable": "Diácono Luis García",
+    "descripcion": "Intercesión y oración por la iglesia y la ciudad",
+    "es_recurrente": true,
+    "activo": true
+  },
+  {
+    "id": "sch_008",
+    "titulo": "Escuela de Niños",
+    "tipo": "escuela_biblica",
+    "hora": "10:00",
+    "dia_semana": 0,
+    "ubicacion": "Salón de Niños",
+    "responsable": "Hna. Patricia Ruiz",
+    "descripcion": "Educación bíblica para niños de 4 a 12 años",
+    "es_recurrente": true,
+    "activo": true
+  },
+  {
+    "id": "sch_009",
+    "titulo": "Culto de Miércoles",
+    "tipo": "culto",
+    "hora": "20:00",
+    "dia_semana": 3,
+    "ubicacion": "Templo Principal",
+    "responsable": "Pastor Roberto Martínez",
+    "descripcion": "Servicio de mitad de semana — oración y Palabra",
+    "es_recurrente": true,
+    "activo": true
+  }
+]

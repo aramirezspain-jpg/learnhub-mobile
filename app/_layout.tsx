@@ -14,6 +14,9 @@ import { useNotesStore } from '@/store/notes.store';
 import { ProgressRepository } from '@/database/repositories/progress';
 import { FavoritesRepository } from '@/database/repositories/favorites';
 import { NotesRepository } from '@/database/repositories/notes';
+import { CommunityNotificationsRepository } from '@/database/repositories/communityNotifications';
+import { CommunityService } from '@/services/community.service';
+import { useCommunityStore } from '@/store/community.store';
 import { Colors } from '@/constants/theme';
 import { useSQLiteContext } from 'expo-sqlite';
 
@@ -29,6 +32,11 @@ function AppBootstrap({ children }: { children: React.ReactNode }) {
   const dbReady = useUIStore(s => s.dbReady);
   const setFavorites = useFavoritesStore(s => s.setFavorites);
   const setAllNotes = useNotesStore(s => s.setAllNotes);
+  const setCommunityAnnouncements = useCommunityStore(s => s.setAnnouncements);
+  const setCommunitySchedules = useCommunityStore(s => s.setSchedules);
+  const setCommunityContacts = useCommunityStore(s => s.setContacts);
+  const setCommunityLibrary = useCommunityStore(s => s.setLibrary);
+  const setReadAnnouncementIds = useCommunityStore(s => s.setReadAnnouncementIds);
   const scheme = useColorScheme() ?? 'dark';
 
   useEffect(() => {
@@ -38,21 +46,30 @@ function AppBootstrap({ children }: { children: React.ReactNode }) {
     setInitialized();
     setContentReady();
 
+    // Cargar contenido de comunidad (sincrónico)
+    setCommunityAnnouncements(CommunityService.getAnnouncements());
+    setCommunitySchedules(CommunityService.getSchedules());
+    setCommunityContacts(CommunityService.getContacts());
+    setCommunityLibrary(CommunityService.getCommunityLibrary());
+
     // Cargar datos persistentes desde SQLite (asíncrono, en paralelo)
     const loadProgress = async () => {
       const progressRepo = new ProgressRepository(db);
       const favRepo = new FavoritesRepository(db);
       const notesRepo = new NotesRepository(db);
-      const [progress, lastViewed, favorites, notes] = await Promise.all([
+      const communityNotifRepo = new CommunityNotificationsRepository(db);
+      const [progress, lastViewed, favorites, notes, readIds] = await Promise.all([
         progressRepo.getAllProgress(),
         progressRepo.getLastViewed(),
         favRepo.getAllFavorites(),
         notesRepo.getAllNotes(),
+        communityNotifRepo.getReadIds(),
       ]);
       setAllProgress(progress);
       if (lastViewed) setLastViewed(lastViewed);
       setFavorites(favorites);
       setAllNotes(notes);
+      setReadAnnouncementIds(readIds);
       setDbReady();
     };
 
@@ -101,6 +118,22 @@ export default function RootLayout() {
           <Stack.Screen
             name="notes/[id]"
             options={{ animation: 'slide_from_bottom' }}
+          />
+          <Stack.Screen
+            name="announcements"
+            options={{ animation: 'slide_from_right' }}
+          />
+          <Stack.Screen
+            name="schedules"
+            options={{ animation: 'slide_from_right' }}
+          />
+          <Stack.Screen
+            name="contacts"
+            options={{ animation: 'slide_from_right' }}
+          />
+          <Stack.Screen
+            name="community-library"
+            options={{ animation: 'slide_from_right' }}
           />
         </Stack>
       </AppBootstrap>

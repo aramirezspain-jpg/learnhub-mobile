@@ -1,0 +1,88 @@
+[
+  {
+    "id": "con_001",
+    "nombre": "Pastor Roberto Martínez",
+    "tipo": "lider",
+    "cargo": "Pastor Principal",
+    "descripcion": "Líder espiritual principal de la congregación. Disponible para consejería previa cita.",
+    "whatsapp": "+34600000001",
+    "ubicacion": "Templo Principal",
+    "color": "#6366F1"
+  },
+  {
+    "id": "con_002",
+    "nombre": "Pastora María Martínez",
+    "tipo": "lider",
+    "cargo": "Pastora Auxiliar — Mujeres",
+    "descripcion": "Coordina el ministerio de mujeres y acompañamiento familiar.",
+    "whatsapp": "+34600000002",
+    "ubicacion": "Templo Principal",
+    "color": "#8B5CF6"
+  },
+  {
+    "id": "con_003",
+    "nombre": "Diácono Luis García",
+    "tipo": "lider",
+    "cargo": "Diácono — Oración e Intercesión",
+    "descripcion": "Coordina el ministerio de oración e intercesión de la iglesia.",
+    "whatsapp": "+34600000008",
+    "ubicacion": "Templo Principal",
+    "color": "#3B82F6"
+  },
+  {
+    "id": "con_004",
+    "nombre": "Ministerio de Jóvenes",
+    "tipo": "ministerio",
+    "cargo": "Lda. Andrea López",
+    "descripcion": "Ministerio para jóvenes de 13 a 25 años. Actividades, discipulado y servicio cada miércoles a las 19:00.",
+    "whatsapp": "+34600000003",
+    "telegram": "@jovenes_iglesia",
+    "color": "#F59E0B"
+  },
+  {
+    "id": "con_005",
+    "nombre": "Ministerio de Alabanza",
+    "tipo": "ministerio",
+    "cargo": "Hno. Daniel Ramos",
+    "descripcion": "Equipo de adoración y alabanza. Ensayos los sábados a las 17:00.",
+    "whatsapp": "+34600000004",
+    "color": "#22C55E"
+  },
+  {
+    "id": "con_006",
+    "nombre": "Ministerio de Niños",
+    "tipo": "ministerio",
+    "cargo": "Hna. Patricia Ruiz",
+    "descripcion": "Educación cristiana para niños de 4 a 12 años. Clases cada domingo en paralelo al culto.",
+    "whatsapp": "+34600000005",
+    "color": "#EF4444"
+  },
+  {
+    "id": "con_007",
+    "nombre": "Grupo Zona Norte",
+    "tipo": "grupo",
+    "descripcion": "Grupo celular del área norte. Reuniones los miércoles a las 19:30 en casas rotativas.",
+    "whatsapp": "+34600000006",
+    "zona": "Zona Norte",
+    "color": "#3B82F6"
+  },
+  {
+    "id": "con_008",
+    "nombre": "Grupo Zona Sur",
+    "tipo": "grupo",
+    "descripcion": "Grupo celular del área sur. Reuniones los jueves a las 19:00.",
+    "whatsapp": "+34600000007",
+    "telegram": "@grupo_sur",
+    "zona": "Zona Sur",
+    "color": "#06B6D4"
+  },
+  {
+    "id": "con_009",
+    "nombre": "Grupo Zona Centro",
+    "tipo": "grupo",
+    "descripcion": "Grupo celular del área centro. Reuniones los martes a las 19:30.",
+    "whatsapp": "+34600000009",
+    "zona": "Zona Centro",
+    "color": "#8B5CF6"
+  }
+]
