@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import { View, ActivityIndicator, Animated, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { Stack, useRouter } from 'expo-router';
+import { Stack, useRouter, usePathname } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { SQLiteProvider } from 'expo-sqlite';
 import { useColorScheme } from '@/hooks/use-color-scheme';
@@ -21,6 +21,8 @@ import { LeadershipMessagesRepository } from '@/database/repositories/leadership
 import { ServiceRequestsRepository } from '@/database/repositories/serviceRequests';
 import { AppNotificationsRepository } from '@/database/repositories/appNotifications';
 import { LocalUserProfileRepository } from '@/database/repositories/localUserProfile';
+import { MockAuthService } from '@/services/auth/mock-auth.service';
+import { useAuthStore } from '@/store/auth.store';
 import { CommunityService } from '@/services/community.service';
 import { NotificationService } from '@/services/notification.service';
 import { useCommunityStore } from '@/store/community.store';
@@ -129,8 +131,9 @@ function AppBootstrap({ children }: { children: React.ReactNode }) {
   const addNotification = useNotificationStore(s => s.addNotification);
   const setPermissionsGranted = useNotificationStore(s => s.setPermissionsGranted);
   const setProfile = useUserProfileStore(s => s.setProfile);
+  const setAuthenticated = useAuthStore(s => s.setAuthenticated);
+  const setAuthStatus = useAuthStore(s => s.setStatus);
   const scheme = useColorScheme() ?? 'dark';
-  const router = useRouter();
 
   useEffect(() => {
     // Cargar contenido JSON (sincrónico)
@@ -177,7 +180,17 @@ function AppBootstrap({ children }: { children: React.ReactNode }) {
       setLeadershipMessages(messages);
       setServiceRequests(services);
       setNotifications(notifs);
-      setProfile(userProfile);
+
+      // Auth session check — authenticated profile takes priority over local profile
+      const authSvc = new MockAuthService(db);
+      const authUser = await authSvc.getStoredSession();
+      if (authUser) {
+        setAuthenticated(authUser.id ?? '');
+        setProfile(authUser);
+      } else {
+        setAuthStatus('local');
+        setProfile(userProfile);
+      }
 
       // Check notification permissions and sync new announcement notifications
       await NotificationService.initialize();
@@ -208,6 +221,7 @@ function AppBootstrap({ children }: { children: React.ReactNode }) {
 
     loadProgress().catch((e) => {
       console.error('[AppBootstrap] DB load failed:', e);
+      setAuthStatus('local');
       setDbReady();
     });
   }, []);
@@ -217,6 +231,30 @@ function AppBootstrap({ children }: { children: React.ReactNode }) {
   }
 
   return <>{children}</>;
+}
+
+// ─── Auth navigation guard ────────────────────────────────────────────────────
+function NavigationGuard() {
+  const router   = useRouter();
+  const pathname = usePathname();
+  const status   = useAuthStore(s => s.status);
+  const dbReady  = useUIStore(s => s.dbReady);
+
+  useEffect(() => {
+    if (!dbReady || status === 'loading') return;
+
+    const isAuthScreen = pathname?.startsWith('/auth') ?? false;
+    const isLanding    = pathname === '/landing';
+    const isAuthenticated = status === 'authenticated';
+
+    if (!isAuthenticated && !isAuthScreen && !isLanding) {
+      router.replace('/landing');
+    } else if (isAuthenticated && isLanding) {
+      router.replace('/(tabs)');
+    }
+  }, [status, dbReady]);
+
+  return null;
 }
 
 function NotificationListeners() {
@@ -259,9 +297,11 @@ export default function RootLayout() {
     <SQLiteProvider databaseName="learnhub.db" onInit={migrateDatabase}>
       <AppBootstrap>
         <SessionProvider>
+        <NavigationGuard />
         <NotificationListeners />
         <StatusBar style={scheme === 'dark' ? 'light' : 'dark'} />
         <Stack screenOptions={{ headerShown: false }}>
+          <Stack.Screen name="landing" options={{ animation: 'fade', headerShown: false }} />
           <Stack.Screen name="(tabs)" />
           <Stack.Screen
             name="course/[id]"
@@ -314,6 +354,18 @@ export default function RootLayout() {
           <Stack.Screen
             name="service-request"
             options={{ animation: 'slide_from_right' }}
+          />
+          <Stack.Screen
+            name="auth/login"
+            options={{ animation: 'slide_from_bottom', presentation: 'modal' }}
+          />
+          <Stack.Screen
+            name="auth/register"
+            options={{ animation: 'slide_from_bottom', presentation: 'modal' }}
+          />
+          <Stack.Screen
+            name="auth/forgot-password"
+            options={{ animation: 'slide_from_bottom', presentation: 'modal' }}
           />
         </Stack>
         </SessionProvider>

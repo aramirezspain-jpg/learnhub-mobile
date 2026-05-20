@@ -103,4 +103,18 @@ export const SCHEMA_SQL = `
   CREATE INDEX IF NOT EXISTS idx_service_tipo ON service_requests(tipo);
   CREATE INDEX IF NOT EXISTS idx_notif_leida ON app_notifications(leida);
   CREATE INDEX IF NOT EXISTS idx_notif_tipo ON app_notifications(tipo);
+
+  CREATE TABLE IF NOT EXISTS auth_local_users (
+    id TEXT PRIMARY KEY,
+    email TEXT NOT NULL UNIQUE,
+    display_name TEXT NOT NULL,
+    password_hash TEXT NOT NULL,
+    rol TEXT NOT NULL DEFAULT 'member',
+    iglesia TEXT,
+    ministerio TEXT,
+    created_at TEXT NOT NULL DEFAULT (datetime('now')),
+    updated_at TEXT NOT NULL DEFAULT (datetime('now'))
+  );
+
+  CREATE INDEX IF NOT EXISTS idx_auth_email ON auth_local_users(email);
 `;

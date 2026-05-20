@@ -51,3 +51,44 @@ export interface Session {
   // refresh_token?: string;
   // expires_at?: number;
 }
+
+// ─── Auth types ───────────────────────────────────────────────────────────────
+
+/** Row in auth_local_users table (mock-only, replaced by remote in Phase 5) */
+export interface LocalAuthUser {
+  id: string;
+  email: string;
+  display_name: string;
+  password_hash: string;
+  rol: UserRole;
+  iglesia?: string;
+  ministerio?: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface AuthCredentials {
+  email: string;
+  password: string;
+}
+
+export interface RegisterData {
+  display_name: string;
+  email: string;
+  password: string;
+  iglesia?: string;
+  ministerio?: string;
+}
+
+export type AuthError =
+  | 'invalid_credentials'
+  | 'email_taken'
+  | 'weak_password'
+  | 'network_error'
+  | 'unknown';
+
+export interface AuthResult {
+  success: boolean;
+  error?: AuthError;
+  user?: UserProfile;
+}

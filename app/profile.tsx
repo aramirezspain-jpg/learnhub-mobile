@@ -17,6 +17,7 @@ import { ContentService } from '@/services/content.service';
 import { type LessonProgress } from '@/types';
 import * as Haptics from 'expo-haptics';
 import { useLocalProfile } from '@/hooks/auth/useLocalProfile';
+import { useSession } from '@/hooks/auth/useSession';
 import { ROLE_META } from '@/types/user';
 
 function SpiritualItem({
@@ -188,7 +189,9 @@ export default function ProfileScreen() {
   const theme = Colors[scheme];
 
   const { profile, save } = useLocalProfile();
+  const { isAuthenticated, logout } = useSession();
   const [isEditing, setIsEditing] = useState(false);
+  const [loggingOut, setLoggingOut] = useState(false);
   const [draftName, setDraftName] = useState('');
   const [draftEmail, setDraftEmail] = useState('');
   const [draftIglesia, setDraftIglesia] = useState('');
@@ -218,6 +221,16 @@ export default function ProfileScreen() {
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
     }
     setIsEditing(false);
+  }
+
+  async function handleLogout() {
+    setLoggingOut(true);
+    await logout();
+    if (Platform.OS !== 'web') {
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    }
+    setLoggingOut(false);
+    router.replace('/landing');
   }
 
   const { courses } = useCourses();
@@ -341,6 +354,43 @@ export default function ProfileScreen() {
                   {roleMeta.label}
                 </Typography>
               </View>
+
+              {/* Auth CTAs */}
+              {isAuthenticated ? (
+                <TouchableOpacity
+                  style={[styles.logoutBtn, { borderColor: Colors.error }]}
+                  onPress={handleLogout}
+                  disabled={loggingOut}
+                  activeOpacity={0.8}
+                >
+                  <Ionicons name="log-out-outline" size={15} color={Colors.error} />
+                  <Typography variant="caption" color={Colors.error} style={{ fontWeight: FontWeights.semibold }}>
+                    {loggingOut ? 'Saliendo…' : 'Cerrar sesión'}
+                  </Typography>
+                </TouchableOpacity>
+              ) : (
+                <View style={styles.authCTARow}>
+                  <TouchableOpacity
+                    style={[styles.authBtnPrimary, { backgroundColor: Colors.primary }]}
+                    onPress={() => router.push('/auth/register' as never)}
+                    activeOpacity={0.85}
+                  >
+                    <Ionicons name="person-add-outline" size={14} color="#fff" />
+                    <Typography variant="caption" style={{ color: '#fff', fontWeight: FontWeights.semibold }}>
+                      Registrarse
+                    </Typography>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    style={[styles.authBtnSecondary, { borderColor: Colors.primary }]}
+                    onPress={() => router.push('/auth/login' as never)}
+                    activeOpacity={0.8}
+                  >
+                    <Typography variant="caption" color={Colors.primary} style={{ fontWeight: FontWeights.semibold }}>
+                      Iniciar sesión
+                    </Typography>
+                  </TouchableOpacity>
+                </View>
+              )}
             </>
           ) : (
             /* Edit form */
@@ -756,6 +806,37 @@ const styles = StyleSheet.create({
     paddingVertical: 6,
     borderRadius: BorderRadius.full,
     marginTop: 6,
+  },
+  authCTARow: {
+    flexDirection: 'row',
+    gap: 10,
+    marginTop: 14,
+  },
+  authBtnPrimary: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    paddingHorizontal: 18,
+    paddingVertical: 9,
+    borderRadius: BorderRadius.full,
+  },
+  authBtnSecondary: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 18,
+    paddingVertical: 9,
+    borderRadius: BorderRadius.full,
+    borderWidth: 1.5,
+  },
+  logoutBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: BorderRadius.full,
+    borderWidth: 1,
+    marginTop: 14,
   },
   section: {
     paddingHorizontal: Spacing.lg,
