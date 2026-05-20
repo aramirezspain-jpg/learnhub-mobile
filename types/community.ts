@@ -82,3 +82,46 @@ export interface LocalNotification {
   announcement_id?: string;
   created_at: string;
 }
+
+// ─── Peticiones de Oración ────────────────────────────────────────────────────
+
+export type PrayerCategory = 'sanidad' | 'familia' | 'trabajo' | 'finanzas' | 'espiritual' | 'otro';
+export type PrayerRequestStatus = 'pendiente' | 'respondida' | 'archivada';
+
+export interface PrayerRequest {
+  id: string;
+  titulo: string;
+  descripcion?: string;
+  categoria: PrayerCategory;
+  privado: boolean;
+  estado: PrayerRequestStatus;
+  fecha: string;             // ISO date
+  created_at: string;        // ISO datetime
+}
+
+// ─── Mensajes a Liderazgo ─────────────────────────────────────────────────────
+
+export type MessagePriority = 'normal' | 'urgente';
+export type MessageStatus = 'enviado' | 'leido';
+
+export interface LeadershipMessage {
+  id: string;
+  ministerio: string;
+  mensaje: string;
+  prioridad: MessagePriority;
+  estado: MessageStatus;
+  created_at: string;
+}
+
+// ─── Solicitudes de Servicio ──────────────────────────────────────────────────
+
+export type ServiceRequestType = 'consejeria' | 'visita_pastoral' | 'ayuda' | 'bautismo' | 'matrimonio' | 'otro';
+export type ServiceRequestStatus = 'pendiente' | 'en_proceso' | 'completada';
+
+export interface ServiceRequest {
+  id: string;
+  tipo: ServiceRequestType;
+  descripcion?: string;
+  estado: ServiceRequestStatus;
+  created_at: string;
+}

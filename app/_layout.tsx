@@ -15,8 +15,12 @@ import { ProgressRepository } from '@/database/repositories/progress';
 import { FavoritesRepository } from '@/database/repositories/favorites';
 import { NotesRepository } from '@/database/repositories/notes';
 import { CommunityNotificationsRepository } from '@/database/repositories/communityNotifications';
+import { PrayerRequestsRepository } from '@/database/repositories/prayerRequests';
+import { LeadershipMessagesRepository } from '@/database/repositories/leadershipMessages';
+import { ServiceRequestsRepository } from '@/database/repositories/serviceRequests';
 import { CommunityService } from '@/services/community.service';
 import { useCommunityStore } from '@/store/community.store';
+import { useUserActivityStore } from '@/store/userActivity.store';
 import { Colors } from '@/constants/theme';
 import { useSQLiteContext } from 'expo-sqlite';
 
@@ -37,6 +41,9 @@ function AppBootstrap({ children }: { children: React.ReactNode }) {
   const setCommunityContacts = useCommunityStore(s => s.setContacts);
   const setCommunityLibrary = useCommunityStore(s => s.setLibrary);
   const setReadAnnouncementIds = useCommunityStore(s => s.setReadAnnouncementIds);
+  const setPrayerRequests = useUserActivityStore(s => s.setPrayerRequests);
+  const setLeadershipMessages = useUserActivityStore(s => s.setLeadershipMessages);
+  const setServiceRequests = useUserActivityStore(s => s.setServiceRequests);
   const scheme = useColorScheme() ?? 'dark';
 
   useEffect(() => {
@@ -58,18 +65,27 @@ function AppBootstrap({ children }: { children: React.ReactNode }) {
       const favRepo = new FavoritesRepository(db);
       const notesRepo = new NotesRepository(db);
       const communityNotifRepo = new CommunityNotificationsRepository(db);
-      const [progress, lastViewed, favorites, notes, readIds] = await Promise.all([
+      const prayerRepo = new PrayerRequestsRepository(db);
+      const leadershipRepo = new LeadershipMessagesRepository(db);
+      const serviceRepo = new ServiceRequestsRepository(db);
+      const [progress, lastViewed, favorites, notes, readIds, prayers, messages, services] = await Promise.all([
         progressRepo.getAllProgress(),
         progressRepo.getLastViewed(),
         favRepo.getAllFavorites(),
         notesRepo.getAllNotes(),
         communityNotifRepo.getReadIds(),
+        prayerRepo.getAll(),
+        leadershipRepo.getAll(),
+        serviceRepo.getAll(),
       ]);
       setAllProgress(progress);
       if (lastViewed) setLastViewed(lastViewed);
       setFavorites(favorites);
       setAllNotes(notes);
       setReadAnnouncementIds(readIds);
+      setPrayerRequests(prayers);
+      setLeadershipMessages(messages);
+      setServiceRequests(services);
       setDbReady();
     };
 

@@ -55,9 +55,39 @@ export const SCHEMA_SQL = `
     updated_at TEXT NOT NULL DEFAULT (datetime('now'))
   );
 
+  CREATE TABLE IF NOT EXISTS prayer_requests (
+    id TEXT PRIMARY KEY,
+    titulo TEXT NOT NULL,
+    descripcion TEXT,
+    categoria TEXT NOT NULL DEFAULT 'otro',
+    privado INTEGER NOT NULL DEFAULT 0,
+    estado TEXT NOT NULL DEFAULT 'pendiente',
+    fecha TEXT NOT NULL,
+    created_at TEXT NOT NULL DEFAULT (datetime('now'))
+  );
+
+  CREATE TABLE IF NOT EXISTS leadership_messages (
+    id TEXT PRIMARY KEY,
+    ministerio TEXT NOT NULL,
+    mensaje TEXT NOT NULL,
+    prioridad TEXT NOT NULL DEFAULT 'normal',
+    estado TEXT NOT NULL DEFAULT 'enviado',
+    created_at TEXT NOT NULL DEFAULT (datetime('now'))
+  );
+
+  CREATE TABLE IF NOT EXISTS service_requests (
+    id TEXT PRIMARY KEY,
+    tipo TEXT NOT NULL,
+    descripcion TEXT,
+    estado TEXT NOT NULL DEFAULT 'pendiente',
+    created_at TEXT NOT NULL DEFAULT (datetime('now'))
+  );
+
   CREATE INDEX IF NOT EXISTS idx_progress_course ON lesson_progress(course_id);
   CREATE INDEX IF NOT EXISTS idx_progress_lesson ON lesson_progress(lesson_id);
   CREATE INDEX IF NOT EXISTS idx_quiz_course ON quiz_results(course_id);
   CREATE INDEX IF NOT EXISTS idx_notes_lesson ON notes(lesson_id);
   CREATE INDEX IF NOT EXISTS idx_favorites_type ON favorites(content_type);
+  CREATE INDEX IF NOT EXISTS idx_prayer_estado ON prayer_requests(estado);
+  CREATE INDEX IF NOT EXISTS idx_service_tipo ON service_requests(tipo);
 `;
