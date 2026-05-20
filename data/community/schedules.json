@@ -8,6 +8,8 @@
     "ubicacion": "Templo Principal",
     "responsable": "Pastor Roberto Martínez",
     "descripcion": "Culto de adoración y predicación de la Palabra",
+    "categoria": "Principal",
+    "recordatorio": true,
     "es_recurrente": true,
     "activo": true
   },
@@ -20,6 +22,8 @@
     "ubicacion": "Templo Principal",
     "responsable": "Pastor Roberto Martínez",
     "descripcion": "Culto de la tarde con énfasis en alabanza y adoración",
+    "categoria": "Principal",
+    "recordatorio": false,
     "es_recurrente": true,
     "activo": true
   },
@@ -32,6 +36,8 @@
     "ubicacion": "Salón de Educación",
     "responsable": "Hno. Carlos Vega",
     "descripcion": "Estudio sistemático de la Biblia para toda la familia",
+    "categoria": "Formación",
+    "recordatorio": true,
     "es_recurrente": true,
     "activo": true
   },
@@ -44,6 +50,8 @@
     "ubicacion": "Salón Juvenil",
     "responsable": "Lda. Andrea López",
     "descripcion": "Discipulado y actividades para jóvenes de 13 a 25 años",
+    "categoria": "Jóvenes",
+    "recordatorio": true,
     "es_recurrente": true,
     "activo": true
   },
@@ -56,6 +64,8 @@
     "ubicacion": "Sala de Juntas",
     "responsable": "Pastor Roberto Martínez",
     "descripcion": "Reunión semanal del equipo de liderazgo",
+    "categoria": "Liderazgo",
+    "recordatorio": false,
     "es_recurrente": true,
     "activo": true
   },
@@ -68,6 +78,8 @@
     "ubicacion": "Templo Principal",
     "responsable": "Pastora María Martínez",
     "descripcion": "Reunión semanal del ministerio de mujeres",
+    "categoria": "Ministerios",
+    "recordatorio": false,
     "es_recurrente": true,
     "activo": true
   },
@@ -80,6 +92,8 @@
     "ubicacion": "Templo Principal",
     "responsable": "Diácono Luis García",
     "descripcion": "Intercesión y oración por la iglesia y la ciudad",
+    "categoria": "Oración",
+    "recordatorio": true,
     "es_recurrente": true,
     "activo": true
   },
@@ -92,18 +106,22 @@
     "ubicacion": "Salón de Niños",
     "responsable": "Hna. Patricia Ruiz",
     "descripcion": "Educación bíblica para niños de 4 a 12 años",
+    "categoria": "Niños",
+    "recordatorio": false,
     "es_recurrente": true,
     "activo": true
   },
   {
     "id": "sch_009",
-    "titulo": "Culto de Miércoles",
+    "titulo": "Culto de Mitad de Semana",
     "tipo": "culto",
     "hora": "20:00",
     "dia_semana": 3,
     "ubicacion": "Templo Principal",
     "responsable": "Pastor Roberto Martínez",
     "descripcion": "Servicio de mitad de semana — oración y Palabra",
+    "categoria": "Principal",
+    "recordatorio": false,
     "es_recurrente": true,
     "activo": true
   }

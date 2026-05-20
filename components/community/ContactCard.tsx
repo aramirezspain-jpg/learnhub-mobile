@@ -35,15 +35,17 @@ export function ContactCard({ contact }: Props) {
   const theme = Colors[scheme];
 
   const openWhatsApp = () => {
-    if (!contact.whatsapp) return;
-    const num = contact.whatsapp.replace(/\D/g, '');
+    const num = contact.whatsapp?.replace(/\D/g, '') ?? '';
     Linking.openURL(`https://wa.me/${num}`).catch(() => {});
   };
 
   const openTelegram = () => {
-    if (!contact.telegram) return;
-    const handle = contact.telegram.replace('@', '');
+    const handle = (contact.telegram ?? '').replace('@', '');
     Linking.openURL(`https://t.me/${handle}`).catch(() => {});
+  };
+
+  const openEmail = () => {
+    Linking.openURL(`mailto:${contact.email}`).catch(() => {});
   };
 
   return (
@@ -57,8 +59,8 @@ export function ContactCard({ contact }: Props) {
 
       {/* Info */}
       <View style={styles.info}>
-        {/* Header */}
-        <View style={styles.header}>
+        {/* Header row */}
+        <View style={styles.headerRow}>
           <View style={[styles.typeBadge, { backgroundColor: `${contact.color}15` }]}>
             <Ionicons name={`${TYPE_ICON[contact.tipo]}-outline` as any} size={10} color={contact.color} />
             <Typography style={{ color: contact.color, fontSize: 9, fontWeight: '700', textTransform: 'uppercase' }}>
@@ -91,6 +93,16 @@ export function ContactCard({ contact }: Props) {
           </Typography>
         ) : null}
 
+        {/* Horario de atención */}
+        {contact.horario_atencion ? (
+          <View style={styles.metaRow}>
+            <Ionicons name="time-outline" size={11} color={Colors.success} />
+            <Typography style={{ color: Colors.success, fontSize: 11, fontWeight: '500' }}>
+              {contact.horario_atencion}
+            </Typography>
+          </View>
+        ) : null}
+
         {/* Ubicación */}
         {contact.ubicacion ? (
           <View style={styles.metaRow}>
@@ -102,7 +114,7 @@ export function ContactCard({ contact }: Props) {
         ) : null}
 
         {/* Botones de contacto */}
-        {(contact.whatsapp || contact.telegram) ? (
+        {(contact.whatsapp || contact.telegram || contact.email) ? (
           <View style={styles.contactBtns}>
             {contact.whatsapp ? (
               <TouchableOpacity
@@ -125,6 +137,18 @@ export function ContactCard({ contact }: Props) {
                 <Ionicons name="paper-plane-outline" size={14} color="#0088CC" />
                 <Typography style={{ color: '#0088CC', fontSize: 11, fontWeight: '600' }}>
                   Telegram
+                </Typography>
+              </TouchableOpacity>
+            ) : null}
+            {contact.email ? (
+              <TouchableOpacity
+                style={[styles.contactBtn, { backgroundColor: '#EA433515' }]}
+                onPress={openEmail}
+                activeOpacity={0.8}
+              >
+                <Ionicons name="mail-outline" size={14} color="#EA4335" />
+                <Typography style={{ color: '#EA4335', fontSize: 11, fontWeight: '600' }}>
+                  Email
                 </Typography>
               </TouchableOpacity>
             ) : null}
@@ -156,7 +180,7 @@ const styles = StyleSheet.create({
     flex: 1,
     gap: 5,
   },
-  header: {
+  headerRow: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 8,
@@ -176,8 +200,9 @@ const styles = StyleSheet.create({
   },
   contactBtns: {
     flexDirection: 'row',
-    gap: 8,
+    gap: 6,
     marginTop: 4,
+    flexWrap: 'wrap',
   },
   contactBtn: {
     flexDirection: 'row',

@@ -4,8 +4,10 @@
     "nombre": "Pastor Roberto Martínez",
     "tipo": "lider",
     "cargo": "Pastor Principal",
-    "descripcion": "Líder espiritual principal de la congregación. Disponible para consejería previa cita.",
+    "descripcion": "Líder espiritual principal de la congregación. Disponible para consejería con cita previa.",
     "whatsapp": "+34600000001",
+    "email": "pastor@iglesia.org",
+    "horario_atencion": "Mar–Jue 10:00–13:00",
     "ubicacion": "Templo Principal",
     "color": "#6366F1"
   },
@@ -16,6 +18,8 @@
     "cargo": "Pastora Auxiliar — Mujeres",
     "descripcion": "Coordina el ministerio de mujeres y acompañamiento familiar.",
     "whatsapp": "+34600000002",
+    "email": "pastora.maria@iglesia.org",
+    "horario_atencion": "Lun–Vie 09:00–12:00",
     "ubicacion": "Templo Principal",
     "color": "#8B5CF6"
   },
@@ -26,6 +30,8 @@
     "cargo": "Diácono — Oración e Intercesión",
     "descripcion": "Coordina el ministerio de oración e intercesión de la iglesia.",
     "whatsapp": "+34600000008",
+    "email": "intercesion@iglesia.org",
+    "horario_atencion": "Jue 07:00–08:30",
     "ubicacion": "Templo Principal",
     "color": "#3B82F6"
   },
@@ -37,6 +43,8 @@
     "descripcion": "Ministerio para jóvenes de 13 a 25 años. Actividades, discipulado y servicio cada miércoles a las 19:00.",
     "whatsapp": "+34600000003",
     "telegram": "@jovenes_iglesia",
+    "email": "jovenes@iglesia.org",
+    "horario_atencion": "Mié 18:00–21:00 · Sáb 10:00–12:00",
     "color": "#F59E0B"
   },
   {
@@ -46,6 +54,8 @@
     "cargo": "Hno. Daniel Ramos",
     "descripcion": "Equipo de adoración y alabanza. Ensayos los sábados a las 17:00.",
     "whatsapp": "+34600000004",
+    "email": "alabanza@iglesia.org",
+    "horario_atencion": "Sáb 17:00–19:00",
     "color": "#22C55E"
   },
   {
@@ -55,6 +65,8 @@
     "cargo": "Hna. Patricia Ruiz",
     "descripcion": "Educación cristiana para niños de 4 a 12 años. Clases cada domingo en paralelo al culto.",
     "whatsapp": "+34600000005",
+    "email": "ninos@iglesia.org",
+    "horario_atencion": "Dom 10:00–12:00",
     "color": "#EF4444"
   },
   {

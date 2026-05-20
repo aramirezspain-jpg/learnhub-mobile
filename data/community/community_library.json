@@ -6,7 +6,8 @@
     "descripcion": "Predicación sobre Mateo 17:20 — La fe genuina y el poder transformador de Dios en nuestra vida diaria.",
     "autor": "Pastor Roberto Martínez",
     "fecha": "2026-05-11",
-    "categoria": "Predicaciones"
+    "categoria": "Predicaciones",
+    "destacado": true
   },
   {
     "id": "lib_002",
@@ -15,7 +16,8 @@
     "descripcion": "Guía completa para el proceso de discipulado cristiano. Incluye estudios bíblicos, actividades y guías de oración.",
     "autor": "Equipo Pastoral",
     "fecha": "2026-04-01",
-    "categoria": "Formación"
+    "categoria": "Formación",
+    "destacado": true
   },
   {
     "id": "lib_003",
@@ -24,34 +26,38 @@
     "descripcion": "Estudio bíblico completo del libro de Romanos en 12 lecciones. Incluye preguntas de reflexión y aplicación práctica.",
     "autor": "Hno. Carlos Vega",
     "fecha": "2026-03-15",
-    "categoria": "Estudios Bíblicos"
+    "categoria": "Estudios Bíblicos",
+    "destacado": false
   },
   {
     "id": "lib_004",
     "titulo": "Devocional Diario — Bible Gateway",
     "tipo": "enlace",
-    "descripcion": "Devocional diario con lectura bíblica, reflexión y oración. Disponible en múltiples versiones de la Biblia.",
+    "descripcion": "Devocional diario con lectura bíblica, reflexión y oración. Disponible en múltiples versiones.",
     "url": "https://www.biblegateway.com",
     "fecha": "2026-01-01",
-    "categoria": "Devocional"
+    "categoria": "Devocional",
+    "destacado": true
   },
   {
     "id": "lib_005",
     "titulo": "Cancionero de Adoración",
     "tipo": "pdf",
-    "descripcion": "Letras y acordes de los himnos y canciones usados en el ministerio de alabanza de nuestra iglesia.",
+    "descripcion": "Letras y acordes de los himnos y canciones usados en el ministerio de alabanza.",
     "autor": "Ministerio de Alabanza",
     "fecha": "2026-02-20",
-    "categoria": "Adoración"
+    "categoria": "Adoración",
+    "destacado": false
   },
   {
     "id": "lib_006",
     "titulo": "Plan de Lectura Bíblica Anual",
     "tipo": "recurso",
-    "descripcion": "Plan estructurado para leer la Biblia completa en un año. Incluye guía diaria y cronograma de avance.",
+    "descripcion": "Plan estructurado para leer la Biblia completa en un año. Incluye guía diaria y cronograma.",
     "autor": "Equipo Pastoral",
     "fecha": "2026-01-01",
-    "categoria": "Formación"
+    "categoria": "Formación",
+    "destacado": false
   },
   {
     "id": "lib_007",
@@ -60,15 +66,17 @@
     "descripcion": "Serie completa de 8 sermones sobre el carácter de Dios: gracia, verdad, misericordia y justicia.",
     "autor": "Pastor Roberto Martínez",
     "fecha": "2026-04-20",
-    "categoria": "Predicaciones"
+    "categoria": "Predicaciones",
+    "destacado": false
   },
   {
     "id": "lib_008",
     "titulo": "Guía de Estudio: Los Salmos",
     "tipo": "pdf",
-    "descripcion": "Introducción a los Salmos como libro de oración y adoración. 6 lecciones con estudio contextual y aplicación.",
+    "descripcion": "Introducción a los Salmos como libro de oración. 6 lecciones con estudio contextual y aplicación.",
     "autor": "Hno. Carlos Vega",
     "fecha": "2026-05-01",
-    "categoria": "Estudios Bíblicos"
+    "categoria": "Estudios Bíblicos",
+    "destacado": false
   }
 ]

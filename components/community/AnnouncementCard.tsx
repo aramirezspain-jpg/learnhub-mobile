@@ -2,7 +2,7 @@ import React from 'react';
 import { View, TouchableOpacity, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useColorScheme } from '@/hooks/use-color-scheme';
-import { Colors, Spacing, BorderRadius, Shadows, FontSizes } from '@/constants/theme';
+import { Colors, Spacing, BorderRadius, Shadows } from '@/constants/theme';
 import { Typography } from '@/components/ui/Typography';
 import type { Announcement } from '@/types/community';
 
@@ -39,6 +39,11 @@ function formatDate(dateStr: string): string {
   return d.toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric' });
 }
 
+function formatDateShort(dateStr: string): string {
+  const d = new Date(dateStr);
+  return d.toLocaleDateString('es-ES', { day: 'numeric', month: 'short' });
+}
+
 interface Props {
   announcement: Announcement;
   onPress?: () => void;
@@ -49,42 +54,76 @@ interface Props {
 export function AnnouncementCard({ announcement: ann, onPress, isRead = false, expanded = false }: Props) {
   const scheme = useColorScheme() ?? 'dark';
   const theme = Colors[scheme];
+
+  const isDestacado = ann.estado === 'destacado';
   const priorityColor = PRIORITY_COLOR[ann.prioridad];
+  const accentColor = isDestacado ? Colors.accent : priorityColor;
 
   return (
     <TouchableOpacity
-      style={[styles.card, { backgroundColor: theme.card }, Shadows.sm, isRead && styles.cardRead]}
+      style={[
+        styles.card,
+        { backgroundColor: theme.card },
+        Shadows.sm,
+        isDestacado && { borderColor: `${Colors.accent}35`, borderWidth: 1.5 },
+        isRead && !isDestacado && styles.cardRead,
+      ]}
       onPress={onPress}
       activeOpacity={0.85}
     >
-      {/* Accent lateral de prioridad */}
-      <View style={[styles.accent, { backgroundColor: priorityColor }]} />
+      {/* Accent lateral */}
+      <View style={[styles.accent, { backgroundColor: accentColor }]} />
 
       <View style={styles.body}>
         {/* Encabezado */}
-        <View style={styles.header}>
+        <View style={styles.headerRow}>
           <View style={styles.headerLeft}>
-            <View style={[styles.categoryBadge, { backgroundColor: `${priorityColor}15` }]}>
-              <Ionicons
-                name={`${CATEGORY_ICON[ann.categoria]}-outline` as any}
-                size={10}
-                color={priorityColor}
-              />
-              <Typography style={{ color: priorityColor, fontSize: 9, fontWeight: '700', textTransform: 'uppercase', letterSpacing: 0.5 }}>
-                {CATEGORY_LABEL[ann.categoria]}
-              </Typography>
-            </View>
-            {!isRead && (
-              <View style={styles.unreadDot} />
+            {isDestacado ? (
+              <View style={[styles.destacadoBadge, { backgroundColor: `${Colors.accent}18` }]}>
+                <Ionicons name="star" size={10} color={Colors.accent} />
+                <Typography style={{ color: Colors.accent, fontSize: 9, fontWeight: '800', letterSpacing: 0.5 }}>
+                  DESTACADO
+                </Typography>
+              </View>
+            ) : (
+              <View style={[styles.categoryBadge, { backgroundColor: `${accentColor}15` }]}>
+                <Ionicons
+                  name={`${CATEGORY_ICON[ann.categoria]}-outline` as any}
+                  size={10}
+                  color={accentColor}
+                />
+                <Typography style={{ color: accentColor, fontSize: 9, fontWeight: '700', textTransform: 'uppercase', letterSpacing: 0.5 }}>
+                  {CATEGORY_LABEL[ann.categoria]}
+                </Typography>
+              </View>
             )}
+            {!isRead && <View style={styles.unreadDot} />}
           </View>
           <Typography variant="caption" color={Colors.primary} style={{ fontSize: 10 }}>
-            {formatDate(ann.fecha)}
+            {formatDateShort(ann.fecha)}
           </Typography>
         </View>
 
+        {/* Categoría (si es destacado, mostramos también la categoría) */}
+        {isDestacado && (
+          <View style={[styles.categoryBadge, { backgroundColor: `${priorityColor}12`, alignSelf: 'flex-start' }]}>
+            <Ionicons
+              name={`${CATEGORY_ICON[ann.categoria]}-outline` as any}
+              size={9}
+              color={priorityColor}
+            />
+            <Typography style={{ color: priorityColor, fontSize: 9, fontWeight: '600', textTransform: 'uppercase' }}>
+              {CATEGORY_LABEL[ann.categoria]}
+            </Typography>
+          </View>
+        )}
+
         {/* Título */}
-        <Typography variant="label" style={{ color: theme.text }} numberOfLines={expanded ? undefined : 1}>
+        <Typography
+          variant="label"
+          style={{ color: isDestacado ? Colors.accent : theme.text }}
+          numberOfLines={expanded ? undefined : 1}
+        >
           {ann.titulo}
         </Typography>
 
@@ -98,7 +137,7 @@ export function AnnouncementCard({ announcement: ann, onPress, isRead = false, e
           {ann.descripcion}
         </Typography>
 
-        {/* Footer */}
+        {/* Footer: prioridad + expiración */}
         <View style={styles.footer}>
           <View style={[styles.priorityBadge, { backgroundColor: `${priorityColor}12` }]}>
             <View style={[styles.priorityDot, { backgroundColor: priorityColor }]} />
@@ -106,9 +145,19 @@ export function AnnouncementCard({ announcement: ann, onPress, isRead = false, e
               Prioridad {PRIORITY_LABEL[ann.prioridad]}
             </Typography>
           </View>
-          {!expanded && (
-            <Ionicons name="chevron-forward" size={14} color={theme.textMuted} />
-          )}
+          <View style={styles.footerRight}>
+            {ann.fecha_expiracion && (
+              <View style={[styles.expBadge, { backgroundColor: theme.surface }]}>
+                <Ionicons name="time-outline" size={9} color={theme.textMuted} />
+                <Typography style={{ color: theme.textMuted, fontSize: 9 }}>
+                  Exp: {formatDate(ann.fecha_expiracion)}
+                </Typography>
+              </View>
+            )}
+            {!expanded && (
+              <Ionicons name="chevron-forward" size={14} color={theme.textMuted} />
+            )}
+          </View>
         </View>
       </View>
     </TouchableOpacity>
@@ -123,7 +172,7 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   cardRead: {
-    opacity: 0.7,
+    opacity: 0.65,
   },
   accent: {
     width: 4,
@@ -133,7 +182,7 @@ const styles = StyleSheet.create({
     padding: Spacing.md,
     gap: 7,
   },
-  header: {
+  headerRow: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
@@ -142,6 +191,14 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 8,
+  },
+  destacadoBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: BorderRadius.full,
   },
   categoryBadge: {
     flexDirection: 'row',
@@ -163,6 +220,11 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     marginTop: 2,
   },
+  footerRight: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+  },
   priorityBadge: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -175,5 +237,13 @@ const styles = StyleSheet.create({
     width: 5,
     height: 5,
     borderRadius: 3,
+  },
+  expBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 3,
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: BorderRadius.full,
   },
 });

@@ -2,18 +2,19 @@
 
 export type AnnouncementCategory = 'evento' | 'campana' | 'ayuno' | 'actividad' | 'general';
 export type AnnouncementPriority = 'alta' | 'media' | 'baja';
-export type AnnouncementStatus = 'activo' | 'expirado';
+export type AnnouncementStatus = 'activo' | 'expirado' | 'destacado';
 
 export interface Announcement {
   id: string;
   titulo: string;
   descripcion: string;
-  fecha: string; // ISO date — ej. "2026-06-14"
+  fecha: string;             // ISO date — fecha del evento/inicio
+  fecha_expiracion?: string; // ISO date — cuándo deja de mostrarse
   categoria: AnnouncementCategory;
   prioridad: AnnouncementPriority;
   imagen_url?: string;
   estado: AnnouncementStatus;
-  created_at: string; // ISO datetime
+  created_at: string;        // ISO datetime
 }
 
 // ─── Horarios ─────────────────────────────────────────────────────────────────
@@ -24,12 +25,14 @@ export interface Schedule {
   id: string;
   titulo: string;
   tipo: ScheduleType;
-  hora: string; // "HH:mm" — ej. "10:00"
-  dia_semana?: number; // 0=Domingo … 6=Sábado (para recurrentes)
+  hora: string;              // "HH:mm"
+  dia_semana?: number;       // 0=Domingo … 6=Sábado (recurrentes)
   fecha_especifica?: string; // ISO date para eventos únicos
   ubicacion: string;
   responsable: string;
   descripcion?: string;
+  categoria?: string;        // Agrupación: "Principal", "Jóvenes", "Formación"
+  recordatorio?: boolean;    // Preparado para push notifications (Phase 4)
   es_recurrente: boolean;
   activo: boolean;
 }
@@ -46,9 +49,11 @@ export interface Contact {
   descripcion?: string;
   whatsapp?: string;
   telegram?: string;
+  email?: string;            // Email de contacto
+  horario_atencion?: string; // Ej. "Lun–Vie 10:00–18:00"
   ubicacion?: string;
   zona?: string;
-  color: string; // hex
+  color: string;             // hex
 }
 
 // ─── Biblioteca Comunidad ─────────────────────────────────────────────────────
@@ -62,8 +67,9 @@ export interface CommunityResource {
   descripcion?: string;
   url?: string;
   autor?: string;
-  fecha: string; // ISO date
+  fecha: string;             // ISO date
   categoria: string;
+  destacado?: boolean;       // Recursos seleccionados por el equipo pastoral
 }
 
 // ─── Notificaciones locales ───────────────────────────────────────────────────

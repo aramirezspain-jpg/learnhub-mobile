@@ -44,7 +44,7 @@ export function ScheduleItem({ schedule: sch }: Props) {
 
   return (
     <View style={[styles.card, { backgroundColor: theme.card }, Shadows.sm]}>
-      {/* Hora */}
+      {/* Bloque de hora */}
       <View style={[styles.timeBlock, { backgroundColor: `${color}12` }]}>
         <Typography style={{ color, fontSize: 15, fontWeight: '700', lineHeight: 18 }}>
           {sch.hora}
@@ -54,43 +54,75 @@ export function ScheduleItem({ schedule: sch }: Props) {
         </Typography>
       </View>
 
-      {/* Info */}
+      {/* Contenido */}
       <View style={styles.info}>
+        {/* Título */}
         <Typography variant="label" style={{ color: theme.text }} numberOfLines={1}>
           {sch.titulo}
         </Typography>
+
+        {/* Descripción */}
         {sch.descripcion ? (
           <Typography variant="caption" secondary numberOfLines={1}>
             {sch.descripcion}
           </Typography>
         ) : null}
-        <View style={styles.meta}>
+
+        {/* Ubicación */}
+        <View style={styles.metaRow}>
           <Ionicons name="location-outline" size={11} color={theme.textMuted} />
           <Typography variant="caption" muted numberOfLines={1} style={{ flex: 1 }}>
             {sch.ubicacion}
           </Typography>
         </View>
-        <View style={styles.meta}>
+
+        {/* Responsable */}
+        <View style={styles.metaRow}>
           <Ionicons name="person-outline" size={11} color={theme.textMuted} />
           <Typography variant="caption" muted numberOfLines={1} style={{ flex: 1 }}>
             {sch.responsable}
           </Typography>
         </View>
+
+        {/* Chips fila inferior */}
+        <View style={styles.chipsRow}>
+          {/* Categoría */}
+          {sch.categoria ? (
+            <View style={[styles.catChip, { backgroundColor: theme.surface }]}>
+              <Typography style={{ color: theme.textSecondary, fontSize: 9, fontWeight: '600' }}>
+                {sch.categoria}
+              </Typography>
+            </View>
+          ) : null}
+
+          {/* Recurrente */}
+          {sch.es_recurrente && (
+            <View style={[styles.recChip, { backgroundColor: `${color}10` }]}>
+              <Ionicons name="repeat" size={9} color={color} />
+              <Typography style={{ color, fontSize: 9, fontWeight: '600' }}>Semanal</Typography>
+            </View>
+          )}
+
+          {/* Recordatorio (placeholder Phase 4) */}
+          {sch.recordatorio && (
+            <View style={[styles.recChip, { backgroundColor: `${Colors.info}10` }]}>
+              <Ionicons name="notifications-outline" size={9} color={Colors.info} />
+              <Typography style={{ color: Colors.info, fontSize: 9, fontWeight: '600' }}>
+                Recuerdo
+              </Typography>
+            </View>
+          )}
+        </View>
       </View>
 
-      {/* Tipo badge */}
-      <View style={styles.typeBadge}>
+      {/* Tipo badge (columna derecha) */}
+      <View style={styles.typeCol}>
         <View style={[styles.typeChip, { backgroundColor: `${color}15` }]}>
           <Ionicons name={`${TIPO_ICON[sch.tipo]}-outline` as any} size={12} color={color} />
           <Typography style={{ color, fontSize: 9, fontWeight: '700' }}>
             {TIPO_LABEL[sch.tipo]}
           </Typography>
         </View>
-        {sch.es_recurrente && (
-          <View style={[styles.recChip, { backgroundColor: `${theme.border}` }]}>
-            <Ionicons name="repeat" size={10} color={theme.textMuted} />
-          </View>
-        )}
       </View>
     </View>
   );
@@ -117,30 +149,41 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     gap: 4,
   },
-  meta: {
+  metaRow: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 4,
   },
-  typeBadge: {
+  chipsRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 5,
+    marginTop: 3,
+  },
+  catChip: {
+    paddingHorizontal: 7,
+    paddingVertical: 2,
+    borderRadius: BorderRadius.full,
+  },
+  recChip: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 3,
+    paddingHorizontal: 7,
+    paddingVertical: 2,
+    borderRadius: BorderRadius.full,
+  },
+  typeCol: {
     padding: 10,
     alignItems: 'flex-end',
     justifyContent: 'flex-start',
-    gap: 6,
   },
   typeChip: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 3,
     paddingHorizontal: 7,
-    paddingVertical: 3,
+    paddingVertical: 4,
     borderRadius: BorderRadius.full,
-  },
-  recChip: {
-    width: 22,
-    height: 22,
-    borderRadius: 11,
-    alignItems: 'center',
-    justifyContent: 'center',
   },
 });

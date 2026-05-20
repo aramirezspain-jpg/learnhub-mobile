@@ -135,6 +135,18 @@ export default function RootLayout() {
             name="community-library"
             options={{ animation: 'slide_from_right' }}
           />
+          <Stack.Screen
+            name="prayer-requests"
+            options={{ animation: 'slide_from_right' }}
+          />
+          <Stack.Screen
+            name="contact-leadership"
+            options={{ animation: 'slide_from_right' }}
+          />
+          <Stack.Screen
+            name="service-request"
+            options={{ animation: 'slide_from_right' }}
+          />
         </Stack>
       </AppBootstrap>
     </SQLiteProvider>

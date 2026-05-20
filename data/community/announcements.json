@@ -2,11 +2,12 @@
   {
     "id": "ann_001",
     "titulo": "Retiro Espiritual Anual 2026",
-    "descripcion": "Los invitamos a nuestro retiro anual de renovación espiritual. Tres días de adoración, enseñanza y comunión. Transporte disponible desde el templo. Cupos limitados — inscríbase en secretaría.",
+    "descripcion": "Los invitamos a nuestro retiro anual de renovación espiritual. Tres días de adoración, enseñanza profunda y comunión. Transporte disponible desde el templo. Cupos limitados — inscríbase en secretaría antes del 1 de junio.",
     "fecha": "2026-06-14",
+    "fecha_expiracion": "2026-06-10",
     "categoria": "evento",
     "prioridad": "alta",
-    "estado": "activo",
+    "estado": "destacado",
     "created_at": "2026-05-15T08:00:00.000Z"
   },
   {
@@ -14,6 +15,7 @@
     "titulo": "Cadena de Ayuno y Oración",
     "descripcion": "21 días de ayuno y oración en comunidad. Cada familia se une al turno asignado. Inscripciones abiertas en secretaría esta semana.",
     "fecha": "2026-06-01",
+    "fecha_expiracion": "2026-06-21",
     "categoria": "ayuno",
     "prioridad": "alta",
     "estado": "activo",
@@ -24,6 +26,7 @@
     "titulo": "Noche de Alabanza y Adoración",
     "descripcion": "Únete a una noche especial de adoración y alabanza con todos los ministerios de la iglesia. Traigan a sus familias. Entrada libre.",
     "fecha": "2026-05-30",
+    "fecha_expiracion": "2026-05-30",
     "categoria": "evento",
     "prioridad": "media",
     "estado": "activo",
@@ -32,8 +35,9 @@
   {
     "id": "ann_004",
     "titulo": "Brigada de Limpieza del Templo",
-    "descripcion": "Este sábado realizaremos la limpieza y mantenimiento del templo. Todos los miembros están invitados a participar. Traigan guantes y ropa cómoda.",
+    "descripcion": "Este sábado realizaremos la limpieza y mantenimiento del templo. Todos los miembros están invitados. Traigan guantes y ropa cómoda.",
     "fecha": "2026-05-24",
+    "fecha_expiracion": "2026-05-24",
     "categoria": "actividad",
     "prioridad": "baja",
     "estado": "activo",
@@ -44,19 +48,32 @@
     "titulo": "Conferencia para Matrimonios",
     "descripcion": "Conferencia especial «Construyendo sobre la Roca» para matrimonios. Cupos limitados. Registro previo obligatorio antes del 30 de junio.",
     "fecha": "2026-07-05",
+    "fecha_expiracion": "2026-07-01",
     "categoria": "evento",
     "prioridad": "alta",
-    "estado": "activo",
+    "estado": "destacado",
     "created_at": "2026-05-13T11:00:00.000Z"
   },
   {
     "id": "ann_006",
     "titulo": "Campaña de Recolección de Alimentos",
-    "descripcion": "Recolectaremos alimentos no perecederos para familias en necesidad de nuestra comunidad. Depositen las donaciones en la entrada del templo hasta el domingo.",
+    "descripcion": "Recolectaremos alimentos no perecederos para familias en necesidad. Depositen las donaciones en la entrada del templo hasta el domingo.",
     "fecha": "2026-05-25",
+    "fecha_expiracion": "2026-05-25",
     "categoria": "campana",
     "prioridad": "media",
     "estado": "activo",
     "created_at": "2026-05-17T14:00:00.000Z"
+  },
+  {
+    "id": "ann_007",
+    "titulo": "Culto de Aniversario de la Iglesia",
+    "descripcion": "Celebramos 25 años de ministerio. Un culto especial de acción de gracias con toda la familia de la iglesia. Fue una noche memorable.",
+    "fecha": "2026-05-10",
+    "fecha_expiracion": "2026-05-10",
+    "categoria": "evento",
+    "prioridad": "alta",
+    "estado": "expirado",
+    "created_at": "2026-05-01T09:00:00.000Z"
   }
 ]

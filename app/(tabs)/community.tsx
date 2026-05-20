@@ -16,6 +16,14 @@ function formatDate(dateStr: string): string {
   return d.toLocaleDateString('es-ES', { day: 'numeric', month: 'short' });
 }
 
+function daysUntil(dateStr: string): number {
+  const now = new Date();
+  now.setHours(0, 0, 0, 0);
+  const target = new Date(dateStr);
+  target.setHours(0, 0, 0, 0);
+  return Math.ceil((target.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
+}
+
 const PRIORITY_COLOR: Record<Announcement['prioridad'], string> = {
   alta: Colors.error,
   media: Colors.warning,
@@ -39,6 +47,31 @@ const RESOURCE_ICON: Record<CommunityResource['tipo'], string> = {
   recurso: 'archive-outline',
 };
 
+// Placeholders de funciones en desarrollo (Phase 4)
+const COMING_SOON = [
+  {
+    route: '/prayer-requests' as const,
+    titulo: 'Peticiones de Oración',
+    descripcion: 'Comparte tu petición con la iglesia',
+    icon: 'hand-left-outline',
+    color: Colors.secondary,
+  },
+  {
+    route: '/contact-leadership' as const,
+    titulo: 'Contactar Liderazgo',
+    descripcion: 'Mensaje privado al equipo pastoral',
+    icon: 'chatbubble-ellipses-outline',
+    color: Colors.info,
+  },
+  {
+    route: '/service-request' as const,
+    titulo: 'Solicitudes',
+    descripcion: 'Bautismo, membresía, matrimonio...',
+    icon: 'document-text-outline',
+    color: Colors.accent,
+  },
+];
+
 // ── Encabezado de sección ────────────────────────────────────────────────────
 
 function SectionHeader({
@@ -46,11 +79,13 @@ function SectionHeader({
   icon,
   color,
   onPress,
+  hideVerTodo,
 }: {
   title: string;
   icon: string;
   color: string;
-  onPress: () => void;
+  onPress?: () => void;
+  hideVerTodo?: boolean;
 }) {
   const scheme = useColorScheme() ?? 'dark';
   const theme = Colors[scheme];
@@ -62,10 +97,12 @@ function SectionHeader({
       <Typography variant="h3" style={{ color: theme.text, flex: 1 }}>
         {title}
       </Typography>
-      <TouchableOpacity onPress={onPress} style={sStyles.verTodo} activeOpacity={0.7}>
-        <Typography variant="caption" color={Colors.primary}>Ver todo</Typography>
-        <Ionicons name="chevron-forward" size={12} color={Colors.primary} />
-      </TouchableOpacity>
+      {!hideVerTodo && onPress && (
+        <TouchableOpacity onPress={onPress} style={sStyles.verTodo} activeOpacity={0.7}>
+          <Typography variant="caption" color={Colors.primary}>Ver todo</Typography>
+          <Ionicons name="chevron-forward" size={12} color={Colors.primary} />
+        </TouchableOpacity>
+      )}
     </View>
   );
 }
@@ -89,24 +126,66 @@ export default function CommunityScreen() {
   const library = useCommunityStore(s => s.library);
   const readIds = useCommunityStore(s => s.readAnnouncementIds);
 
-  const activeAnnouncements = useMemo(
-    () => announcements.filter(a => a.estado === 'activo').slice(0, 3),
-    [announcements]
-  );
+  // ── Cómputos ────────────────────────────────────────────────────────────────
+
+  // Anuncios activos + destacados, con destacados primero
+  const featuredAnnouncements = useMemo(() => {
+    const visible = announcements.filter(a => a.estado === 'activo' || a.estado === 'destacado');
+    return [...visible]
+      .sort((a, b) => {
+        if (a.estado === 'destacado' && b.estado !== 'destacado') return -1;
+        if (b.estado === 'destacado' && a.estado !== 'destacado') return 1;
+        return 0;
+      })
+      .slice(0, 3);
+  }, [announcements]);
 
   const unreadCount = useMemo(
-    () => announcements.filter(a => a.estado === 'activo' && !readIds.includes(a.id)).length,
+    () => announcements.filter(a => a.estado !== 'expirado' && !readIds.includes(a.id)).length,
     [announcements, readIds]
   );
 
+  // Próximos eventos (por fecha, más próximos primero)
+  const proximosEventos = useMemo(() => {
+    const now = new Date();
+    now.setHours(0, 0, 0, 0);
+    return announcements
+      .filter(a => {
+        if (a.estado === 'expirado') return false;
+        const d = new Date(a.fecha);
+        d.setHours(0, 0, 0, 0);
+        return d >= now && (a.categoria === 'evento' || a.categoria === 'ayuno');
+      })
+      .sort((a, b) => new Date(a.fecha).getTime() - new Date(b.fecha).getTime())
+      .slice(0, 3);
+  }, [announcements]);
+
+  // Horarios de hoy
   const todaySchedules = useMemo(() => {
     const today = new Date().getDay();
     const todays = schedules.filter(s => s.activo && s.dia_semana === today);
     return todays.length > 0 ? todays.slice(0, 3) : schedules.filter(s => s.activo).slice(0, 3);
   }, [schedules]);
 
+  // Contactos destacados
   const featuredContacts = useMemo(() => contacts.slice(0, 4), [contacts]);
-  const featuredLibrary = useMemo(() => library.slice(0, 3), [library]);
+
+  // Biblioteca: destacados primero
+  const featuredLibrary = useMemo(() => {
+    const sorted = [...library].sort((a, b) => {
+      if (a.destacado && !b.destacado) return -1;
+      if (b.destacado && !a.destacado) return 1;
+      return 0;
+    });
+    return sorted.slice(0, 3);
+  }, [library]);
+
+  // Resumen semanal
+  const resumen = useMemo(() => ({
+    servicios: schedules.filter(s => s.activo).length,
+    anuncios: announcements.filter(a => a.estado !== 'expirado').length,
+    proximoEvento: proximosEventos[0] ?? null,
+  }), [schedules, announcements, proximosEventos]);
 
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: theme.background }]} edges={['top']}>
@@ -123,7 +202,7 @@ export default function CommunityScreen() {
         >
           <Ionicons name="notifications-outline" size={22} color={Colors.primary} />
           {unreadCount > 0 && (
-            <View style={styles.badge}>
+            <View style={styles.notifBadge}>
               <Typography style={{ color: '#FFF', fontSize: 9, fontWeight: '700', lineHeight: 14 }}>
                 {unreadCount > 9 ? '9+' : String(unreadCount)}
               </Typography>
@@ -132,10 +211,111 @@ export default function CommunityScreen() {
         </TouchableOpacity>
       </View>
 
-      <ScrollView
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={styles.content}
-      >
+      <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.content}>
+
+        {/* ── RESUMEN SEMANAL ── */}
+        <View style={styles.summarySection}>
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.summaryRow}>
+            <View style={[styles.statChip, { backgroundColor: `${Colors.success}12` }]}>
+              <Ionicons name="calendar-outline" size={14} color={Colors.success} />
+              <Typography style={{ color: Colors.success, fontSize: 13, fontWeight: '800' }}>
+                {resumen.servicios}
+              </Typography>
+              <Typography variant="caption" muted style={{ fontSize: 10 }}>servicios</Typography>
+            </View>
+            <View style={[styles.statChip, { backgroundColor: `${Colors.error}12` }]}>
+              <Ionicons name="megaphone-outline" size={14} color={Colors.error} />
+              <Typography style={{ color: Colors.error, fontSize: 13, fontWeight: '800' }}>
+                {resumen.anuncios}
+              </Typography>
+              <Typography variant="caption" muted style={{ fontSize: 10 }}>anuncios</Typography>
+            </View>
+            {resumen.proximoEvento && (
+              <TouchableOpacity
+                style={[styles.statChip, { backgroundColor: `${Colors.accent}12` }]}
+                onPress={() => router.push('/announcements' as never)}
+                activeOpacity={0.85}
+              >
+                <Ionicons name="time-outline" size={14} color={Colors.accent} />
+                <Typography style={{ color: Colors.accent, fontSize: 13, fontWeight: '800' }}>
+                  {formatDate(resumen.proximoEvento.fecha)}
+                </Typography>
+                <Typography variant="caption" muted style={{ fontSize: 10 }}>próx. evento</Typography>
+              </TouchableOpacity>
+            )}
+            {unreadCount > 0 && (
+              <TouchableOpacity
+                style={[styles.statChip, { backgroundColor: `${Colors.primary}12` }]}
+                onPress={() => router.push('/announcements' as never)}
+                activeOpacity={0.85}
+              >
+                <Ionicons name="notifications-outline" size={14} color={Colors.primary} />
+                <Typography style={{ color: Colors.primary, fontSize: 13, fontWeight: '800' }}>
+                  {unreadCount}
+                </Typography>
+                <Typography variant="caption" muted style={{ fontSize: 10 }}>sin leer</Typography>
+              </TouchableOpacity>
+            )}
+          </ScrollView>
+        </View>
+
+        {/* ── PRÓXIMOS EVENTOS ── */}
+        {proximosEventos.length > 0 && (
+          <View style={styles.section}>
+            <SectionHeader
+              title="Próximos Eventos"
+              icon="time-outline"
+              color={Colors.accent}
+              onPress={() => router.push('/announcements' as never)}
+            />
+            {proximosEventos.map(ann => {
+              const days = daysUntil(ann.fecha);
+              const daysLabel = days === 0 ? 'Hoy' : days === 1 ? 'Mañana' : `En ${days} días`;
+              const isDestacado = ann.estado === 'destacado';
+              return (
+                <TouchableOpacity
+                  key={ann.id}
+                  style={[
+                    styles.eventCard,
+                    { backgroundColor: theme.card },
+                    Shadows.sm,
+                    isDestacado && { borderColor: `${Colors.accent}35`, borderWidth: 1.5 },
+                  ]}
+                  onPress={() => router.push('/announcements' as never)}
+                  activeOpacity={0.85}
+                >
+                  <View style={[styles.eventDateBlock, { backgroundColor: `${Colors.accent}12` }]}>
+                    <Typography style={{ color: Colors.accent, fontSize: 17, fontWeight: '800', lineHeight: 20 }}>
+                      {new Date(ann.fecha).getDate()}
+                    </Typography>
+                    <Typography style={{ color: Colors.accent, fontSize: 9, textTransform: 'uppercase', letterSpacing: 0.5 }}>
+                      {new Date(ann.fecha).toLocaleDateString('es-ES', { month: 'short' })}
+                    </Typography>
+                  </View>
+                  <View style={styles.eventInfo}>
+                    <View style={styles.eventHeader}>
+                      {isDestacado && (
+                        <Ionicons name="star" size={10} color={Colors.accent} style={{ marginRight: 3 }} />
+                      )}
+                      <Typography variant="label" style={{ color: theme.text, flex: 1 }} numberOfLines={1}>
+                        {ann.titulo}
+                      </Typography>
+                    </View>
+                    <Typography variant="caption" secondary numberOfLines={1}>
+                      {ann.descripcion}
+                    </Typography>
+                  </View>
+                  <View style={[styles.daysChip, { backgroundColor: days <= 3 ? `${Colors.error}12` : `${Colors.success}12` }]}>
+                    <Typography style={{ color: days <= 3 ? Colors.error : Colors.success, fontSize: 9, fontWeight: '700' }}>
+                      {daysLabel}
+                    </Typography>
+                  </View>
+                </TouchableOpacity>
+              );
+            })}
+          </View>
+        )}
+
         {/* ── CARTELERA ── */}
         <View style={styles.section}>
           <SectionHeader
@@ -144,42 +324,60 @@ export default function CommunityScreen() {
             color={Colors.error}
             onPress={() => router.push('/announcements' as never)}
           />
-          {activeAnnouncements.length === 0 ? (
+          {featuredAnnouncements.length === 0 ? (
             <Typography variant="caption" secondary style={styles.emptyText}>
               No hay anuncios activos
             </Typography>
           ) : (
-            activeAnnouncements.map(ann => (
-              <TouchableOpacity
-                key={ann.id}
-                style={[styles.annCard, { backgroundColor: theme.card }, Shadows.sm]}
-                onPress={() => router.push('/announcements' as never)}
-                activeOpacity={0.85}
-              >
-                <View style={[styles.annAccent, { backgroundColor: PRIORITY_COLOR[ann.prioridad] }]} />
-                <View style={styles.annBody}>
-                  <View style={styles.annHeader}>
-                    <Typography variant="label" style={{ color: theme.text, flex: 1 }} numberOfLines={1}>
-                      {ann.titulo}
-                    </Typography>
-                    <Typography variant="caption" color={Colors.primary} style={{ fontSize: 10 }}>
-                      {formatDate(ann.fecha)}
-                    </Typography>
-                  </View>
-                  <Typography variant="caption" secondary numberOfLines={2} style={{ lineHeight: 16 }}>
-                    {ann.descripcion}
-                  </Typography>
-                  <View style={styles.annFooter}>
-                    <View style={[styles.chip, { backgroundColor: `${PRIORITY_COLOR[ann.prioridad]}12` }]}>
-                      <Typography style={{ color: PRIORITY_COLOR[ann.prioridad], fontSize: 9, fontWeight: '700', textTransform: 'uppercase' }}>
-                        {ann.categoria} · {ann.prioridad}
+            featuredAnnouncements.map(ann => {
+              const isDestacado = ann.estado === 'destacado';
+              return (
+                <TouchableOpacity
+                  key={ann.id}
+                  style={[
+                    styles.annCard,
+                    { backgroundColor: theme.card },
+                    Shadows.sm,
+                    isDestacado && { borderColor: `${Colors.accent}35`, borderWidth: 1.5 },
+                  ]}
+                  onPress={() => router.push('/announcements' as never)}
+                  activeOpacity={0.85}
+                >
+                  <View style={[styles.annAccent, {
+                    backgroundColor: isDestacado ? Colors.accent : PRIORITY_COLOR[ann.prioridad]
+                  }]} />
+                  <View style={styles.annBody}>
+                    <View style={styles.annHeader}>
+                      {isDestacado && (
+                        <Ionicons name="star" size={10} color={Colors.accent} />
+                      )}
+                      <Typography variant="label" style={{ color: isDestacado ? Colors.accent : theme.text, flex: 1 }} numberOfLines={1}>
+                        {ann.titulo}
+                      </Typography>
+                      <Typography variant="caption" color={Colors.primary} style={{ fontSize: 10 }}>
+                        {formatDate(ann.fecha)}
                       </Typography>
                     </View>
-                    {!readIds.includes(ann.id) && <View style={styles.unreadDot} />}
+                    <Typography variant="caption" secondary numberOfLines={2} style={{ lineHeight: 16 }}>
+                      {ann.descripcion}
+                    </Typography>
+                    <View style={styles.annFooter}>
+                      <View style={[styles.chip, {
+                        backgroundColor: `${isDestacado ? Colors.accent : PRIORITY_COLOR[ann.prioridad]}12`
+                      }]}>
+                        <Typography style={{
+                          color: isDestacado ? Colors.accent : PRIORITY_COLOR[ann.prioridad],
+                          fontSize: 9, fontWeight: '700', textTransform: 'uppercase'
+                        }}>
+                          {isDestacado ? 'Destacado' : `${ann.categoria} · ${ann.prioridad}`}
+                        </Typography>
+                      </View>
+                      {!readIds.includes(ann.id) && <View style={styles.unreadDot} />}
+                    </View>
                   </View>
-                </View>
-              </TouchableOpacity>
-            ))
+                </TouchableOpacity>
+              );
+            })
           )}
         </View>
 
@@ -223,9 +421,18 @@ export default function CommunityScreen() {
                   <Typography variant="label" style={{ color: theme.text }} numberOfLines={1}>
                     {sch.titulo}
                   </Typography>
-                  <Typography variant="caption" secondary numberOfLines={1}>
-                    {sch.ubicacion}
-                  </Typography>
+                  <View style={styles.schedMeta}>
+                    <Typography variant="caption" secondary numberOfLines={1} style={{ flex: 1 }}>
+                      {sch.ubicacion}
+                    </Typography>
+                    {sch.categoria && (
+                      <View style={[styles.chip, { backgroundColor: `${Colors.success}10` }]}>
+                        <Typography style={{ color: Colors.success, fontSize: 9, fontWeight: '600' }}>
+                          {sch.categoria}
+                        </Typography>
+                      </View>
+                    )}
+                  </View>
                 </View>
                 <View style={[styles.chip, { backgroundColor: `${Colors.success}12`, marginRight: 12 }]}>
                   <Typography style={{ color: Colors.success, fontSize: 9, fontWeight: '700' }}>
@@ -284,18 +491,23 @@ export default function CommunityScreen() {
           </ScrollView>
         </View>
 
-        {/* ── BIBLIOTECA ── */}
+        {/* ── BIBLIOTECA (DESTACADOS) ── */}
         <View style={styles.section}>
           <SectionHeader
-            title="Biblioteca"
-            icon="folder-open-outline"
+            title="Recursos Destacados"
+            icon="star-outline"
             color={Colors.secondary}
             onPress={() => router.push('/community-library' as never)}
           />
           {featuredLibrary.map(res => (
             <TouchableOpacity
               key={res.id}
-              style={[styles.libCard, { backgroundColor: theme.card }, Shadows.sm]}
+              style={[
+                styles.libCard,
+                { backgroundColor: theme.card },
+                Shadows.sm,
+                res.destacado && { borderColor: `${Colors.secondary}30`, borderWidth: 1 },
+              ]}
               onPress={() => router.push('/community-library' as never)}
               activeOpacity={0.85}
             >
@@ -303,14 +515,50 @@ export default function CommunityScreen() {
                 <Ionicons name={RESOURCE_ICON[res.tipo] as any} size={18} color={Colors.secondary} />
               </View>
               <View style={styles.libContent}>
-                <Typography variant="label" style={{ color: theme.text }} numberOfLines={1}>
-                  {res.titulo}
-                </Typography>
+                <View style={styles.libTitleRow}>
+                  {res.destacado && (
+                    <Ionicons name="star" size={10} color={Colors.accent} style={{ marginRight: 4 }} />
+                  )}
+                  <Typography variant="label" style={{ color: theme.text, flex: 1 }} numberOfLines={1}>
+                    {res.titulo}
+                  </Typography>
+                </View>
                 <Typography variant="caption" secondary numberOfLines={1}>
                   {res.categoria}{res.autor ? ` · ${res.autor}` : ''}
                 </Typography>
               </View>
               <Ionicons name="chevron-forward" size={14} color={theme.textMuted} style={{ alignSelf: 'center', marginRight: 12 }} />
+            </TouchableOpacity>
+          ))}
+        </View>
+
+        {/* ── PRÓXIMAMENTE (Phase 4) ── */}
+        <View style={styles.section}>
+          <SectionHeader
+            title="En Desarrollo"
+            icon="rocket-outline"
+            color={Colors.primary}
+            hideVerTodo
+          />
+          {COMING_SOON.map(item => (
+            <TouchableOpacity
+              key={item.route}
+              style={[styles.phCard, { backgroundColor: theme.card }, Shadows.sm]}
+              onPress={() => router.push(item.route as never)}
+              activeOpacity={0.85}
+            >
+              <View style={[styles.phIcon, { backgroundColor: `${item.color}15` }]}>
+                <Ionicons name={item.icon as any} size={20} color={item.color} />
+              </View>
+              <View style={styles.phInfo}>
+                <Typography variant="label" style={{ color: theme.text }}>{item.titulo}</Typography>
+                <Typography variant="caption" secondary numberOfLines={1}>{item.descripcion}</Typography>
+              </View>
+              <View style={[styles.prox, { backgroundColor: `${Colors.primary}12` }]}>
+                <Typography style={{ color: Colors.primary, fontSize: 8, fontWeight: '800', letterSpacing: 0.5 }}>
+                  PRÓX.
+                </Typography>
+              </View>
             </TouchableOpacity>
           ))}
         </View>
@@ -335,7 +583,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: Spacing.lg,
     paddingTop: Spacing.md,
-    paddingBottom: Spacing.lg,
+    paddingBottom: Spacing.md,
   },
   notifBtn: {
     width: 44,
@@ -344,7 +592,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  badge: {
+  notifBadge: {
     position: 'absolute',
     top: 6,
     right: 6,
@@ -356,9 +604,42 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   content: { paddingBottom: 40 },
-  section: {
-    paddingHorizontal: Spacing.lg,
-    marginBottom: Spacing.xl,
+  section: { paddingHorizontal: Spacing.lg, marginBottom: Spacing.xl },
+
+  // Resumen semanal
+  summarySection: { marginBottom: Spacing.xl },
+  summaryRow: { paddingHorizontal: Spacing.lg, gap: 10 },
+  statChip: {
+    alignItems: 'center',
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    borderRadius: BorderRadius.xl,
+    gap: 3,
+    minWidth: 80,
+  },
+
+  // Próximos eventos
+  eventCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderRadius: BorderRadius.lg,
+    overflow: 'hidden',
+    marginBottom: 8,
+    gap: 0,
+  },
+  eventDateBlock: {
+    width: 60,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 14,
+  },
+  eventInfo: { flex: 1, paddingHorizontal: 12, paddingVertical: 10, gap: 3 },
+  eventHeader: { flexDirection: 'row', alignItems: 'center' },
+  daysChip: {
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: BorderRadius.full,
+    marginRight: 12,
   },
 
   // Announcements
@@ -370,7 +651,7 @@ const styles = StyleSheet.create({
   },
   annAccent: { width: 4 },
   annBody: { flex: 1, padding: 12, gap: 6 },
-  annHeader: { flexDirection: 'row', alignItems: 'flex-start', gap: 8 },
+  annHeader: { flexDirection: 'row', alignItems: 'center', gap: 4 },
   annFooter: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
   chip: {
     paddingHorizontal: 8,
@@ -406,6 +687,7 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
   },
   schedInfo: { flex: 1, paddingHorizontal: 12, paddingVertical: 10, gap: 3 },
+  schedMeta: { flexDirection: 'row', alignItems: 'center', gap: 6 },
 
   // Contacts
   contactsRow: { gap: 10, paddingRight: 4 },
@@ -442,8 +724,32 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   libContent: { flex: 1, gap: 3 },
+  libTitleRow: { flexDirection: 'row', alignItems: 'center' },
 
   emptyText: { textAlign: 'center', paddingVertical: 16 },
+
+  // Próximamente
+  phCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderRadius: BorderRadius.lg,
+    padding: 14,
+    marginBottom: 8,
+    gap: 14,
+  },
+  phIcon: {
+    width: 42,
+    height: 42,
+    borderRadius: BorderRadius.md,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  phInfo: { flex: 1, gap: 2 },
+  prox: {
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: BorderRadius.full,
+  },
 
   // Footer
   footer: {
