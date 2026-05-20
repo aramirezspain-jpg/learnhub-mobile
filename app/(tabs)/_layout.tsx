@@ -5,6 +5,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { Colors, FontSizes, FontWeights } from '@/constants/theme';
 import { HapticTab } from '@/components/haptic-tab';
+import { useNotificationStore } from '@/store/notification.store';
 
 type IoniconsName = React.ComponentProps<typeof Ionicons>['name'];
 
@@ -24,6 +25,7 @@ export default function TabLayout() {
   const scheme = useColorScheme() ?? 'dark';
   const theme = Colors[scheme];
   const insets = useSafeAreaInsets();
+  const unreadCount = useNotificationStore(s => s.unreadCount);
   const tabBarHeight = 64 + insets.bottom;
   const tabBarPaddingBottom = Math.max(insets.bottom, 8);
 
@@ -89,6 +91,8 @@ export default function TabLayout() {
         name="community"
         options={{
           title: 'Comunidad',
+          tabBarBadge: unreadCount > 0 ? (unreadCount > 99 ? '99+' : unreadCount) : undefined,
+          tabBarBadgeStyle: { backgroundColor: Colors.error, fontSize: 9, minWidth: 16, height: 16 },
           tabBarIcon: ({ focused, color }) => (
             <TabIcon name="people" focused={focused} color={color} />
           ),

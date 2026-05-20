@@ -7,6 +7,7 @@ import { useColorScheme } from '@/hooks/use-color-scheme';
 import { Colors, Spacing, BorderRadius, Shadows, FontSizes } from '@/constants/theme';
 import { Typography } from '@/components/ui/Typography';
 import { useCommunityStore } from '@/store/community.store';
+import { useNotificationStore } from '@/store/notification.store';
 import type { Announcement, Schedule, CommunityResource } from '@/types/community';
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
@@ -125,6 +126,7 @@ export default function CommunityScreen() {
   const contacts = useCommunityStore(s => s.contacts);
   const library = useCommunityStore(s => s.library);
   const readIds = useCommunityStore(s => s.readAnnouncementIds);
+  const notifUnreadCount = useNotificationStore(s => s.unreadCount);
 
   // ── Cómputos ────────────────────────────────────────────────────────────────
 
@@ -197,14 +199,14 @@ export default function CommunityScreen() {
         </View>
         <TouchableOpacity
           style={[styles.notifBtn, { backgroundColor: theme.card }]}
-          onPress={() => router.push('/announcements' as never)}
+          onPress={() => router.push('/notifications' as never)}
           activeOpacity={0.8}
         >
           <Ionicons name="notifications-outline" size={22} color={Colors.primary} />
-          {unreadCount > 0 && (
+          {notifUnreadCount > 0 && (
             <View style={styles.notifBadge}>
               <Typography style={{ color: '#FFF', fontSize: 9, fontWeight: '700', lineHeight: 14 }}>
-                {unreadCount > 9 ? '9+' : String(unreadCount)}
+                {notifUnreadCount > 9 ? '9+' : String(notifUnreadCount)}
               </Typography>
             </View>
           )}

@@ -88,6 +88,19 @@ export const SCHEMA_SQL = `
   CREATE INDEX IF NOT EXISTS idx_quiz_course ON quiz_results(course_id);
   CREATE INDEX IF NOT EXISTS idx_notes_lesson ON notes(lesson_id);
   CREATE INDEX IF NOT EXISTS idx_favorites_type ON favorites(content_type);
+  CREATE TABLE IF NOT EXISTS app_notifications (
+    id TEXT PRIMARY KEY,
+    titulo TEXT NOT NULL,
+    cuerpo TEXT NOT NULL,
+    tipo TEXT NOT NULL DEFAULT 'sistema',
+    referencia_id TEXT,
+    ruta TEXT,
+    leida INTEGER NOT NULL DEFAULT 0,
+    created_at TEXT NOT NULL DEFAULT (datetime('now'))
+  );
+
   CREATE INDEX IF NOT EXISTS idx_prayer_estado ON prayer_requests(estado);
   CREATE INDEX IF NOT EXISTS idx_service_tipo ON service_requests(tipo);
+  CREATE INDEX IF NOT EXISTS idx_notif_leida ON app_notifications(leida);
+  CREATE INDEX IF NOT EXISTS idx_notif_tipo ON app_notifications(tipo);
 `;

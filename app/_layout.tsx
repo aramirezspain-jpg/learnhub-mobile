@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { View, ActivityIndicator } from 'react-native';
-import { Stack } from 'expo-router';
+import { Stack, useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { SQLiteProvider } from 'expo-sqlite';
 import { useColorScheme } from '@/hooks/use-color-scheme';
@@ -18,9 +18,12 @@ import { CommunityNotificationsRepository } from '@/database/repositories/commun
 import { PrayerRequestsRepository } from '@/database/repositories/prayerRequests';
 import { LeadershipMessagesRepository } from '@/database/repositories/leadershipMessages';
 import { ServiceRequestsRepository } from '@/database/repositories/serviceRequests';
+import { AppNotificationsRepository } from '@/database/repositories/appNotifications';
 import { CommunityService } from '@/services/community.service';
+import { NotificationService } from '@/services/notification.service';
 import { useCommunityStore } from '@/store/community.store';
 import { useUserActivityStore } from '@/store/userActivity.store';
+import { useNotificationStore } from '@/store/notification.store';
 import { Colors } from '@/constants/theme';
 import { useSQLiteContext } from 'expo-sqlite';
 
@@ -44,7 +47,11 @@ function AppBootstrap({ children }: { children: React.ReactNode }) {
   const setPrayerRequests = useUserActivityStore(s => s.setPrayerRequests);
   const setLeadershipMessages = useUserActivityStore(s => s.setLeadershipMessages);
   const setServiceRequests = useUserActivityStore(s => s.setServiceRequests);
+  const setNotifications = useNotificationStore(s => s.setNotifications);
+  const addNotification = useNotificationStore(s => s.addNotification);
+  const setPermissionsGranted = useNotificationStore(s => s.setPermissionsGranted);
   const scheme = useColorScheme() ?? 'dark';
+  const router = useRouter();
 
   useEffect(() => {
     // Cargar contenido JSON (sincrónico)
@@ -68,7 +75,8 @@ function AppBootstrap({ children }: { children: React.ReactNode }) {
       const prayerRepo = new PrayerRequestsRepository(db);
       const leadershipRepo = new LeadershipMessagesRepository(db);
       const serviceRepo = new ServiceRequestsRepository(db);
-      const [progress, lastViewed, favorites, notes, readIds, prayers, messages, services] = await Promise.all([
+      const notifRepo = new AppNotificationsRepository(db);
+      const [progress, lastViewed, favorites, notes, readIds, prayers, messages, services, notifs] = await Promise.all([
         progressRepo.getAllProgress(),
         progressRepo.getLastViewed(),
         favRepo.getAllFavorites(),
@@ -77,6 +85,7 @@ function AppBootstrap({ children }: { children: React.ReactNode }) {
         prayerRepo.getAll(),
         leadershipRepo.getAll(),
         serviceRepo.getAll(),
+        notifRepo.getAll(),
       ]);
       setAllProgress(progress);
       if (lastViewed) setLastViewed(lastViewed);
@@ -86,6 +95,32 @@ function AppBootstrap({ children }: { children: React.ReactNode }) {
       setPrayerRequests(prayers);
       setLeadershipMessages(messages);
       setServiceRequests(services);
+      setNotifications(notifs);
+
+      // Check notification permissions and sync new announcement notifications
+      await NotificationService.initialize();
+      const granted = await NotificationService.hasPermissions();
+      setPermissionsGranted(granted);
+
+      const announcements = CommunityService.getAnnouncements();
+      const existingRefIds = await notifRepo.getExistingReferenceIds('anuncio');
+      const newAnns = announcements.filter(
+        a => a.estado !== 'expirado' && !existingRefIds.includes(a.id)
+      );
+      for (const ann of newAnns) {
+        const created = await notifRepo.create({
+          titulo: ann.titulo,
+          cuerpo: ann.descripcion.slice(0, 120),
+          tipo: 'anuncio',
+          referencia_id: ann.id,
+          ruta: '/announcements',
+        });
+        addNotification(created);
+      }
+      if (granted) {
+        await NotificationService.setBadge(newAnns.length);
+      }
+
       setDbReady();
     };
 
@@ -106,12 +141,46 @@ function AppBootstrap({ children }: { children: React.ReactNode }) {
   return <>{children}</>;
 }
 
+function NotificationListeners() {
+  const addNotification = useNotificationStore(s => s.addNotification);
+  const router = useRouter();
+  const db = useSQLiteContext();
+
+  useEffect(() => {
+    const receivedSub = NotificationService.onNotificationReceived(async (notification) => {
+      const data = notification.request.content.data as Record<string, string> | undefined;
+      const repo = new AppNotificationsRepository(db);
+      const created = await repo.create({
+        titulo: notification.request.content.title ?? 'Notificación',
+        cuerpo: notification.request.content.body ?? '',
+        tipo: (data?.tipo as any) ?? 'sistema',
+        referencia_id: data?.referencia_id,
+        ruta: data?.ruta,
+      });
+      addNotification(created);
+    });
+
+    const responseSub = NotificationService.onNotificationResponse((response) => {
+      const data = response.notification.request.content.data as Record<string, string> | undefined;
+      if (data?.ruta) router.push(data.ruta as never);
+    });
+
+    return () => {
+      receivedSub.remove();
+      responseSub.remove();
+    };
+  }, []);
+
+  return null;
+}
+
 export default function RootLayout() {
   const scheme = useColorScheme() ?? 'dark';
 
   return (
     <SQLiteProvider databaseName="learnhub.db" onInit={migrateDatabase}>
       <AppBootstrap>
+        <NotificationListeners />
         <StatusBar style={scheme === 'dark' ? 'light' : 'dark'} />
         <Stack screenOptions={{ headerShown: false }}>
           <Stack.Screen name="(tabs)" />
@@ -149,6 +218,10 @@ export default function RootLayout() {
           />
           <Stack.Screen
             name="community-library"
+            options={{ animation: 'slide_from_right' }}
+          />
+          <Stack.Screen
+            name="notifications"
             options={{ animation: 'slide_from_right' }}
           />
           <Stack.Screen
