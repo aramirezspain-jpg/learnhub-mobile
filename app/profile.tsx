@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from 'react';
-import { View, ScrollView, TouchableOpacity, StyleSheet, TextInput, Platform } from 'react-native';
+import { View, ScrollView, TouchableOpacity, StyleSheet, TextInput, Platform, Image } from 'react-native';
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
@@ -18,7 +18,7 @@ import { type LessonProgress } from '@/types';
 import * as Haptics from 'expo-haptics';
 import { useLocalProfile } from '@/hooks/auth/useLocalProfile';
 import { useSession } from '@/hooks/auth/useSession';
-import { ROLE_META } from '@/types/user';
+import { ROLE_META, type SyncStatus } from '@/types/user';
 
 function SpiritualItem({
   icon,
@@ -78,6 +78,7 @@ function EditField({
   theme,
   keyboardType = 'default',
   autoCapitalize = 'words',
+  multiline = false,
 }: {
   icon: React.ComponentProps<typeof Ionicons>['name'];
   placeholder: string;
@@ -86,10 +87,15 @@ function EditField({
   theme: (typeof Colors)['dark'];
   keyboardType?: 'default' | 'email-address';
   autoCapitalize?: 'none' | 'words' | 'sentences';
+  multiline?: boolean;
 }) {
   return (
-    <View style={[editStyles.field, { backgroundColor: theme.card, borderColor: theme.border }]}>
-      <Ionicons name={icon} size={16} color={theme.textMuted} />
+    <View style={[
+      editStyles.field,
+      { backgroundColor: theme.card, borderColor: theme.border },
+      multiline && editStyles.fieldMultiline,
+    ]}>
+      <Ionicons name={icon} size={16} color={theme.textMuted} style={multiline && { marginTop: 2 }} />
       <TextInput
         value={value}
         onChangeText={onChangeText}
@@ -97,7 +103,9 @@ function EditField({
         placeholderTextColor={theme.textMuted}
         keyboardType={keyboardType}
         autoCapitalize={autoCapitalize}
-        style={[editStyles.input, { color: theme.text }]}
+        multiline={multiline}
+        numberOfLines={multiline ? 3 : 1}
+        style={[editStyles.input, { color: theme.text }, multiline && editStyles.inputMultiline]}
       />
     </View>
   );
@@ -114,12 +122,31 @@ const editStyles = StyleSheet.create({
     gap: 10,
     marginBottom: 10,
   },
+  fieldMultiline: {
+    alignItems: 'flex-start',
+    paddingTop: 12,
+  },
   input: {
     flex: 1,
     fontSize: 15,
     fontWeight: FontWeights.regular,
   },
+  inputMultiline: {
+    minHeight: 72,
+    textAlignVertical: 'top',
+  },
 });
+
+const SYNC_META: Record<SyncStatus, { label: string; icon: React.ComponentProps<typeof Ionicons>['name']; color: string }> = {
+  local:        { label: 'Local',          icon: 'phone-portrait-outline', color: '#6366F1' },
+  pending_sync: { label: 'Sin sincronizar', icon: 'cloud-upload-outline',   color: '#F59E0B' },
+  synced:       { label: 'Sincronizado',    icon: 'cloud-done-outline',     color: '#10B981' },
+};
+
+function formatFechaRegistro(iso?: string): string | null {
+  if (!iso) return null;
+  return new Date(iso).toLocaleDateString('es-ES', { day: 'numeric', month: 'long', year: 'numeric' });
+}
 
 function computeStreak(lessonProgress: Record<string, LessonProgress>): number {
   const entries = Object.values(lessonProgress).filter(
@@ -196,6 +223,9 @@ export default function ProfileScreen() {
   const [draftEmail, setDraftEmail] = useState('');
   const [draftIglesia, setDraftIglesia] = useState('');
   const [draftMinisterio, setDraftMinisterio] = useState('');
+  const [draftCiudad, setDraftCiudad] = useState('');
+  const [draftPais, setDraftPais] = useState('');
+  const [draftBio, setDraftBio] = useState('');
 
   const displayName = profile?.display_name || 'Estudiante';
   const initials = getInitials(displayName);
@@ -206,6 +236,9 @@ export default function ProfileScreen() {
     setDraftEmail(profile?.email ?? '');
     setDraftIglesia(profile?.iglesia ?? '');
     setDraftMinisterio(profile?.ministerio ?? '');
+    setDraftCiudad(profile?.ciudad ?? '');
+    setDraftPais(profile?.pais ?? '');
+    setDraftBio(profile?.bio ?? '');
     setIsEditing(true);
   }
 
@@ -213,9 +246,12 @@ export default function ProfileScreen() {
     if (!draftName.trim()) return;
     await save({
       display_name: draftName.trim(),
-      email: draftEmail.trim() || undefined,
-      iglesia: draftIglesia.trim() || undefined,
-      ministerio: draftMinisterio.trim() || undefined,
+      email:        draftEmail.trim() || undefined,
+      iglesia:      draftIglesia.trim() || undefined,
+      ministerio:   draftMinisterio.trim() || undefined,
+      ciudad:       draftCiudad.trim() || undefined,
+      pais:         draftPais.trim() || undefined,
+      bio:          draftBio.trim() || undefined,
     });
     if (Platform.OS !== 'web') {
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
@@ -308,9 +344,13 @@ export default function ProfileScreen() {
           {/* Avatar with camera overlay */}
           <View>
             <View style={[styles.avatar, { backgroundColor: `${Colors.primary}22` }]}>
-              <Typography style={{ fontSize: 34, fontWeight: FontWeights.extrabold, color: Colors.primary, lineHeight: 40 }}>
-                {initials}
-              </Typography>
+              {profile?.photo_url ? (
+                <Image source={{ uri: profile.photo_url }} style={styles.avatarImage} />
+              ) : (
+                <Typography style={{ fontSize: 34, fontWeight: FontWeights.extrabold, color: Colors.primary, lineHeight: 40 }}>
+                  {initials}
+                </Typography>
+              )}
             </View>
             <View style={[styles.avatarCamera, { backgroundColor: theme.card, borderColor: theme.border }]}>
               <Ionicons name="camera-outline" size={12} color={theme.textMuted} />
@@ -323,8 +363,28 @@ export default function ProfileScreen() {
                 {displayName}
               </Typography>
 
+              {/* Fecha de registro */}
+              {formatFechaRegistro(profile?.fecha_registro) && (
+                <View style={styles.memberSince}>
+                  <Ionicons name="calendar-outline" size={11} color={theme.textMuted} />
+                  <Typography variant="caption" muted>
+                    Miembro desde {formatFechaRegistro(profile?.fecha_registro)}
+                  </Typography>
+                </View>
+              )}
+
+              {/* Bio */}
+              {profile?.bio ? (
+                <View style={[styles.bioCard, { backgroundColor: theme.card }]}>
+                  <Ionicons name="chatbubble-outline" size={13} color={theme.textMuted} style={{ marginTop: 1 }} />
+                  <Typography variant="caption" secondary style={{ flex: 1, lineHeight: 18 }}>
+                    {profile.bio}
+                  </Typography>
+                </View>
+              ) : null}
+
               {/* Info pills */}
-              {(profile?.email || profile?.iglesia || profile?.ministerio) && (
+              {(profile?.email || profile?.iglesia || profile?.ministerio || profile?.ciudad || profile?.pais) && (
                 <View style={styles.infoPills}>
                   {profile?.email ? (
                     <View style={[styles.infoPill, { backgroundColor: theme.card }]}>
@@ -344,6 +404,14 @@ export default function ProfileScreen() {
                       <Typography variant="caption" muted numberOfLines={1}>{profile.ministerio}</Typography>
                     </View>
                   ) : null}
+                  {(profile?.ciudad || profile?.pais) ? (
+                    <View style={[styles.infoPill, { backgroundColor: theme.card }]}>
+                      <Ionicons name="location-outline" size={11} color={theme.textMuted} />
+                      <Typography variant="caption" muted numberOfLines={1}>
+                        {[profile.ciudad, profile.pais].filter(Boolean).join(', ')}
+                      </Typography>
+                    </View>
+                  ) : null}
                 </View>
               )}
 
@@ -354,6 +422,20 @@ export default function ProfileScreen() {
                   {roleMeta.label}
                 </Typography>
               </View>
+
+              {/* Sync status */}
+              {(() => {
+                const syncStatus = profile?.syncStatus ?? 'local';
+                const sm = SYNC_META[syncStatus];
+                return (
+                  <View style={[styles.syncChip, { backgroundColor: `${sm.color}12` }]}>
+                    <Ionicons name={sm.icon} size={11} color={sm.color} />
+                    <Typography style={{ color: sm.color, fontSize: 10, fontWeight: FontWeights.semibold }}>
+                      {sm.label}
+                    </Typography>
+                  </View>
+                );
+              })()}
 
               {/* Auth CTAs */}
               {isAuthenticated ? (
@@ -424,6 +506,29 @@ export default function ProfileScreen() {
                 value={draftMinisterio}
                 onChangeText={setDraftMinisterio}
                 theme={theme}
+              />
+              <EditField
+                icon="location-outline"
+                placeholder="Ciudad (opcional)"
+                value={draftCiudad}
+                onChangeText={setDraftCiudad}
+                theme={theme}
+              />
+              <EditField
+                icon="earth-outline"
+                placeholder="País (opcional)"
+                value={draftPais}
+                onChangeText={setDraftPais}
+                theme={theme}
+              />
+              <EditField
+                icon="chatbubble-outline"
+                placeholder="Bio corta (opcional)"
+                value={draftBio}
+                onChangeText={setDraftBio}
+                theme={theme}
+                multiline
+                autoCapitalize="sentences"
               />
               <TouchableOpacity
                 style={[styles.saveBtn, { backgroundColor: Colors.primary }]}
@@ -756,6 +861,12 @@ const styles = StyleSheet.create({
     borderRadius: 48,
     alignItems: 'center',
     justifyContent: 'center',
+    overflow: 'hidden',
+  },
+  avatarImage: {
+    width: 96,
+    height: 96,
+    borderRadius: 48,
   },
   avatarCamera: {
     position: 'absolute',
@@ -767,6 +878,31 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  memberSince: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    marginTop: 2,
+  },
+  bioCard: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: 7,
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+    borderRadius: BorderRadius.md,
+    marginTop: 8,
+    marginHorizontal: 24,
+  },
+  syncChip: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: BorderRadius.full,
+    marginTop: 4,
   },
   infoPills: {
     flexDirection: 'row',

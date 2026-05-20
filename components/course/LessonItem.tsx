@@ -45,7 +45,7 @@ export function LessonItem({
 
   const color = accentColor ?? Colors.primary;
   const metaDividerStyle = React.useMemo(
-    () => [styles.metaDivider, { backgroundColor: theme.border }] as const,
+    () => [styles.metaDivider, { backgroundColor: theme.border }],
     [theme.border]
   );
 

@@ -8,27 +8,40 @@ export const ROLE_META: Record<UserRole, { label: string; color: string; icon: s
   admin:   { label: 'Admin',   color: '#F59E0B', icon: 'shield-outline'  },
 };
 
+// ─── Sync ────────────────────────────────────────────────────────────────────
+
+/** Estado de sincronización. Phase 5: 'synced' when Supabase is connected. */
+export type SyncStatus = 'local' | 'pending_sync' | 'synced';
+
 // ─── Profile ─────────────────────────────────────────────────────────────────
 
 /**
  * Perfil de usuario.
- * Fase 3: almacenado localmente en SQLite (app_settings).
- * Fase 4: sincronizado con backend; `id` vendrá del proveedor de auth.
+ * Phase 3: almacenado localmente en SQLite (app_settings o auth_local_users).
+ * Phase 5: sincronizado con Supabase; userId/churchId vendrán del proveedor de auth.
  */
 export interface UserProfile {
-  id?: string;            // Phase 4: set by auth provider (Supabase uid)
+  id?: string;              // Phase 5: Supabase auth UID (mismo que userId)
+  userId?: string;          // Phase 5: Supabase auth UID (preparado para cloud)
+  churchId?: string;        // Phase 5: Supabase church record ID
   display_name: string;
   email?: string;
-  photo_url?: string;     // Phase 4: remote URL or local file URI
+  photo_url?: string;       // Phase 5: remote URL o local file URI
   iglesia?: string;
   ministerio?: string;
+  ciudad?: string;
+  pais?: string;
+  bio?: string;             // Presentación corta del usuario
+  fecha_registro?: string;  // ISO — cuándo el usuario se unió a la app
+  syncStatus: SyncStatus;   // Siempre 'local' hasta Phase 5
   rol: UserRole;
-  updated_at: string;     // ISO datetime
+  updated_at: string;       // ISO datetime
 }
 
 export const DEFAULT_PROFILE: UserProfile = {
   display_name: 'Estudiante',
   rol: 'member',
+  syncStatus: 'local',
   updated_at: new Date().toISOString(),
 };
 
@@ -63,6 +76,10 @@ export interface LocalAuthUser {
   rol: UserRole;
   iglesia?: string;
   ministerio?: string;
+  ciudad?: string;
+  pais?: string;
+  bio?: string;
+  fecha_registro?: string;
   created_at: string;
   updated_at: string;
 }

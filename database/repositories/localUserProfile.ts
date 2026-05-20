@@ -17,7 +17,9 @@ export class LocalUserProfileRepository {
     );
     if (!row) return { ...DEFAULT_PROFILE, updated_at: new Date().toISOString() };
     try {
-      return JSON.parse(row.value) as UserProfile;
+      const parsed = JSON.parse(row.value) as UserProfile;
+      // ensure syncStatus is present in older stored profiles
+      return { ...parsed, syncStatus: parsed.syncStatus ?? 'local' };
     } catch {
       return { ...DEFAULT_PROFILE, updated_at: new Date().toISOString() };
     }

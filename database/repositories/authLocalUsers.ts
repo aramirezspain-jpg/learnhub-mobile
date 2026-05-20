@@ -24,11 +24,17 @@ function generateId(): string {
 export function authUserToProfile(user: LocalAuthUser): UserProfile {
   return {
     id: user.id,
+    userId: user.id,
     display_name: user.display_name,
     email: user.email,
     rol: user.rol as UserRole,
     iglesia: user.iglesia,
     ministerio: user.ministerio,
+    ciudad: user.ciudad,
+    pais: user.pais,
+    bio: user.bio,
+    fecha_registro: user.fecha_registro ?? user.created_at,
+    syncStatus: 'pending_sync',
     updated_at: user.updated_at,
   };
 }
@@ -68,17 +74,17 @@ export class AuthLocalUsersRepository {
     const email = data.email.toLowerCase().trim();
     await this.db.runAsync(
       `INSERT INTO auth_local_users
-         (id, email, display_name, password_hash, rol, iglesia, ministerio, created_at, updated_at)
-       VALUES (?, ?, ?, ?, 'member', ?, ?, ?, ?)`,
+         (id, email, display_name, password_hash, rol, iglesia, ministerio, fecha_registro, created_at, updated_at)
+       VALUES (?, ?, ?, ?, 'member', ?, ?, ?, ?, ?)`,
       [id, email, data.display_name.trim(), hash,
-        data.iglesia?.trim() ?? null, data.ministerio?.trim() ?? null, now, now]
+        data.iglesia?.trim() ?? null, data.ministerio?.trim() ?? null, now, now, now]
     );
     return (await this.findById(id))!;
   }
 
   async updateProfile(
     id: string,
-    updates: Partial<Pick<LocalAuthUser, 'display_name' | 'iglesia' | 'ministerio' | 'rol'>>
+    updates: Partial<Pick<LocalAuthUser, 'display_name' | 'iglesia' | 'ministerio' | 'rol' | 'ciudad' | 'pais' | 'bio'>>
   ): Promise<void> {
     const now = new Date().toISOString();
     const fields: string[] = [];
@@ -87,6 +93,9 @@ export class AuthLocalUsersRepository {
     if (updates.iglesia !== undefined)       { fields.push('iglesia = ?');      values.push(updates.iglesia ?? null); }
     if (updates.ministerio !== undefined)    { fields.push('ministerio = ?');   values.push(updates.ministerio ?? null); }
     if (updates.rol !== undefined)           { fields.push('rol = ?');          values.push(updates.rol); }
+    if (updates.ciudad !== undefined)        { fields.push('ciudad = ?');       values.push(updates.ciudad ?? null); }
+    if (updates.pais !== undefined)          { fields.push('pais = ?');         values.push(updates.pais ?? null); }
+    if (updates.bio !== undefined)           { fields.push('bio = ?');          values.push(updates.bio ?? null); }
     if (fields.length === 0) return;
     fields.push('updated_at = ?');
     values.push(now);
