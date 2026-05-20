@@ -1,5 +1,5 @@
-import React, { useMemo } from 'react';
-import { View, ScrollView, TouchableOpacity, StyleSheet } from 'react-native';
+import React, { useMemo, useState } from 'react';
+import { View, ScrollView, TouchableOpacity, StyleSheet, TextInput, Platform } from 'react-native';
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
@@ -15,6 +15,9 @@ import { useNotificationStore } from '@/store/notification.store';
 import { useCourses } from '@/hooks/useCourses';
 import { ContentService } from '@/services/content.service';
 import { type LessonProgress } from '@/types';
+import * as Haptics from 'expo-haptics';
+import { useLocalProfile } from '@/hooks/auth/useLocalProfile';
+import { ROLE_META } from '@/types/user';
 
 function SpiritualItem({
   icon,
@@ -53,6 +56,67 @@ const sp = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 2,
+  },
+});
+
+function getInitials(name: string): string {
+  return name
+    .trim()
+    .split(/\s+/)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map(w => w[0].toUpperCase())
+    .join('');
+}
+
+function EditField({
+  icon,
+  placeholder,
+  value,
+  onChangeText,
+  theme,
+  keyboardType = 'default',
+  autoCapitalize = 'words',
+}: {
+  icon: React.ComponentProps<typeof Ionicons>['name'];
+  placeholder: string;
+  value: string;
+  onChangeText: (t: string) => void;
+  theme: (typeof Colors)['dark'];
+  keyboardType?: 'default' | 'email-address';
+  autoCapitalize?: 'none' | 'words' | 'sentences';
+}) {
+  return (
+    <View style={[editStyles.field, { backgroundColor: theme.card, borderColor: theme.border }]}>
+      <Ionicons name={icon} size={16} color={theme.textMuted} />
+      <TextInput
+        value={value}
+        onChangeText={onChangeText}
+        placeholder={placeholder}
+        placeholderTextColor={theme.textMuted}
+        keyboardType={keyboardType}
+        autoCapitalize={autoCapitalize}
+        style={[editStyles.input, { color: theme.text }]}
+      />
+    </View>
+  );
+}
+
+const editStyles = StyleSheet.create({
+  field: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderRadius: BorderRadius.md,
+    borderWidth: StyleSheet.hairlineWidth,
+    paddingHorizontal: 14,
+    paddingVertical: 11,
+    gap: 10,
+    marginBottom: 10,
+  },
+  input: {
+    flex: 1,
+    fontSize: 15,
+    fontWeight: FontWeights.regular,
   },
 });
 
@@ -122,6 +186,40 @@ export default function ProfileScreen() {
   const router = useRouter();
   const scheme = useColorScheme() ?? 'dark';
   const theme = Colors[scheme];
+
+  const { profile, save } = useLocalProfile();
+  const [isEditing, setIsEditing] = useState(false);
+  const [draftName, setDraftName] = useState('');
+  const [draftEmail, setDraftEmail] = useState('');
+  const [draftIglesia, setDraftIglesia] = useState('');
+  const [draftMinisterio, setDraftMinisterio] = useState('');
+
+  const displayName = profile?.display_name || 'Estudiante';
+  const initials = getInitials(displayName);
+  const roleMeta = ROLE_META[profile?.rol ?? 'member'];
+
+  function handleEditStart() {
+    setDraftName(profile?.display_name ?? 'Estudiante');
+    setDraftEmail(profile?.email ?? '');
+    setDraftIglesia(profile?.iglesia ?? '');
+    setDraftMinisterio(profile?.ministerio ?? '');
+    setIsEditing(true);
+  }
+
+  async function handleSave() {
+    if (!draftName.trim()) return;
+    await save({
+      display_name: draftName.trim(),
+      email: draftEmail.trim() || undefined,
+      iglesia: draftIglesia.trim() || undefined,
+      ministerio: draftMinisterio.trim() || undefined,
+    });
+    if (Platform.OS !== 'web') {
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+    }
+    setIsEditing(false);
+  }
+
   const { courses } = useCourses();
   const lessonProgress = useProgressStore(s => s.lessonProgress);
   const getCompletedCount = useProgressStore(s => s.getCompletedCountForCourse);
@@ -179,33 +277,116 @@ export default function ProfileScreen() {
           <Ionicons name="close" size={22} color={theme.text} />
         </TouchableOpacity>
         <Typography variant="h4" style={{ color: theme.text }}>Perfil</Typography>
-        <View style={{ width: 36 }} />
+        <TouchableOpacity
+          style={styles.closeBtn}
+          onPress={isEditing ? () => setIsEditing(false) : handleEditStart}
+        >
+          <Ionicons
+            name={isEditing ? 'close-outline' : 'create-outline'}
+            size={20}
+            color={isEditing ? Colors.error : theme.text}
+          />
+        </TouchableOpacity>
       </View>
 
       <ScrollView style={{ flex: 1 }} showsVerticalScrollIndicator={false} contentContainerStyle={styles.scroll}>
         {/* Avatar + nombre */}
         <View style={styles.avatarSection}>
-          <View style={[styles.avatar, { backgroundColor: `${Colors.primary}22` }]}>
-            <Ionicons name="person" size={40} color={Colors.primary} />
+          {/* Avatar with camera overlay */}
+          <View>
+            <View style={[styles.avatar, { backgroundColor: `${Colors.primary}22` }]}>
+              <Typography style={{ fontSize: 34, fontWeight: FontWeights.extrabold, color: Colors.primary, lineHeight: 40 }}>
+                {initials}
+              </Typography>
+            </View>
+            <View style={[styles.avatarCamera, { backgroundColor: theme.card, borderColor: theme.border }]}>
+              <Ionicons name="camera-outline" size={12} color={theme.textMuted} />
+            </View>
           </View>
-          <Typography variant="h2" style={{ color: theme.text, marginTop: 12 }}>
-            Estudiante
-          </Typography>
-          <Typography variant="body" secondary>LearnHub · Instituto Bíblico</Typography>
 
-          {/* Insignia de progreso */}
-          <View style={[styles.progressBadge, { backgroundColor: `${Colors.primary}15` }]}>
-            <Ionicons name="school-outline" size={14} color={Colors.primary} />
-            <Typography variant="label" color={Colors.primary}>
-              {globalPercent < 25
-                ? 'Principiante'
-                : globalPercent < 60
-                ? 'Estudiante'
-                : globalPercent < 90
-                ? 'Avanzado'
-                : 'Maestro'}
-            </Typography>
-          </View>
+          {!isEditing ? (
+            <>
+              <Typography variant="h2" style={{ color: theme.text, marginTop: 12 }}>
+                {displayName}
+              </Typography>
+
+              {/* Info pills */}
+              {(profile?.email || profile?.iglesia || profile?.ministerio) && (
+                <View style={styles.infoPills}>
+                  {profile?.email ? (
+                    <View style={[styles.infoPill, { backgroundColor: theme.card }]}>
+                      <Ionicons name="mail-outline" size={11} color={theme.textMuted} />
+                      <Typography variant="caption" muted numberOfLines={1}>{profile.email}</Typography>
+                    </View>
+                  ) : null}
+                  {profile?.iglesia ? (
+                    <View style={[styles.infoPill, { backgroundColor: theme.card }]}>
+                      <Ionicons name="home-outline" size={11} color={theme.textMuted} />
+                      <Typography variant="caption" muted numberOfLines={1}>{profile.iglesia}</Typography>
+                    </View>
+                  ) : null}
+                  {profile?.ministerio ? (
+                    <View style={[styles.infoPill, { backgroundColor: theme.card }]}>
+                      <Ionicons name="people-outline" size={11} color={theme.textMuted} />
+                      <Typography variant="caption" muted numberOfLines={1}>{profile.ministerio}</Typography>
+                    </View>
+                  ) : null}
+                </View>
+              )}
+
+              {/* Role badge */}
+              <View style={[styles.progressBadge, { backgroundColor: `${roleMeta.color}15` }]}>
+                <Ionicons name={roleMeta.icon as React.ComponentProps<typeof Ionicons>['name']} size={14} color={roleMeta.color} />
+                <Typography variant="label" color={roleMeta.color}>
+                  {roleMeta.label}
+                </Typography>
+              </View>
+            </>
+          ) : (
+            /* Edit form */
+            <View style={styles.editForm}>
+              <EditField
+                icon="person-outline"
+                placeholder="Tu nombre"
+                value={draftName}
+                onChangeText={setDraftName}
+                theme={theme}
+              />
+              <EditField
+                icon="mail-outline"
+                placeholder="Email (opcional)"
+                value={draftEmail}
+                onChangeText={setDraftEmail}
+                theme={theme}
+                keyboardType="email-address"
+                autoCapitalize="none"
+              />
+              <EditField
+                icon="home-outline"
+                placeholder="Iglesia (opcional)"
+                value={draftIglesia}
+                onChangeText={setDraftIglesia}
+                theme={theme}
+              />
+              <EditField
+                icon="people-outline"
+                placeholder="Ministerio (opcional)"
+                value={draftMinisterio}
+                onChangeText={setDraftMinisterio}
+                theme={theme}
+              />
+              <TouchableOpacity
+                style={[styles.saveBtn, { backgroundColor: Colors.primary }]}
+                onPress={handleSave}
+                activeOpacity={0.85}
+              >
+                <Ionicons name="checkmark" size={16} color="#fff" />
+                <Typography style={{ color: '#fff', fontWeight: FontWeights.semibold, fontSize: FontSizes.sm }}>
+                  Guardar cambios
+                </Typography>
+              </TouchableOpacity>
+            </View>
+          )}
         </View>
 
         {/* Resumen espiritual */}
@@ -525,6 +706,47 @@ const styles = StyleSheet.create({
     borderRadius: 48,
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  avatarCamera: {
+    position: 'absolute',
+    bottom: 0,
+    right: 0,
+    width: 26,
+    height: 26,
+    borderRadius: 13,
+    borderWidth: 2,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  infoPills: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'center',
+    gap: 6,
+    marginTop: 8,
+    paddingHorizontal: 16,
+  },
+  infoPill: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: BorderRadius.full,
+  },
+  editForm: {
+    width: '100%',
+    paddingHorizontal: Spacing.lg,
+    paddingTop: 16,
+  },
+  saveBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    paddingVertical: 13,
+    borderRadius: BorderRadius.lg,
+    marginTop: 4,
   },
   progressBadge: {
     flexDirection: 'row',

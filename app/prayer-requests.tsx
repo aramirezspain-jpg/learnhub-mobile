@@ -1,8 +1,9 @@
 import React, { useState, useMemo } from 'react';
 import {
   View, ScrollView, TouchableOpacity, TextInput,
-  StyleSheet, Alert, Switch,
+  StyleSheet, Alert, Switch, Platform,
 } from 'react-native';
+import * as Haptics from 'expo-haptics';
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
@@ -53,6 +54,9 @@ export default function PrayerRequestsScreen() {
   const handleSubmit = async () => {
     if (!canSubmit) return;
     await submit({ titulo: titulo.trim(), descripcion: descripcion.trim() || undefined, categoria, privado });
+    if (Platform.OS !== 'web') {
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+    }
     setSubmitted(true);
     setTitulo('');
     setDescripcion('');

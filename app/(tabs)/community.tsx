@@ -1,5 +1,5 @@
-import React, { useMemo } from 'react';
-import { View, ScrollView, TouchableOpacity, StyleSheet } from 'react-native';
+import React, { useMemo, useEffect, useRef } from 'react';
+import { View, ScrollView, TouchableOpacity, StyleSheet, Animated } from 'react-native';
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
@@ -204,8 +204,18 @@ export default function CommunityScreen() {
     proximoEvento: proximosEventos[0] ?? null,
   }), [schedules, announcements, proximosEventos]);
 
+  const fadeIn = useRef(new Animated.Value(0)).current;
+  useEffect(() => {
+    Animated.timing(fadeIn, {
+      toValue: 1,
+      duration: 220,
+      useNativeDriver: true,
+    }).start();
+  }, []);
+
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: theme.background }]} edges={['top']}>
+      <Animated.View style={{ flex: 1, opacity: fadeIn }}>
       {/* Header */}
       <View style={styles.header}>
         <View>
@@ -596,6 +606,7 @@ export default function CommunityScreen() {
           </Typography>
         </View>
       </ScrollView>
+      </Animated.View>
     </SafeAreaView>
   );
 }

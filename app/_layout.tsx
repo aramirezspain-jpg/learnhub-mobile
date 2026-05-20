@@ -1,5 +1,6 @@
-import React, { useEffect } from 'react';
-import { View, ActivityIndicator } from 'react-native';
+import React, { useEffect, useRef } from 'react';
+import { View, ActivityIndicator, Animated, StyleSheet } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { Stack, useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { SQLiteProvider } from 'expo-sqlite';
@@ -19,13 +20,90 @@ import { PrayerRequestsRepository } from '@/database/repositories/prayerRequests
 import { LeadershipMessagesRepository } from '@/database/repositories/leadershipMessages';
 import { ServiceRequestsRepository } from '@/database/repositories/serviceRequests';
 import { AppNotificationsRepository } from '@/database/repositories/appNotifications';
+import { LocalUserProfileRepository } from '@/database/repositories/localUserProfile';
 import { CommunityService } from '@/services/community.service';
 import { NotificationService } from '@/services/notification.service';
 import { useCommunityStore } from '@/store/community.store';
 import { useUserActivityStore } from '@/store/userActivity.store';
 import { useNotificationStore } from '@/store/notification.store';
-import { Colors } from '@/constants/theme';
+import { useUserProfileStore } from '@/store/userProfile.store';
+import { SessionProvider } from '@/contexts/session';
+import { Colors, FontWeights } from '@/constants/theme';
 import { useSQLiteContext } from 'expo-sqlite';
+
+// ─── Branded loading screen ──────────────────────────────────────────────────
+function LoadingScreen({ scheme }: { scheme: 'dark' | 'light' }) {
+  const pulse = useRef(new Animated.Value(1)).current;
+
+  useEffect(() => {
+    const loop = Animated.loop(
+      Animated.sequence([
+        Animated.timing(pulse, { toValue: 1.1, duration: 1100, useNativeDriver: true }),
+        Animated.timing(pulse, { toValue: 1.0, duration: 1100, useNativeDriver: true }),
+      ])
+    );
+    loop.start();
+    return () => loop.stop();
+  }, []);
+
+  return (
+    <View style={[loadStyles.container, { backgroundColor: Colors[scheme].background }]}>
+      <Animated.View
+        style={[
+          loadStyles.logoWrap,
+          { backgroundColor: `${Colors.primary}0E`, borderColor: `${Colors.primary}28` },
+          { transform: [{ scale: pulse }] },
+        ]}
+      >
+        <Ionicons name="book-outline" size={48} color={Colors.primary} />
+      </Animated.View>
+      <View style={loadStyles.textGroup}>
+        <Animated.Text style={[loadStyles.appName, { color: Colors.primary }]}>
+          LearnHub
+        </Animated.Text>
+        <Animated.Text style={[loadStyles.appSub, { color: Colors[scheme].textSecondary }]}>
+          Instituto Bíblico
+        </Animated.Text>
+      </View>
+      <ActivityIndicator color={`${Colors.primary}70`} size="small" style={loadStyles.spinner} />
+    </View>
+  );
+}
+
+const loadStyles = StyleSheet.create({
+  container: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 0,
+  },
+  logoWrap: {
+    width: 104,
+    height: 104,
+    borderRadius: 30,
+    borderWidth: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  textGroup: {
+    alignItems: 'center',
+    gap: 4,
+    marginTop: 20,
+  },
+  appName: {
+    fontSize: 28,
+    fontWeight: FontWeights.extrabold,
+    letterSpacing: 0.5,
+  },
+  appSub: {
+    fontSize: 14,
+    fontWeight: FontWeights.medium,
+    letterSpacing: 0.3,
+  },
+  spinner: {
+    marginTop: 48,
+  },
+});
 
 function AppBootstrap({ children }: { children: React.ReactNode }) {
   const db = useSQLiteContext();
@@ -50,6 +128,7 @@ function AppBootstrap({ children }: { children: React.ReactNode }) {
   const setNotifications = useNotificationStore(s => s.setNotifications);
   const addNotification = useNotificationStore(s => s.addNotification);
   const setPermissionsGranted = useNotificationStore(s => s.setPermissionsGranted);
+  const setProfile = useUserProfileStore(s => s.setProfile);
   const scheme = useColorScheme() ?? 'dark';
   const router = useRouter();
 
@@ -76,7 +155,8 @@ function AppBootstrap({ children }: { children: React.ReactNode }) {
       const leadershipRepo = new LeadershipMessagesRepository(db);
       const serviceRepo = new ServiceRequestsRepository(db);
       const notifRepo = new AppNotificationsRepository(db);
-      const [progress, lastViewed, favorites, notes, readIds, prayers, messages, services, notifs] = await Promise.all([
+      const profileRepo = new LocalUserProfileRepository(db);
+      const [progress, lastViewed, favorites, notes, readIds, prayers, messages, services, notifs, userProfile] = await Promise.all([
         progressRepo.getAllProgress(),
         progressRepo.getLastViewed(),
         favRepo.getAllFavorites(),
@@ -86,6 +166,7 @@ function AppBootstrap({ children }: { children: React.ReactNode }) {
         leadershipRepo.getAll(),
         serviceRepo.getAll(),
         notifRepo.getAll(),
+        profileRepo.get(),
       ]);
       setAllProgress(progress);
       if (lastViewed) setLastViewed(lastViewed);
@@ -96,6 +177,7 @@ function AppBootstrap({ children }: { children: React.ReactNode }) {
       setLeadershipMessages(messages);
       setServiceRequests(services);
       setNotifications(notifs);
+      setProfile(userProfile);
 
       // Check notification permissions and sync new announcement notifications
       await NotificationService.initialize();
@@ -131,11 +213,7 @@ function AppBootstrap({ children }: { children: React.ReactNode }) {
   }, []);
 
   if (!dbReady) {
-    return (
-      <View style={{ flex: 1, backgroundColor: Colors[scheme].background, alignItems: 'center', justifyContent: 'center' }}>
-        <ActivityIndicator color={Colors.primary} size="large" />
-      </View>
-    );
+    return <LoadingScreen scheme={scheme} />;
   }
 
   return <>{children}</>;
@@ -180,6 +258,7 @@ export default function RootLayout() {
   return (
     <SQLiteProvider databaseName="learnhub.db" onInit={migrateDatabase}>
       <AppBootstrap>
+        <SessionProvider>
         <NotificationListeners />
         <StatusBar style={scheme === 'dark' ? 'light' : 'dark'} />
         <Stack screenOptions={{ headerShown: false }}>
@@ -237,6 +316,7 @@ export default function RootLayout() {
             options={{ animation: 'slide_from_right' }}
           />
         </Stack>
+        </SessionProvider>
       </AppBootstrap>
     </SQLiteProvider>
   );

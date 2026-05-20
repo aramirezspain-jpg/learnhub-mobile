@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import {
   View, ScrollView, TouchableOpacity, TextInput,
-  StyleSheet, Alert,
+  StyleSheet, Alert, Platform,
 } from 'react-native';
+import * as Haptics from 'expo-haptics';
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
@@ -54,6 +55,9 @@ export default function ServiceRequestScreen() {
   const handleSubmit = async () => {
     if (!canSubmit || !selectedType) return;
     await submit({ tipo: selectedType, descripcion: descripcion.trim() || undefined });
+    if (Platform.OS !== 'web') {
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+    }
     setSubmitted(true);
     setSelectedType(null);
     setDescripcion('');
