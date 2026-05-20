@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { View, ScrollView, TouchableOpacity, StyleSheet, Alert } from 'react-native';
+import React, { useState, useMemo, useRef } from 'react';
+import { View, ScrollView, TouchableOpacity, StyleSheet, TextInput, LayoutAnimation, Platform, UIManager } from 'react-native';
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
@@ -7,9 +7,14 @@ import { useColorScheme } from '@/hooks/use-color-scheme';
 import { Colors, Spacing, BorderRadius, FontSizes, FontWeights } from '@/constants/theme';
 import { Typography } from '@/components/ui/Typography';
 import { CourseCard } from '@/components/course/CourseCard';
+import { EmptyState } from '@/components/ui/EmptyState';
 import { useCourses } from '@/hooks/useCourses';
 import { useProgressStore } from '@/store/progress.store';
 import { ContentService } from '@/services/content.service';
+
+if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
+  UIManager.setLayoutAnimationEnabledExperimental(true);
+}
 
 const FILTER_ALL = 'all';
 
@@ -21,12 +26,45 @@ export default function CoursesScreen() {
   const getCourseProgress = useProgressStore(s => s.getCourseProgress);
   const getCompletedCount = useProgressStore(s => s.getCompletedCountForCourse);
   const [activeFilter, setActiveFilter] = useState(FILTER_ALL);
+  const [showSearch, setShowSearch] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const searchRef = useRef<TextInput>(null);
 
   const filters = [{ id: FILTER_ALL, nombre: 'Todos', color: Colors.primary }, ...levels];
 
-  const filteredCourses = activeFilter === FILTER_ALL
-    ? courses
-    : courses.filter(c => c.nivel_id === activeFilter);
+  const filteredCourses = useMemo(() => {
+    let list = activeFilter === FILTER_ALL
+      ? courses
+      : courses.filter(c => c.nivel_id === activeFilter);
+    if (searchQuery.trim()) {
+      const q = searchQuery.toLowerCase().trim();
+      list = list.filter(c =>
+        c.titulo.toLowerCase().includes(q) ||
+        c.subtitulo.toLowerCase().includes(q) ||
+        c.descripcion.toLowerCase().includes(q)
+      );
+    }
+    return list;
+  }, [courses, activeFilter, searchQuery]);
+
+  const toggleSearch = () => {
+    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+    if (showSearch) {
+      setSearchQuery('');
+      setShowSearch(false);
+    } else {
+      setShowSearch(true);
+      setTimeout(() => searchRef.current?.focus(), 120);
+    }
+  };
+
+  const emptyTitle = searchQuery.trim()
+    ? 'Sin resultados'
+    : 'Sin cursos en este nivel';
+  const emptySubtitle = searchQuery.trim()
+    ? `No encontramos cursos que coincidan con "${searchQuery.trim()}".`
+    : 'Prueba otro filtro o explora todos los cursos disponibles.';
+  const emptyIcon = searchQuery.trim() ? 'search-outline' : 'book-outline';
 
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: theme.background }]} edges={['top']}>
@@ -37,13 +75,36 @@ export default function CoursesScreen() {
           <Typography variant="h1" style={{ color: theme.text }}>Cursos</Typography>
         </View>
         <TouchableOpacity
-          style={[styles.headerIcon, { backgroundColor: `${Colors.primary}15` }]}
+          style={[styles.headerIcon, { backgroundColor: showSearch ? `${Colors.primary}22` : `${Colors.primary}12` }]}
           activeOpacity={0.7}
-          onPress={() => Alert.alert('Búsqueda', 'La búsqueda de cursos estará disponible pronto.')}
+          onPress={toggleSearch}
         >
-          <Ionicons name="search-outline" size={22} color={Colors.primary} />
+          <Ionicons name={showSearch ? 'close' : 'search-outline'} size={22} color={Colors.primary} />
         </TouchableOpacity>
       </View>
+
+      {/* Barra de búsqueda */}
+      {showSearch && (
+        <View style={[styles.searchRow, { backgroundColor: theme.inputBg, borderColor: theme.border }]}>
+          <Ionicons name="search-outline" size={18} color={theme.textMuted} />
+          <TextInput
+            ref={searchRef}
+            value={searchQuery}
+            onChangeText={setSearchQuery}
+            placeholder="Buscar cursos..."
+            placeholderTextColor={theme.textMuted}
+            style={[styles.searchInput, { color: theme.text }]}
+            returnKeyType="search"
+            autoCapitalize="none"
+            autoCorrect={false}
+          />
+          {searchQuery.length > 0 && (
+            <TouchableOpacity onPress={() => setSearchQuery('')} hitSlop={8}>
+              <Ionicons name="close-circle" size={18} color={theme.textMuted} />
+            </TouchableOpacity>
+          )}
+        </View>
+      )}
 
       {/* Filtros */}
       <ScrollView
@@ -82,17 +143,16 @@ export default function CoursesScreen() {
         style={styles.list}
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.listContent}
+        keyboardShouldPersistTaps="handled"
       >
         {filteredCourses.length === 0 ? (
-          <View style={styles.empty}>
-            <Ionicons name="book-outline" size={48} color={theme.textMuted} />
-            <Typography variant="h3" muted center style={{ marginTop: 12 }}>
-              No hay cursos en este nivel aún
-            </Typography>
-            <Typography variant="body" muted center style={{ marginTop: 6 }}>
-              Estamos preparando más contenido. ¡Vuelve pronto!
-            </Typography>
-          </View>
+          <EmptyState
+            icon={emptyIcon}
+            title={emptyTitle}
+            subtitle={emptySubtitle}
+            action={searchQuery.trim() ? 'Limpiar búsqueda' : undefined}
+            onAction={searchQuery.trim() ? () => setSearchQuery('') : undefined}
+          />
         ) : (
           filteredCourses.map(course => {
             const total = ContentService.getTotalLessons(course.id);
@@ -109,17 +169,6 @@ export default function CoursesScreen() {
             );
           })
         )}
-
-        {/* Próximamente */}
-        <View style={[styles.comingSoon, { backgroundColor: theme.card }]}>
-          <Ionicons name="time-outline" size={24} color={theme.textMuted} />
-          <View style={{ flex: 1 }}>
-            <Typography variant="label" secondary>Próximamente</Typography>
-            <Typography variant="caption" muted>
-              Más cursos de Formación Teológica y Apologética estarán disponibles en la siguiente fase.
-            </Typography>
-          </View>
-        </View>
       </ScrollView>
     </SafeAreaView>
   );
@@ -141,6 +190,22 @@ const styles = StyleSheet.create({
     borderRadius: 22,
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  searchRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+    marginHorizontal: Spacing.lg,
+    marginBottom: Spacing.sm,
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+    borderRadius: BorderRadius.lg,
+    borderWidth: 1,
+  },
+  searchInput: {
+    flex: 1,
+    fontSize: FontSizes.md,
+    paddingVertical: 0,
   },
   filtersScroll: {
     flexGrow: 0,
@@ -165,14 +230,5 @@ const styles = StyleSheet.create({
   listContent: {
     paddingHorizontal: Spacing.lg,
     paddingBottom: 32,
-  },
-  empty: { alignItems: 'center', paddingVertical: 60 },
-  comingSoon: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-    padding: Spacing.md,
-    borderRadius: BorderRadius.lg,
-    marginTop: 8,
   },
 });

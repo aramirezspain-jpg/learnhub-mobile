@@ -257,7 +257,7 @@ export default function CommunityScreen() {
                 <Typography style={{ color: Colors.accent, fontSize: 13, fontWeight: '800' }}>
                   {formatDate(resumen.proximoEvento.fecha)}
                 </Typography>
-                <Typography variant="caption" muted style={{ fontSize: 10 }}>próx. evento</Typography>
+                <Typography variant="caption" muted style={{ fontSize: 10 }}>próximo</Typography>
               </TouchableOpacity>
             )}
             {notifUnreadCount > 0 && (

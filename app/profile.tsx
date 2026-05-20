@@ -4,7 +4,7 @@ import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useColorScheme } from '@/hooks/use-color-scheme';
-import { Colors, Spacing, BorderRadius, Shadows, FontSizes } from '@/constants/theme';
+import { Colors, Spacing, BorderRadius, Shadows, FontSizes, FontWeights } from '@/constants/theme';
 import { Typography } from '@/components/ui/Typography';
 import { ProgressBar } from '@/components/ui/ProgressBar';
 import { useProgressStore } from '@/store/progress.store';
@@ -15,6 +15,46 @@ import { useNotificationStore } from '@/store/notification.store';
 import { useCourses } from '@/hooks/useCourses';
 import { ContentService } from '@/services/content.service';
 import { type LessonProgress } from '@/types';
+
+function SpiritualItem({
+  icon,
+  value,
+  label,
+  color,
+}: {
+  icon: React.ComponentProps<typeof Ionicons>['name'];
+  value: number;
+  label: string;
+  color: string;
+}) {
+  const scheme = useColorScheme() ?? 'dark';
+  const theme = Colors[scheme];
+  return (
+    <View style={sp.item}>
+      <View style={[sp.itemIcon, { backgroundColor: `${color}15` }]}>
+        <Ionicons name={icon} size={17} color={color} />
+      </View>
+      <Typography style={{ color, fontSize: 22, fontWeight: FontWeights.extrabold, lineHeight: 28 }}>
+        {value}
+      </Typography>
+      <Typography style={{ color: theme.textMuted, fontSize: 10, fontWeight: FontWeights.semibold, textAlign: 'center' }}>
+        {label}
+      </Typography>
+    </View>
+  );
+}
+
+const sp = StyleSheet.create({
+  item: { flex: 1, alignItems: 'center', gap: 4 },
+  itemIcon: {
+    width: 36,
+    height: 36,
+    borderRadius: BorderRadius.md,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 2,
+  },
+});
 
 function computeStreak(lessonProgress: Record<string, LessonProgress>): number {
   const entries = Object.values(lessonProgress).filter(
@@ -86,6 +126,7 @@ export default function ProfileScreen() {
   const lessonProgress = useProgressStore(s => s.lessonProgress);
   const getCompletedCount = useProgressStore(s => s.getCompletedCountForCourse);
   const getCourseProgress = useProgressStore(s => s.getCourseProgress);
+  const lastViewed = useProgressStore(s => s.lastViewed);
   const favCount = useFavoritesStore(s => s.favorites.length);
   const noteCount = useNotesStore(s => s.notes.length);
   const prayerRequests = useUserActivityStore(s => s.prayerRequests);
@@ -98,6 +139,23 @@ export default function ProfileScreen() {
   const prayerAnswered = useMemo(() => prayerRequests.filter(p => p.estado === 'respondida').length,  [prayerRequests]);
   const svcActive      = useMemo(() => serviceRequests.filter(s => s.estado !== 'completada').length, [serviceRequests]);
   const msgUrgent      = useMemo(() => leadershipMessages.filter(m => m.prioridad === 'urgente').length, [leadershipMessages]);
+
+  const lastActivityDate = useMemo(() => {
+    const dates: string[] = [];
+    if (lastViewed?.updated_at) dates.push(lastViewed.updated_at);
+    for (const p of prayerRequests) dates.push(p.created_at);
+    for (const m of leadershipMessages) dates.push(m.created_at);
+    for (const sv of serviceRequests) dates.push(sv.created_at);
+    if (!dates.length) return null;
+    const latest = [...dates].sort((a, b) => b.localeCompare(a))[0];
+    const d = new Date(latest);
+    const now = new Date();
+    const diff = Math.floor((now.getTime() - d.getTime()) / (1000 * 60 * 60 * 24));
+    if (diff === 0) return 'Hoy';
+    if (diff === 1) return 'Ayer';
+    if (diff < 7) return `Hace ${diff} días`;
+    return d.toLocaleDateString('es-ES', { day: 'numeric', month: 'long' });
+  }, [lastViewed, prayerRequests, leadershipMessages, serviceRequests]);
 
   const totalLessons = courses.reduce((sum, c) => sum + c.total_lecciones, 0);
   const totalCompleted = courses.reduce((sum, c) => sum + getCompletedCount(c.id), 0);
@@ -147,6 +205,46 @@ export default function ProfileScreen() {
                 ? 'Avanzado'
                 : 'Maestro'}
             </Typography>
+          </View>
+        </View>
+
+        {/* Resumen espiritual */}
+        <View style={styles.section}>
+          <Typography variant="h3" style={[styles.sectionTitle, { color: theme.text }]}>
+            Resumen espiritual
+          </Typography>
+          <View style={[styles.spiritualCard, { backgroundColor: theme.card, borderColor: `${Colors.primary}18` }]}>
+            {/* Actividad comunitaria */}
+            <View style={styles.spiritualRow}>
+              <SpiritualItem icon="hand-left" value={prayerRequests.length} label="Peticiones" color={Colors.secondary} />
+              <View style={[styles.spiritualDivider, { backgroundColor: theme.border }]} />
+              <SpiritualItem icon="chatbubble-ellipses" value={leadershipMessages.length} label="Contactos" color={Colors.info} />
+              <View style={[styles.spiritualDivider, { backgroundColor: theme.border }]} />
+              <SpiritualItem icon="construct" value={serviceRequests.length} label="Solicitudes" color={Colors.accent} />
+            </View>
+            <View style={[styles.spiritualSep, { backgroundColor: theme.border }]} />
+            {/* Formación y recursos */}
+            <View style={styles.spiritualRow}>
+              <SpiritualItem icon="play-circle" value={coursesInProgress} label="Iniciados" color={Colors.primary} />
+              <View style={[styles.spiritualDivider, { backgroundColor: theme.border }]} />
+              <SpiritualItem icon="trophy" value={coursesCompleted} label="Completados" color={Colors.success} />
+              <View style={[styles.spiritualDivider, { backgroundColor: theme.border }]} />
+              <SpiritualItem icon="bookmark" value={favCount + noteCount} label="Guardados" color={Colors.error} />
+            </View>
+            {lastActivityDate && (
+              <>
+                <View style={[styles.spiritualSep, { backgroundColor: theme.border }]} />
+                <View style={styles.spiritualFooter}>
+                  <Ionicons name="time-outline" size={13} color={theme.textMuted} />
+                  <Typography variant="caption" muted>
+                    Última actividad:{'  '}
+                  </Typography>
+                  <Typography variant="caption" color={Colors.primary} style={{ fontWeight: FontWeights.semibold }}>
+                    {lastActivityDate}
+                  </Typography>
+                </View>
+              </>
+            )}
           </View>
         </View>
 
@@ -546,5 +644,33 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 8,
+  },
+
+  // Resumen espiritual
+  spiritualCard: {
+    borderRadius: BorderRadius.xl,
+    borderWidth: 1,
+    overflow: 'hidden',
+  },
+  spiritualRow: {
+    flexDirection: 'row',
+    paddingVertical: 18,
+    paddingHorizontal: 8,
+  },
+  spiritualDivider: {
+    width: 1,
+    alignSelf: 'stretch',
+    marginVertical: 6,
+  },
+  spiritualSep: {
+    height: StyleSheet.hairlineWidth,
+    marginHorizontal: 16,
+  },
+  spiritualFooter: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 5,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
   },
 });

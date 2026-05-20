@@ -1,8 +1,8 @@
 import React from 'react';
-import { View, StyleSheet } from 'react-native';
+import { View, TouchableOpacity, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useColorScheme } from '@/hooks/use-color-scheme';
-import { Colors, BorderRadius } from '@/constants/theme';
+import { Colors, BorderRadius, FontWeights } from '@/constants/theme';
 import { Typography } from './Typography';
 
 interface EmptyStateProps {
@@ -10,24 +10,37 @@ interface EmptyStateProps {
   title: string;
   subtitle: string;
   color?: string;
+  action?: string;
+  onAction?: () => void;
 }
 
-export function EmptyState({ icon, title, subtitle, color }: EmptyStateProps) {
+export function EmptyState({ icon, title, subtitle, color, action, onAction }: EmptyStateProps) {
   const scheme = useColorScheme() ?? 'dark';
   const theme = Colors[scheme];
   const iconColor = color ?? theme.textMuted;
 
   return (
     <View style={styles.container}>
-      <View style={[styles.iconWrap, { backgroundColor: `${iconColor}15` }]}>
-        <Ionicons name={icon} size={32} color={iconColor} />
+      <View style={[styles.iconWrap, { backgroundColor: `${iconColor}12`, borderColor: `${iconColor}22`, borderWidth: 1 }]}>
+        <Ionicons name={icon} size={34} color={iconColor} />
       </View>
-      <Typography variant="h3" muted center style={styles.title}>
+      <Typography variant="h3" style={[styles.title, { color: theme.text }]}>
         {title}
       </Typography>
       <Typography variant="body" muted center style={styles.subtitle}>
         {subtitle}
       </Typography>
+      {action && onAction && (
+        <TouchableOpacity
+          style={[styles.actionBtn, { backgroundColor: `${Colors.primary}14`, borderColor: `${Colors.primary}28`, borderWidth: 1 }]}
+          onPress={onAction}
+          activeOpacity={0.72}
+        >
+          <Typography variant="label" color={Colors.primary} style={{ fontWeight: FontWeights.semibold }}>
+            {action}
+          </Typography>
+        </TouchableOpacity>
+      )}
     </View>
   );
 }
@@ -35,18 +48,30 @@ export function EmptyState({ icon, title, subtitle, color }: EmptyStateProps) {
 const styles = StyleSheet.create({
   container: {
     alignItems: 'center',
-    paddingVertical: 56,
-    paddingHorizontal: 32,
-    gap: 12,
+    paddingVertical: 52,
+    paddingHorizontal: 36,
+    gap: 8,
   },
   iconWrap: {
-    width: 72,
-    height: 72,
+    width: 76,
+    height: 76,
     borderRadius: BorderRadius.xl,
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: 4,
+    marginBottom: 8,
   },
-  title: { marginTop: 4 },
-  subtitle: { lineHeight: 22 },
+  title: {
+    textAlign: 'center',
+    marginTop: 4,
+  },
+  subtitle: {
+    lineHeight: 22,
+    textAlign: 'center',
+  },
+  actionBtn: {
+    marginTop: 12,
+    paddingHorizontal: 22,
+    paddingVertical: 10,
+    borderRadius: BorderRadius.full,
+  },
 });
