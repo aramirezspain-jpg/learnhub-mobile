@@ -1,22 +1,21 @@
 /**
- * Supabase client — initialized but NOT yet wired to auth flows.
+ * Supabase client — Phase 5 ACTIVE.
+ * SUPABASE_ENABLED = true → factory returns Supabase repositories.
  *
- * SUPABASE_ENABLED = false  →  app stays fully offline (local SQLite auth).
- * SUPABASE_ENABLED = true   →  Phase 5: factory switches to Supabase repositories.
+ * Session persistence: AsyncStorage (auto-refresh, survives app restart).
+ * Offline: session reads from AsyncStorage (no network). Profile fetch gracefully
+ * falls back to user_metadata when offline.
  *
- * To activate Phase 5:
- *   1. Set SUPABASE_ENABLED = true below
- *   2. Implement SupabaseAuthRepository / SupabaseUserRepository methods
- *   3. That's it — factories in services/repositories/index.ts do the rest
+ * Deactivate: set SUPABASE_ENABLED = false to fall back to local SQLite auth.
  */
 
 import { createClient } from '@supabase/supabase-js';
-import type { Database } from '@/types/database';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const SUPABASE_URL      = process.env.EXPO_PUBLIC_SUPABASE_URL      ?? '';
 const SUPABASE_ANON_KEY = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY ?? '';
 
-export const SUPABASE_ENABLED = false as const;
+export const SUPABASE_ENABLED = true as const;
 
 export const supabaseConfig = {
   url:          SUPABASE_URL,
@@ -24,10 +23,11 @@ export const supabaseConfig = {
   isConfigured: SUPABASE_URL !== '' && SUPABASE_ANON_KEY !== '',
 } as const;
 
-export const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_ANON_KEY, {
+export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
   auth: {
-    persistSession:   false,  // handled manually via expo-secure-store in Phase 5
-    autoRefreshToken: false,
+    storage:          AsyncStorage,
+    autoRefreshToken: true,
+    persistSession:   true,
     detectSessionInUrl: false,
   },
 });

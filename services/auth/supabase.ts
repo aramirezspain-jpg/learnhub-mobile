@@ -1,98 +1,115 @@
 /**
- * Supabase auth stubs — Phase 5 preparation.
- * Client is initialized; methods are stubs awaiting real implementation.
- *
- * Activation: implement each function body and set SUPABASE_ENABLED = true.
+ * Supabase auth — standalone helpers + Google/Apple OAuth stubs.
+ * Primary auth flow: SessionContext → createAuthRepository → SupabaseAuthRepository.
+ * These helpers can be used directly for password reset, OAuth prep, diagnostics.
  */
 
 import { supabase, supabaseConfig } from '@/services/supabase/client';
-import type { AuthCredentials, AuthResult, RegisterData } from '@/types/user';
+import type { AuthCredentials, AuthResult, RegisterData, AuthError } from '@/types/user';
 import type { PasswordResetResult } from './auth.service';
 
 // ─── Diagnostics ──────────────────────────────────────────────────────────────
 
-/** True only when URL + anon key are present in env vars. */
 export function isSupabaseConfigured(): boolean {
   return supabaseConfig.isConfigured;
 }
 
-// ─── Auth stubs ───────────────────────────────────────────────────────────────
+// ─── Auth helpers (delegate to supabase client) ───────────────────────────────
 
-/**
- * Phase 5: sign in with email + password via Supabase Auth.
- * TODO: replace body with:
- *   const { data, error } = await supabase.auth.signInWithPassword(credentials);
- *   if (error) return { success: false, error: mapError(error.code) };
- *   return { success: true, user: supabaseUserToProfile(data.user) };
- */
-export async function loginSupabase(_credentials: AuthCredentials): Promise<AuthResult> {
-  void supabase; // client ready — remove when implementing
-  return { success: false, error: 'network_error' };
+export async function loginSupabase(credentials: AuthCredentials): Promise<AuthResult> {
+  try {
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email:    credentials.email.trim().toLowerCase(),
+      password: credentials.password,
+    });
+    if (error) return { success: false, error: 'invalid_credentials' };
+    if (!data.user || !data.session) return { success: false, error: 'unknown' };
+    return { success: true };
+  } catch {
+    return { success: false, error: 'network_error' };
+  }
 }
 
-/**
- * Phase 5: create account via Supabase Auth.
- * TODO: replace body with:
- *   const { data, error } = await supabase.auth.signUp({ email, password, options: { data: { display_name } } });
- *   if (error) return { success: false, error: mapError(error.code) };
- *   return { success: true, user: supabaseUserToProfile(data.user) };
- */
-export async function registerSupabase(_data: RegisterData): Promise<AuthResult> {
-  return { success: false, error: 'network_error' };
+export async function registerSupabase(data: RegisterData): Promise<AuthResult> {
+  try {
+    const { data: authData, error } = await supabase.auth.signUp({
+      email:    data.email.trim().toLowerCase(),
+      password: data.password,
+      options:  { data: { display_name: data.display_name.trim() } },
+    });
+    if (error) return { success: false, error: 'unknown' };
+    if (!authData.user) return { success: false, error: 'unknown' };
+    return { success: true };
+  } catch {
+    return { success: false, error: 'network_error' };
+  }
 }
 
-/**
- * Phase 5: sign out from Supabase (invalidates server-side session).
- * TODO: await supabase.auth.signOut();
- */
 export async function logoutSupabase(): Promise<void> {
-  // no-op until Phase 5
+  try {
+    await supabase.auth.signOut();
+  } catch {
+    // Ignore
+  }
 }
 
-/**
- * Phase 5: send password-reset email via Supabase Auth.
- * TODO:
- *   const { error } = await supabase.auth.resetPasswordForEmail(email, {
- *     redirectTo: 'learnhub://auth/reset-password',
- *   });
- *   if (error) return { success: false, error: error.message };
- *   return { success: true };
- */
-export async function resetPasswordSupabase(_email: string): Promise<PasswordResetResult> {
-  return { success: false, error: 'backend_not_connected' };
+export async function resetPasswordSupabase(email: string): Promise<PasswordResetResult> {
+  try {
+    const { error } = await supabase.auth.resetPasswordForEmail(
+      email.trim().toLowerCase()
+    );
+    if (error) return { success: false, error: error.message };
+    return { success: true };
+  } catch {
+    return { success: false, error: 'network_error' };
+  }
 }
 
-/**
- * Phase 5: OAuth sign-in with Google (requires expo-auth-session + Supabase OAuth setup).
- * TODO:
- *   const { data, error } = await supabase.auth.signInWithOAuth({ provider: 'google' });
- *   handle redirect + session exchange
- */
-export async function googleAuth(): Promise<AuthResult> {
-  return { success: false, error: 'network_error' };
-}
-
-/**
- * Phase 5: OAuth sign-in with Apple (iOS only, requires Apple Developer enrollment).
- * TODO:
- *   const { data, error } = await supabase.auth.signInWithOAuth({ provider: 'apple' });
- */
-export async function appleAuth(): Promise<AuthResult> {
-  return { success: false, error: 'network_error' };
-}
-
-/**
- * Phase 5: restore session from stored tokens (expo-secure-store).
- * TODO:
- *   const stored = await SecureStore.getItemAsync('supabase_session');
- *   if (!stored) return null;
- *   const { data, error } = await supabase.auth.setSession(JSON.parse(stored));
- *   if (error || !data.session) return null;
- *   return { access_token: data.session.access_token, expires_at: data.session.expires_at ?? 0 };
- */
 export async function restoreSupabaseSession(): Promise<{
   access_token: string;
   expires_at: number;
 } | null> {
-  return null;
+  try {
+    const { data, error } = await supabase.auth.refreshSession();
+    if (error || !data.session) return null;
+    return {
+      access_token: data.session.access_token,
+      expires_at:   data.session.expires_at ?? 0,
+    };
+  } catch {
+    return null;
+  }
 }
+
+// ─── OAuth stubs — Phase 6 ────────────────────────────────────────────────────
+// Structure ready. Implementation requires:
+//   - expo-auth-session (for redirect handling)
+//   - Supabase OAuth provider configured in dashboard
+//   - Deep link scheme configured in app.json
+
+/** Google OAuth — Phase 6 stub */
+export async function googleAuth(): Promise<AuthResult> {
+  // TODO Phase 6:
+  //   import * as AuthSession from 'expo-auth-session';
+  //   import * as WebBrowser from 'expo-web-browser';
+  //   WebBrowser.maybeCompleteAuthSession();
+  //   const { data, error } = await supabase.auth.signInWithOAuth({
+  //     provider: 'google',
+  //     options: { redirectTo: AuthSession.makeRedirectUri({ scheme: 'learnhub' }) },
+  //   });
+  void supabase;
+  return { success: false, error: 'network_error' };
+}
+
+/** Apple OAuth — Phase 6 stub (iOS only) */
+export async function appleAuth(): Promise<AuthResult> {
+  // TODO Phase 6:
+  //   const { data, error } = await supabase.auth.signInWithOAuth({
+  //     provider: 'apple',
+  //     options: { redirectTo: AuthSession.makeRedirectUri({ scheme: 'learnhub' }) },
+  //   });
+  return { success: false, error: 'network_error' };
+}
+
+// Re-export AuthError type for callers
+export type { AuthError };

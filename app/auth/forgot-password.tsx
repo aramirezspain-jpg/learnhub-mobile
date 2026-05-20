@@ -14,7 +14,7 @@ import * as Haptics from 'expo-haptics';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { Colors, Spacing, BorderRadius, FontWeights, FontSizes } from '@/constants/theme';
 import { Typography } from '@/components/ui/Typography';
-import { AuthService } from '@/services/auth';
+import { resetPasswordSupabase } from '@/services/auth/supabase';
 
 function isValidEmail(value: string) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value.trim());
@@ -56,8 +56,7 @@ export default function ForgotPasswordScreen() {
     }
     if (Platform.OS !== 'web') Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     setLoading(true);
-    // Call stub — Phase 5: will send real reset email via backend
-    await AuthService.resetPassword(email.trim());
+    await resetPasswordSupabase(email.trim());
     setLoading(false);
     setSent(true);
   }

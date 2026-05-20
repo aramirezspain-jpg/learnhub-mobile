@@ -21,7 +21,7 @@ import { LeadershipMessagesRepository } from '@/database/repositories/leadership
 import { ServiceRequestsRepository } from '@/database/repositories/serviceRequests';
 import { AppNotificationsRepository } from '@/database/repositories/appNotifications';
 import { LocalUserProfileRepository } from '@/database/repositories/localUserProfile';
-import { MockAuthService } from '@/services/auth/mock-auth.service';
+import { createAuthRepository } from '@/services/repositories';
 import { useAuthStore } from '@/store/auth.store';
 import { CommunityService } from '@/services/community.service';
 import { NotificationService } from '@/services/notification.service';
@@ -190,13 +190,13 @@ function AppBootstrap({ children }: { children: React.ReactNode }) {
       );
       setOnboardingCompleted(onboardingRow?.value === 'true');
 
-      // Auth session check — authenticated profile takes priority over local profile
-      const authSvc = new MockAuthService(db);
+      // Auth session check — Supabase (or local SQLite) depending on SUPABASE_ENABLED
+      const authRepo = createAuthRepository(db);
       let authUser: import('@/types/user').UserProfile | null = null;
       try {
-        authUser = await authSvc.getStoredSession();
+        authUser = await authRepo.getStoredSession();
       } catch {
-        // Corrupt session — clear and treat as unauthenticated
+        // Corrupt/expired session — clear and treat as unauthenticated
         setSessionError('sesión corrupta');
         authUser = null;
       }
