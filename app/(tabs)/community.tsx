@@ -8,6 +8,7 @@ import { Colors, Spacing, BorderRadius, Shadows, FontSizes } from '@/constants/t
 import { Typography } from '@/components/ui/Typography';
 import { useCommunityStore } from '@/store/community.store';
 import { useNotificationStore } from '@/store/notification.store';
+import { useUserActivityStore } from '@/store/userActivity.store';
 import type { Announcement, Schedule, CommunityResource } from '@/types/community';
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
@@ -48,30 +49,11 @@ const RESOURCE_ICON: Record<CommunityResource['tipo'], string> = {
   recurso: 'archive-outline',
 };
 
-// Placeholders de funciones en desarrollo (Phase 4)
-const COMING_SOON = [
-  {
-    route: '/prayer-requests' as const,
-    titulo: 'Peticiones de Oración',
-    descripcion: 'Comparte tu petición con la iglesia',
-    icon: 'hand-left-outline',
-    color: Colors.secondary,
-  },
-  {
-    route: '/contact-leadership' as const,
-    titulo: 'Contactar Liderazgo',
-    descripcion: 'Mensaje privado al equipo pastoral',
-    icon: 'chatbubble-ellipses-outline',
-    color: Colors.info,
-  },
-  {
-    route: '/service-request' as const,
-    titulo: 'Solicitudes',
-    descripcion: 'Bautismo, membresía, matrimonio...',
-    icon: 'document-text-outline',
-    color: Colors.accent,
-  },
-];
+const COMMUNITY_SERVICES = [
+  { route: '/prayer-requests' as const,   titulo: 'Peticiones de Oración', icon: 'hand-left-outline',           color: Colors.secondary },
+  { route: '/contact-leadership' as const, titulo: 'Contactar Liderazgo',   icon: 'chatbubble-ellipses-outline', color: Colors.info },
+  { route: '/service-request' as const,   titulo: 'Solicitudes',            icon: 'document-text-outline',       color: Colors.accent },
+] as const;
 
 // ── Encabezado de sección ────────────────────────────────────────────────────
 
@@ -127,6 +109,9 @@ export default function CommunityScreen() {
   const library = useCommunityStore(s => s.library);
   const readIds = useCommunityStore(s => s.readAnnouncementIds);
   const notifUnreadCount = useNotificationStore(s => s.unreadCount);
+  const prayerRequests = useUserActivityStore(s => s.prayerRequests);
+  const leadershipMessages = useUserActivityStore(s => s.leadershipMessages);
+  const serviceRequests = useUserActivityStore(s => s.serviceRequests);
 
   // ── Cómputos ────────────────────────────────────────────────────────────────
 
@@ -181,6 +166,36 @@ export default function CommunityScreen() {
     });
     return sorted.slice(0, 3);
   }, [library]);
+
+  // Resúmenes servicios comunidad
+  const prayerSummary = useMemo(() => {
+    const total = prayerRequests.length;
+    if (total === 0) return 'Sin peticiones enviadas';
+    const pending = prayerRequests.filter(p => p.estado === 'pendiente').length;
+    const answered = prayerRequests.filter(p => p.estado === 'respondida').length;
+    if (answered > 0) return `${total} enviada${total !== 1 ? 's' : ''} · ${answered} respondida${answered !== 1 ? 's' : ''}`;
+    return `${total} enviada${total !== 1 ? 's' : ''} · ${pending} pendiente${pending !== 1 ? 's' : ''}`;
+  }, [prayerRequests]);
+
+  const leadershipSummary = useMemo(() => {
+    const total = leadershipMessages.length;
+    if (total === 0) return 'Envía un mensaje al equipo pastoral';
+    const last = leadershipMessages[0];
+    return `${total} mensaje${total !== 1 ? 's' : ''} · ${last.ministerio.split(' ').slice(0, 3).join(' ')}`;
+  }, [leadershipMessages]);
+
+  const serviceSummary = useMemo(() => {
+    const total = serviceRequests.length;
+    if (total === 0) return 'Solicita un servicio pastoral';
+    const active = serviceRequests.filter(s => s.estado !== 'completada').length;
+    return `${total} solicitud${total !== 1 ? 'es' : ''} · ${active} activa${active !== 1 ? 's' : ''}`;
+  }, [serviceRequests]);
+
+  const serviceSummaries: Record<typeof COMMUNITY_SERVICES[number]['route'], string> = {
+    '/prayer-requests': prayerSummary,
+    '/contact-leadership': leadershipSummary,
+    '/service-request': serviceSummary,
+  };
 
   // Resumen semanal
   const resumen = useMemo(() => ({
@@ -245,15 +260,15 @@ export default function CommunityScreen() {
                 <Typography variant="caption" muted style={{ fontSize: 10 }}>próx. evento</Typography>
               </TouchableOpacity>
             )}
-            {unreadCount > 0 && (
+            {notifUnreadCount > 0 && (
               <TouchableOpacity
                 style={[styles.statChip, { backgroundColor: `${Colors.primary}12` }]}
-                onPress={() => router.push('/announcements' as never)}
+                onPress={() => router.push('/notifications' as never)}
                 activeOpacity={0.85}
               >
                 <Ionicons name="notifications-outline" size={14} color={Colors.primary} />
                 <Typography style={{ color: Colors.primary, fontSize: 13, fontWeight: '800' }}>
-                  {unreadCount}
+                  {notifUnreadCount}
                 </Typography>
                 <Typography variant="caption" muted style={{ fontSize: 10 }}>sin leer</Typography>
               </TouchableOpacity>
@@ -534,35 +549,43 @@ export default function CommunityScreen() {
           ))}
         </View>
 
-        {/* ── PRÓXIMAMENTE (Phase 4) ── */}
+        {/* ── SERVICIOS COMUNIDAD ── */}
         <View style={styles.section}>
           <SectionHeader
-            title="En Desarrollo"
-            icon="rocket-outline"
+            title="Servicios Comunidad"
+            icon="apps-outline"
             color={Colors.primary}
             hideVerTodo
           />
-          {COMING_SOON.map(item => (
-            <TouchableOpacity
-              key={item.route}
-              style={[styles.phCard, { backgroundColor: theme.card }, Shadows.sm]}
-              onPress={() => router.push(item.route as never)}
-              activeOpacity={0.85}
-            >
-              <View style={[styles.phIcon, { backgroundColor: `${item.color}15` }]}>
-                <Ionicons name={item.icon as any} size={20} color={item.color} />
-              </View>
-              <View style={styles.phInfo}>
-                <Typography variant="label" style={{ color: theme.text }}>{item.titulo}</Typography>
-                <Typography variant="caption" secondary numberOfLines={1}>{item.descripcion}</Typography>
-              </View>
-              <View style={[styles.prox, { backgroundColor: `${Colors.primary}12` }]}>
-                <Typography style={{ color: Colors.primary, fontSize: 8, fontWeight: '800', letterSpacing: 0.5 }}>
-                  PRÓX.
-                </Typography>
-              </View>
-            </TouchableOpacity>
-          ))}
+          {COMMUNITY_SERVICES.map(item => {
+            const summary = serviceSummaries[item.route];
+            const hasActivity = summary !== 'Sin peticiones enviadas' &&
+              summary !== 'Envía un mensaje al equipo pastoral' &&
+              summary !== 'Solicita un servicio pastoral';
+            return (
+              <TouchableOpacity
+                key={item.route}
+                style={[styles.phCard, { backgroundColor: theme.card }, Shadows.sm]}
+                onPress={() => router.push(item.route as never)}
+                activeOpacity={0.85}
+              >
+                <View style={[styles.phIcon, { backgroundColor: `${item.color}15` }]}>
+                  <Ionicons name={item.icon as any} size={20} color={item.color} />
+                </View>
+                <View style={styles.phInfo}>
+                  <Typography variant="label" style={{ color: theme.text }}>{item.titulo}</Typography>
+                  <Typography
+                    variant="caption"
+                    style={{ color: hasActivity ? item.color : theme.textMuted, fontWeight: hasActivity ? '600' : '400' }}
+                    numberOfLines={1}
+                  >
+                    {summary}
+                  </Typography>
+                </View>
+                <Ionicons name="chevron-forward" size={16} color={theme.textMuted} />
+              </TouchableOpacity>
+            );
+          })}
         </View>
 
         {/* Footer */}

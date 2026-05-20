@@ -10,6 +10,8 @@ import { ProgressBar } from '@/components/ui/ProgressBar';
 import { useProgressStore } from '@/store/progress.store';
 import { useFavoritesStore } from '@/store/favorites.store';
 import { useNotesStore } from '@/store/notes.store';
+import { useUserActivityStore } from '@/store/userActivity.store';
+import { useNotificationStore } from '@/store/notification.store';
 import { useCourses } from '@/hooks/useCourses';
 import { ContentService } from '@/services/content.service';
 import { type LessonProgress } from '@/types';
@@ -86,6 +88,16 @@ export default function ProfileScreen() {
   const getCourseProgress = useProgressStore(s => s.getCourseProgress);
   const favCount = useFavoritesStore(s => s.favorites.length);
   const noteCount = useNotesStore(s => s.notes.length);
+  const prayerRequests = useUserActivityStore(s => s.prayerRequests);
+  const leadershipMessages = useUserActivityStore(s => s.leadershipMessages);
+  const serviceRequests = useUserActivityStore(s => s.serviceRequests);
+  const notifUnread = useNotificationStore(s => s.unreadCount);
+  const notifTotal = useNotificationStore(s => s.notifications.length);
+
+  const prayerPending  = useMemo(() => prayerRequests.filter(p => p.estado === 'pendiente').length,   [prayerRequests]);
+  const prayerAnswered = useMemo(() => prayerRequests.filter(p => p.estado === 'respondida').length,  [prayerRequests]);
+  const svcActive      = useMemo(() => serviceRequests.filter(s => s.estado !== 'completada').length, [serviceRequests]);
+  const msgUrgent      = useMemo(() => leadershipMessages.filter(m => m.prioridad === 'urgente').length, [leadershipMessages]);
 
   const totalLessons = courses.reduce((sum, c) => sum + c.total_lecciones, 0);
   const totalCompleted = courses.reduce((sum, c) => sum + getCompletedCount(c.id), 0);
@@ -187,6 +199,128 @@ export default function ProfileScreen() {
           </View>
         </View>
 
+        {/* Mi actividad */}
+        <View style={styles.section}>
+          <Typography variant="h3" style={[styles.sectionTitle, { color: theme.text }]}>
+            Mi actividad
+          </Typography>
+
+          {/* Resumen numérico */}
+          <View style={[styles.activityBanner, { backgroundColor: theme.card }, Shadows.sm]}>
+            {[
+              { label: 'Peticiones', value: prayerRequests.length, color: Colors.secondary },
+              { label: 'Mensajes',   value: leadershipMessages.length, color: Colors.info },
+              { label: 'Solicitudes',value: serviceRequests.length, color: Colors.accent },
+              { label: 'Notif.',     value: notifTotal, color: Colors.primary },
+            ].map(({ label, value, color }) => (
+              <View key={label} style={styles.activitySummaryItem}>
+                <Typography style={{ color, fontSize: 22, fontWeight: '800', lineHeight: 26 }}>{value}</Typography>
+                <Typography style={{ color: theme.textMuted, fontSize: 9, fontWeight: '600', textAlign: 'center' }}>{label}</Typography>
+              </View>
+            ))}
+          </View>
+
+          {/* Peticiones de Oración */}
+          <TouchableOpacity
+            style={[styles.activityRow, { backgroundColor: theme.card }, Shadows.sm]}
+            onPress={() => router.push('/prayer-requests' as never)}
+            activeOpacity={0.85}
+          >
+            <View style={[styles.activityIcon, { backgroundColor: `${Colors.secondary}15` }]}>
+              <Ionicons name="hand-left-outline" size={18} color={Colors.secondary} />
+            </View>
+            <View style={styles.activityContent}>
+              <Typography variant="label" style={{ color: theme.text }}>Peticiones de Oración</Typography>
+              <Typography variant="caption" style={{ color: prayerRequests.length > 0 ? Colors.secondary : theme.textMuted, fontWeight: prayerRequests.length > 0 ? '600' : '400' }}>
+                {prayerRequests.length === 0
+                  ? 'Sin peticiones enviadas'
+                  : `${prayerRequests.length} enviada${prayerRequests.length !== 1 ? 's' : ''} · ${prayerPending} pendiente${prayerPending !== 1 ? 's' : ''} · ${prayerAnswered} respondida${prayerAnswered !== 1 ? 's' : ''}`}
+              </Typography>
+            </View>
+            {prayerRequests.length > 0 && (
+              <View style={[styles.activityCount, { backgroundColor: `${Colors.secondary}15` }]}>
+                <Typography style={{ color: Colors.secondary, fontSize: FontSizes.sm, fontWeight: '800' }}>{prayerRequests.length}</Typography>
+              </View>
+            )}
+            <Ionicons name="chevron-forward" size={14} color={theme.textMuted} />
+          </TouchableOpacity>
+
+          {/* Contactar Liderazgo */}
+          <TouchableOpacity
+            style={[styles.activityRow, { backgroundColor: theme.card }, Shadows.sm]}
+            onPress={() => router.push('/contact-leadership' as never)}
+            activeOpacity={0.85}
+          >
+            <View style={[styles.activityIcon, { backgroundColor: `${Colors.info}15` }]}>
+              <Ionicons name="chatbubble-ellipses-outline" size={18} color={Colors.info} />
+            </View>
+            <View style={styles.activityContent}>
+              <Typography variant="label" style={{ color: theme.text }}>Contactar Liderazgo</Typography>
+              <Typography variant="caption" style={{ color: leadershipMessages.length > 0 ? Colors.info : theme.textMuted, fontWeight: leadershipMessages.length > 0 ? '600' : '400' }}>
+                {leadershipMessages.length === 0
+                  ? 'Sin mensajes enviados'
+                  : `${leadershipMessages.length} mensaje${leadershipMessages.length !== 1 ? 's' : ''} enviado${leadershipMessages.length !== 1 ? 's' : ''}${msgUrgent > 0 ? ` · ${msgUrgent} urgente${msgUrgent !== 1 ? 's' : ''}` : ''}`}
+              </Typography>
+            </View>
+            {leadershipMessages.length > 0 && (
+              <View style={[styles.activityCount, { backgroundColor: `${Colors.info}15` }]}>
+                <Typography style={{ color: Colors.info, fontSize: FontSizes.sm, fontWeight: '800' }}>{leadershipMessages.length}</Typography>
+              </View>
+            )}
+            <Ionicons name="chevron-forward" size={14} color={theme.textMuted} />
+          </TouchableOpacity>
+
+          {/* Solicitudes */}
+          <TouchableOpacity
+            style={[styles.activityRow, { backgroundColor: theme.card }, Shadows.sm]}
+            onPress={() => router.push('/service-request' as never)}
+            activeOpacity={0.85}
+          >
+            <View style={[styles.activityIcon, { backgroundColor: `${Colors.accent}15` }]}>
+              <Ionicons name="document-text-outline" size={18} color={Colors.accent} />
+            </View>
+            <View style={styles.activityContent}>
+              <Typography variant="label" style={{ color: theme.text }}>Solicitudes</Typography>
+              <Typography variant="caption" style={{ color: serviceRequests.length > 0 ? Colors.accent : theme.textMuted, fontWeight: serviceRequests.length > 0 ? '600' : '400' }}>
+                {serviceRequests.length === 0
+                  ? 'Sin solicitudes enviadas'
+                  : `${serviceRequests.length} enviada${serviceRequests.length !== 1 ? 's' : ''} · ${svcActive} activa${svcActive !== 1 ? 's' : ''}`}
+              </Typography>
+            </View>
+            {serviceRequests.length > 0 && (
+              <View style={[styles.activityCount, { backgroundColor: `${Colors.accent}15` }]}>
+                <Typography style={{ color: Colors.accent, fontSize: FontSizes.sm, fontWeight: '800' }}>{serviceRequests.length}</Typography>
+              </View>
+            )}
+            <Ionicons name="chevron-forward" size={14} color={theme.textMuted} />
+          </TouchableOpacity>
+
+          {/* Notificaciones */}
+          <TouchableOpacity
+            style={[styles.activityRow, { backgroundColor: theme.card }, Shadows.sm]}
+            onPress={() => router.push('/notifications' as never)}
+            activeOpacity={0.85}
+          >
+            <View style={[styles.activityIcon, { backgroundColor: `${Colors.primary}15` }]}>
+              <Ionicons name="notifications-outline" size={18} color={Colors.primary} />
+            </View>
+            <View style={styles.activityContent}>
+              <Typography variant="label" style={{ color: theme.text }}>Notificaciones</Typography>
+              <Typography variant="caption" style={{ color: notifUnread > 0 ? Colors.error : theme.textMuted, fontWeight: notifUnread > 0 ? '600' : '400' }}>
+                {notifTotal === 0
+                  ? 'Sin notificaciones'
+                  : `${notifTotal} recibida${notifTotal !== 1 ? 's' : ''} · ${notifUnread} sin leer`}
+              </Typography>
+            </View>
+            {notifUnread > 0 && (
+              <View style={[styles.activityCount, { backgroundColor: `${Colors.error}15` }]}>
+                <Typography style={{ color: Colors.error, fontSize: FontSizes.sm, fontWeight: '800' }}>{notifUnread}</Typography>
+              </View>
+            )}
+            <Ionicons name="chevron-forward" size={14} color={theme.textMuted} />
+          </TouchableOpacity>
+        </View>
+
         {/* Progreso global */}
         <View style={styles.section}>
           <Typography variant="h3" style={[styles.sectionTitle, { color: theme.text }]}>
@@ -252,7 +386,7 @@ export default function ProfileScreen() {
         <View style={[styles.appInfo, { backgroundColor: theme.card }]}>
           <View style={styles.appInfoRow}>
             <Ionicons name="information-circle-outline" size={18} color={theme.textMuted} />
-            <Typography variant="caption" muted>LearnHub v1.0 · Fase 2</Typography>
+            <Typography variant="caption" muted>LearnHub v1.0 · Instituto Bíblico</Typography>
           </View>
           <View style={styles.appInfoRow}>
             <Ionicons name="shield-checkmark-outline" size={18} color={theme.textMuted} />
@@ -359,6 +493,49 @@ const styles = StyleSheet.create({
     borderRadius: BorderRadius.full,
   },
   courseStats: { flexDirection: 'row', justifyContent: 'space-between' },
+
+  // Mi actividad
+  activityBanner: {
+    flexDirection: 'row',
+    borderRadius: BorderRadius.lg,
+    padding: Spacing.md,
+    marginBottom: Spacing.sm,
+    justifyContent: 'space-around',
+  },
+  activitySummaryItem: {
+    alignItems: 'center',
+    gap: 2,
+    flex: 1,
+  },
+  activityRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderRadius: BorderRadius.lg,
+    padding: Spacing.md,
+    marginBottom: Spacing.sm,
+    gap: 12,
+  },
+  activityIcon: {
+    width: 40,
+    height: 40,
+    borderRadius: BorderRadius.md,
+    alignItems: 'center',
+    justifyContent: 'center',
+    flexShrink: 0,
+  },
+  activityContent: {
+    flex: 1,
+    gap: 2,
+  },
+  activityCount: {
+    minWidth: 28,
+    height: 28,
+    borderRadius: 14,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 6,
+  },
+
   appInfo: {
     marginHorizontal: Spacing.lg,
     padding: Spacing.md,
