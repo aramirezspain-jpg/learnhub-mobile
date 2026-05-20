@@ -1,47 +1,42 @@
 /**
- * AuthService — Fase 4 foundation stub.
+ * AuthService — Fase 4 foundation.
  *
- * En Fase 3 la app opera completamente offline con perfil local.
- * En Fase 4 este servicio se conectará al backend (Supabase u otro).
- * Los métodos están preparados con la firma correcta para no romper
- * la integración cuando se active.
+ * Fase 4: autenticación local via MockAuthService (SQLite).
+ * Fase 5: reemplazar stubs con llamadas reales a Supabase/Firebase.
  */
 
-import type { UserProfile, Session } from '@/types/user';
+import type { AuthCredentials, RegisterData, AuthResult, UserProfile } from '@/types/user';
 
 export class AuthService {
-  /** Siempre true en Fase 3. Fase 4: false cuando hay sesión activa. */
   static isLocalMode(): boolean {
     return true;
   }
 
-  // ── Phase 4: uncomment and implement when backend is ready ──────────────────
+  // ── Phase 5: Supabase stubs ─────────────────────────────────────────────────
+  // Implementar en Phase 5: conectar con supabase.auth.*
 
-  // static async signIn(email: string, password: string): Promise<Session> {
-  //   throw new Error('signIn not implemented — Phase 4');
-  // }
+  /** Stub — Phase 5: supabase.auth.signInWithPassword() */
+  static async loginSupabase(_credentials: AuthCredentials): Promise<AuthResult> {
+    return { success: false, error: 'network_error' };
+  }
 
-  // static async signUp(
-  //   email: string,
-  //   password: string,
-  //   profile: Pick<UserProfile, 'display_name' | 'iglesia'>
-  // ): Promise<Session> {
-  //   throw new Error('signUp not implemented — Phase 4');
-  // }
+  /** Stub — Phase 5: supabase.auth.signUp() */
+  static async registerSupabase(_data: RegisterData): Promise<AuthResult> {
+    return { success: false, error: 'network_error' };
+  }
 
-  // static async signOut(): Promise<void> {
-  //   throw new Error('signOut not implemented — Phase 4');
-  // }
+  /** Stub — Phase 5: supabase.auth.refreshSession() */
+  static async refreshSessionSupabase(): Promise<{ access_token: string; expires_at: number } | null> {
+    return null;
+  }
 
-  // static async refreshSession(): Promise<Session | null> {
-  //   throw new Error('refreshSession not implemented — Phase 4');
-  // }
+  /** Stub — Phase 5: supabase.auth.signOut() */
+  static async logoutSupabase(): Promise<void> {
+    // no-op until Phase 5
+  }
 
-  // static async getSession(): Promise<Session | null> {
-  //   throw new Error('getSession not implemented — Phase 4');
-  // }
-
-  // static async updateRemoteProfile(updates: Partial<UserProfile>): Promise<UserProfile> {
-  //   throw new Error('updateRemoteProfile not implemented — Phase 4');
-  // }
+  /** Stub — Phase 5: sync local profile to remote users table */
+  static async syncProfileSupabase(_profile: UserProfile): Promise<UserProfile | null> {
+    return null;
+  }
 }

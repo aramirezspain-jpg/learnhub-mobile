@@ -37,8 +37,6 @@ export default function RegisterScreen() {
   const [email, setEmail]         = useState('');
   const [password, setPassword]   = useState('');
   const [confirm, setConfirm]     = useState('');
-  const [iglesia, setIglesia]     = useState('');
-  const [ministerio, setMinisterio] = useState('');
   const [showPwd, setShowPwd]     = useState(false);
   const [loading, setLoading]     = useState(false);
   const [error, setError]         = useState<string | null>(null);
@@ -78,13 +76,11 @@ export default function RegisterScreen() {
       display_name: name.trim(),
       email: email.trim(),
       password,
-      iglesia:    iglesia.trim() || undefined,
-      ministerio: ministerio.trim() || undefined,
     });
     setLoading(false);
     if (result.success) {
       if (Platform.OS !== 'web') Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-      router.replace('/(tabs)');
+      router.replace('/auth/complete-profile' as never);
     } else {
       setError(ERROR_MESSAGES[result.error ?? 'unknown']);
       triggerShake();
@@ -156,15 +152,6 @@ export default function RegisterScreen() {
               secureTextEntry={!showPwd}
               theme={theme}
             />
-
-            {/* Optional section */}
-            <View style={[s.optionalSection, { borderColor: theme.border }]}>
-              <Typography variant="caption" muted style={{ textAlign: 'center', marginBottom: 14 }}>
-                Opcional — puedes completar esto después
-              </Typography>
-              <Field label="Iglesia"    icon="home-outline"   placeholder="Nombre de tu iglesia"    value={iglesia}    onChangeText={setIglesia}    theme={theme} />
-              <Field label="Ministerio" icon="people-outline" placeholder="Área de ministerio"      value={ministerio} onChangeText={setMinisterio} theme={theme} />
-            </View>
 
             <TouchableOpacity
               style={[s.primaryBtn, { backgroundColor: loading ? `${Colors.primary}80` : Colors.primary }]}
@@ -280,10 +267,6 @@ const s = StyleSheet.create({
     padding: 12, borderRadius: BorderRadius.md, borderWidth: 1, marginBottom: 16,
   },
   form: { gap: 0 },
-  optionalSection: {
-    borderTopWidth: StyleSheet.hairlineWidth,
-    paddingTop: 20, marginBottom: 16, marginTop: 4,
-  },
   primaryBtn: {
     flexDirection: 'row', alignItems: 'center', justifyContent: 'center',
     gap: 8, paddingVertical: 14, borderRadius: BorderRadius.lg,

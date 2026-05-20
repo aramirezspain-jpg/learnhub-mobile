@@ -116,6 +116,7 @@ function AppBootstrap({ children }: { children: React.ReactNode }) {
   const setLastViewed = useProgressStore(s => s.setLastViewed);
   const setDbReady = useUIStore(s => s.setDbReady);
   const setContentReady = useUIStore(s => s.setContentReady);
+  const setOnboardingCompleted = useUIStore(s => s.setOnboardingCompleted);
   const dbReady = useUIStore(s => s.dbReady);
   const setFavorites = useFavoritesStore(s => s.setFavorites);
   const setAllNotes = useNotesStore(s => s.setAllNotes);
@@ -133,6 +134,7 @@ function AppBootstrap({ children }: { children: React.ReactNode }) {
   const setProfile = useUserProfileStore(s => s.setProfile);
   const setAuthenticated = useAuthStore(s => s.setAuthenticated);
   const setAuthStatus = useAuthStore(s => s.setStatus);
+  const setSessionError = useAuthStore(s => s.setSessionError);
   const scheme = useColorScheme() ?? 'dark';
 
   useEffect(() => {
@@ -181,15 +183,29 @@ function AppBootstrap({ children }: { children: React.ReactNode }) {
       setServiceRequests(services);
       setNotifications(notifs);
 
+      // Read onboarding completion flag
+      const onboardingRow = await db.getFirstAsync<{ value: string }>(
+        'SELECT value FROM app_settings WHERE key = ?',
+        ['onboardingCompleted']
+      );
+      setOnboardingCompleted(onboardingRow?.value === 'true');
+
       // Auth session check — authenticated profile takes priority over local profile
       const authSvc = new MockAuthService(db);
-      const authUser = await authSvc.getStoredSession();
+      let authUser: import('@/types/user').UserProfile | null = null;
+      try {
+        authUser = await authSvc.getStoredSession();
+      } catch {
+        // Corrupt session — clear and treat as unauthenticated
+        setSessionError('sesión corrupta');
+        authUser = null;
+      }
       if (authUser) {
         setAuthenticated(authUser.id ?? '');
         setProfile(authUser);
       } else {
         setAuthStatus('local');
-        setProfile(userProfile);
+        setProfile(userProfile ?? null);
       }
 
       // Check notification permissions and sync new announcement notifications
@@ -222,6 +238,8 @@ function AppBootstrap({ children }: { children: React.ReactNode }) {
     loadProgress().catch((e) => {
       console.error('[AppBootstrap] DB load failed:', e);
       setAuthStatus('local');
+      setSessionError('datos incompletos — recuperación local activa');
+      setOnboardingCompleted(false);
       setDbReady();
     });
   }, []);
@@ -235,24 +253,37 @@ function AppBootstrap({ children }: { children: React.ReactNode }) {
 
 // ─── Auth navigation guard ────────────────────────────────────────────────────
 function NavigationGuard() {
-  const router   = useRouter();
-  const pathname = usePathname();
-  const status   = useAuthStore(s => s.status);
-  const dbReady  = useUIStore(s => s.dbReady);
+  const router              = useRouter();
+  const pathname            = usePathname();
+  const status              = useAuthStore(s => s.status);
+  const dbReady             = useUIStore(s => s.dbReady);
+  const onboardingCompleted = useUIStore(s => s.onboardingCompleted);
 
   useEffect(() => {
     if (!dbReady || status === 'loading') return;
 
-    const isAuthScreen = pathname?.startsWith('/auth') ?? false;
-    const isLanding    = pathname === '/landing';
+    const isAuthScreen    = pathname?.startsWith('/auth') ?? false;
+    const isLanding       = pathname === '/landing';
+    const isOnboarding    = pathname === '/onboarding';
     const isAuthenticated = status === 'authenticated';
 
-    if (!isAuthenticated && !isAuthScreen && !isLanding) {
+    // First-time users: show onboarding before anything else
+    if (!onboardingCompleted && !isOnboarding) {
+      router.replace('/onboarding');
+      return;
+    }
+
+    // Unauthenticated users can only see landing and auth screens
+    if (!isAuthenticated && !isAuthScreen && !isLanding && !isOnboarding) {
       router.replace('/landing');
-    } else if (isAuthenticated && isLanding) {
+      return;
+    }
+
+    // Authenticated users skip landing and onboarding
+    if (isAuthenticated && (isLanding || isOnboarding)) {
       router.replace('/(tabs)');
     }
-  }, [status, dbReady]);
+  }, [status, dbReady, onboardingCompleted]);
 
   return null;
 }
@@ -301,6 +332,7 @@ export default function RootLayout() {
         <NotificationListeners />
         <StatusBar style={scheme === 'dark' ? 'light' : 'dark'} />
         <Stack screenOptions={{ headerShown: false }}>
+          <Stack.Screen name="onboarding" options={{ animation: 'fade', headerShown: false }} />
           <Stack.Screen name="landing" options={{ animation: 'fade', headerShown: false }} />
           <Stack.Screen name="(tabs)" />
           <Stack.Screen
@@ -362,6 +394,10 @@ export default function RootLayout() {
           <Stack.Screen
             name="auth/register"
             options={{ animation: 'slide_from_bottom', presentation: 'modal' }}
+          />
+          <Stack.Screen
+            name="auth/complete-profile"
+            options={{ animation: 'slide_from_right', headerShown: false }}
           />
           <Stack.Screen
             name="auth/forgot-password"
