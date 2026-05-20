@@ -167,6 +167,19 @@ export default function LandingScreen() {
         </Animated.View>
       </View>
 
+      {/* ── Forgot password link ────────────────────────────────────────────── */}
+      <Animated.View style={[s.forgotWrap, { opacity: footerOpacity }]}>
+        <TouchableOpacity
+          onPress={() => router.push('/auth/forgot-password' as never)}
+          activeOpacity={0.7}
+          hitSlop={{ top: 8, bottom: 8, left: 16, right: 16 }}
+        >
+          <Typography variant="caption" color={Colors.primary} style={s.forgotText}>
+            ¿Olvidaste tu contraseña?
+          </Typography>
+        </TouchableOpacity>
+      </Animated.View>
+
       {/* ── Footer ──────────────────────────────────────────────────────────── */}
       <Animated.View style={[s.footer, { opacity: footerOpacity }]}>
         <Ionicons name="shield-checkmark-outline" size={14} color={theme.textMuted} />
@@ -179,10 +192,10 @@ export default function LandingScreen() {
 }
 
 const FEATURES = [
-  { icon: 'book-outline',       label: 'Cursos' },
-  { icon: 'people-outline',     label: 'Comunidad' },
-  { icon: 'bar-chart-outline',  label: 'Progreso' },
-  { icon: 'notifications-outline', label: 'Avisos' },
+  { icon: 'book-outline',        label: 'Cursos' },
+  { icon: 'people-outline',      label: 'Comunidad' },
+  { icon: 'heart-outline',       label: 'Peticiones' },
+  { icon: 'trending-up-outline', label: 'Crecimiento' },
 ];
 
 const s = StyleSheet.create({
@@ -282,6 +295,10 @@ const s = StyleSheet.create({
     borderRadius: BorderRadius.xl, borderWidth: 1.5,
   },
   secondaryBtnLabel: { fontSize: FontSizes.base, fontWeight: FontWeights.semibold },
+
+  // Forgot password
+  forgotWrap: { alignItems: 'center', paddingBottom: Spacing.sm },
+  forgotText: { textDecorationLine: 'underline', textDecorationColor: Colors.primary },
 
   // Footer
   footer: {

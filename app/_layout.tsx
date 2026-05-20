@@ -332,8 +332,8 @@ export default function RootLayout() {
         <NotificationListeners />
         <StatusBar style={scheme === 'dark' ? 'light' : 'dark'} />
         <Stack screenOptions={{ headerShown: false }}>
-          <Stack.Screen name="onboarding" options={{ animation: 'fade', headerShown: false }} />
-          <Stack.Screen name="landing" options={{ animation: 'fade', headerShown: false }} />
+          <Stack.Screen name="onboarding" options={{ animation: 'fade', headerShown: false, animationDuration: 350 }} />
+          <Stack.Screen name="landing"    options={{ animation: 'fade', headerShown: false, animationDuration: 350 }} />
           <Stack.Screen name="(tabs)" />
           <Stack.Screen
             name="course/[id]"
@@ -389,11 +389,11 @@ export default function RootLayout() {
           />
           <Stack.Screen
             name="auth/login"
-            options={{ animation: 'slide_from_bottom', presentation: 'modal' }}
+            options={{ animation: 'slide_from_right', headerShown: false }}
           />
           <Stack.Screen
             name="auth/register"
-            options={{ animation: 'slide_from_bottom', presentation: 'modal' }}
+            options={{ animation: 'slide_from_right', headerShown: false }}
           />
           <Stack.Screen
             name="auth/complete-profile"
@@ -401,7 +401,7 @@ export default function RootLayout() {
           />
           <Stack.Screen
             name="auth/forgot-password"
-            options={{ animation: 'slide_from_bottom', presentation: 'modal' }}
+            options={{ animation: 'slide_from_right', headerShown: false }}
           />
         </Stack>
         </SessionProvider>
