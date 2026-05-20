@@ -27,6 +27,48 @@ const ERROR_MESSAGES: Record<AuthError, string> = {
   unknown:             'Ha ocurrido un error. Inténtalo de nuevo',
 };
 
+function isValidEmail(value: string) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value.trim());
+}
+
+type PwdStrength = { level: 0 | 1 | 2 | 3; label: string; color: string };
+
+function getPasswordStrength(pwd: string): PwdStrength {
+  if (!pwd) return { level: 0, label: '', color: 'transparent' };
+  let score = 0;
+  if (pwd.length >= 6)  score++;
+  if (pwd.length >= 10) score++;
+  if (/[0-9]/.test(pwd)) score++;
+  if (/[^a-zA-Z0-9]/.test(pwd)) score++;
+  if (score <= 1) return { level: 1, label: 'Débil',  color: Colors.error   };
+  if (score === 2) return { level: 2, label: 'Media',  color: Colors.warning };
+  return              { level: 3, label: 'Fuerte', color: Colors.success  };
+}
+
+function PasswordStrengthBar({ pwd }: { pwd: string }) {
+  const { level, label, color } = getPasswordStrength(pwd);
+  if (!pwd) return null;
+  return (
+    <View style={pw.wrap}>
+      <View style={pw.bars}>
+        {([1, 2, 3] as const).map(i => (
+          <View
+            key={i}
+            style={[pw.bar, { backgroundColor: i <= level ? color : Colors.dark.border }]}
+          />
+        ))}
+      </View>
+      <Typography style={[pw.label, { color }]}>{label}</Typography>
+    </View>
+  );
+}
+const pw = StyleSheet.create({
+  wrap:  { flexDirection: 'row', alignItems: 'center', gap: 10, marginTop: 6, marginBottom: 8 },
+  bars:  { flex: 1, flexDirection: 'row', gap: 4 },
+  bar:   { flex: 1, height: 4, borderRadius: 2 },
+  label: { fontSize: 11, fontWeight: '600' as const, minWidth: 40 },
+});
+
 export default function RegisterScreen() {
   const router = useRouter();
   const scheme = useColorScheme() ?? 'dark';
@@ -54,12 +96,12 @@ export default function RegisterScreen() {
   }
 
   function validate(): string | null {
-    if (!name.trim())    return 'Ingresa tu nombre';
-    if (!email.trim())   return 'Ingresa tu correo';
-    if (!email.includes('@')) return 'Correo inválido';
-    if (!password)       return 'Ingresa una contraseña';
-    if (password.length < 6) return ERROR_MESSAGES.weak_password;
-    if (password !== confirm) return 'Las contraseñas no coinciden';
+    if (!name.trim())          return 'Ingresa tu nombre';
+    if (!email.trim())         return 'Ingresa tu correo';
+    if (!isValidEmail(email))  return 'Formato de correo inválido (ej: tu@correo.com)';
+    if (!password)             return 'Ingresa una contraseña';
+    if (password.length < 6)  return ERROR_MESSAGES.weak_password;
+    if (password !== confirm)  return 'Las contraseñas no coinciden';
     return null;
   }
 
@@ -143,6 +185,7 @@ export default function RegisterScreen() {
               onRightIcon={() => setShowPwd(v => !v)}
               theme={theme}
             />
+            <PasswordStrengthBar pwd={password} />
             <Field
               label="Confirmar contraseña *"
               icon="lock-closed-outline"

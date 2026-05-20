@@ -27,6 +27,10 @@ const ERROR_MESSAGES: Record<AuthError, string> = {
   unknown:             'Ha ocurrido un error. Inténtalo de nuevo',
 };
 
+function isValidEmail(value: string) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value.trim());
+}
+
 export default function LoginScreen() {
   const router = useRouter();
   const scheme = useColorScheme() ?? 'dark';
@@ -37,6 +41,7 @@ export default function LoginScreen() {
   const [password, setPassword] = useState('');
   const [showPwd, setShowPwd]   = useState(false);
   const [loading, setLoading]   = useState(false);
+  const [success, setSuccess]   = useState(false);
   const [error, setError]       = useState<string | null>(null);
 
   const shake = useRef(new Animated.Value(0)).current;
@@ -53,8 +58,18 @@ export default function LoginScreen() {
 
   async function handleLogin() {
     setError(null);
-    if (!email.trim() || !password) {
-      setError('Completa todos los campos');
+    if (!email.trim()) {
+      setError('Ingresa tu correo electrónico');
+      triggerShake();
+      return;
+    }
+    if (!isValidEmail(email)) {
+      setError('Formato de correo inválido (ej: tu@correo.com)');
+      triggerShake();
+      return;
+    }
+    if (!password) {
+      setError('Ingresa tu contraseña');
       triggerShake();
       return;
     }
@@ -63,6 +78,9 @@ export default function LoginScreen() {
     setLoading(false);
     if (result.success) {
       if (Platform.OS !== 'web') Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+      setSuccess(true);
+      // Brief success visual before navigating
+      await new Promise<void>(r => setTimeout(r, 500));
       router.replace('/(tabs)');
     } else {
       setError(ERROR_MESSAGES[result.error ?? 'unknown']);
@@ -149,18 +167,29 @@ export default function LoginScreen() {
             </TouchableOpacity>
 
             <TouchableOpacity
-              style={[s.primaryBtn, { backgroundColor: loading ? `${Colors.primary}80` : Colors.primary }]}
+              style={[
+                s.primaryBtn,
+                {
+                  backgroundColor: success
+                    ? Colors.success
+                    : loading
+                    ? `${Colors.primary}80`
+                    : Colors.primary,
+                },
+              ]}
               onPress={handleLogin}
-              disabled={loading}
+              disabled={loading || success}
               activeOpacity={0.85}
             >
-              {loading ? (
+              {success ? (
+                <Ionicons name="checkmark-circle-outline" size={18} color="#fff" />
+              ) : loading ? (
                 <Ionicons name="hourglass-outline" size={18} color="#fff" />
               ) : (
                 <Ionicons name="log-in-outline" size={18} color="#fff" />
               )}
               <Typography style={s.primaryBtnText}>
-                {loading ? 'Iniciando sesión…' : 'Iniciar sesión'}
+                {success ? '¡Bienvenido!' : loading ? 'Iniciando sesión…' : 'Iniciar sesión'}
               </Typography>
             </TouchableOpacity>
           </View>

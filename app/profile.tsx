@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from 'react';
-import { View, ScrollView, TouchableOpacity, StyleSheet, TextInput, Platform, Image } from 'react-native';
+import { View, ScrollView, TouchableOpacity, StyleSheet, TextInput, Platform, Image, Alert } from 'react-native';
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
@@ -18,6 +18,7 @@ import { type LessonProgress } from '@/types';
 import * as Haptics from 'expo-haptics';
 import { useLocalProfile } from '@/hooks/auth/useLocalProfile';
 import { useSession } from '@/hooks/auth/useSession';
+import { useAuthStore } from '@/store/auth.store';
 import { ROLE_META, type SyncStatus } from '@/types/user';
 
 function SpiritualItem({
@@ -217,6 +218,8 @@ export default function ProfileScreen() {
 
   const { profile, save } = useLocalProfile();
   const { isAuthenticated, logout } = useSession();
+  const sessionError = useAuthStore(s => s.sessionError);
+  const setSessionError = useAuthStore(s => s.setSessionError);
   const [isEditing, setIsEditing] = useState(false);
   const [loggingOut, setLoggingOut] = useState(false);
   const [draftName, setDraftName] = useState('');
@@ -259,14 +262,25 @@ export default function ProfileScreen() {
     setIsEditing(false);
   }
 
-  async function handleLogout() {
-    setLoggingOut(true);
-    await logout();
-    if (Platform.OS !== 'web') {
-      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    }
-    setLoggingOut(false);
-    router.replace('/landing');
+  function handleLogout() {
+    Alert.alert(
+      'Cerrar sesión',
+      'Tu progreso, cursos y datos locales se mantendrán en el dispositivo.',
+      [
+        { text: 'Cancelar', style: 'cancel' },
+        {
+          text: 'Cerrar sesión',
+          style: 'destructive',
+          onPress: async () => {
+            setLoggingOut(true);
+            await logout();
+            if (Platform.OS !== 'web') Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+            setLoggingOut(false);
+            router.replace('/landing');
+          },
+        },
+      ]
+    );
   }
 
   const { courses } = useCourses();
@@ -337,6 +351,19 @@ export default function ProfileScreen() {
           />
         </TouchableOpacity>
       </View>
+
+      {/* Session error banner */}
+      {sessionError && (
+        <View style={[styles.sessionErrorBanner, { backgroundColor: `${Colors.warning}14`, borderBottomColor: `${Colors.warning}30` }]}>
+          <Ionicons name="warning-outline" size={15} color={Colors.warning} />
+          <Typography variant="caption" color={Colors.warning} style={{ flex: 1, lineHeight: 17 }}>
+            {sessionError}
+          </Typography>
+          <TouchableOpacity onPress={() => setSessionError(null)} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
+            <Ionicons name="close-outline" size={16} color={Colors.warning} />
+          </TouchableOpacity>
+        </View>
+      )}
 
       <ScrollView style={{ flex: 1 }} showsVerticalScrollIndicator={false} contentContainerStyle={styles.scroll}>
         {/* Avatar + nombre */}
@@ -834,6 +861,11 @@ export default function ProfileScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1 },
+  sessionErrorBanner: {
+    flexDirection: 'row', alignItems: 'center', gap: 8,
+    paddingHorizontal: Spacing.lg, paddingVertical: 10,
+    borderBottomWidth: StyleSheet.hairlineWidth,
+  },
   header: {
     flexDirection: 'row',
     alignItems: 'center',

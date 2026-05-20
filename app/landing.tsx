@@ -12,6 +12,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { Colors, Spacing, BorderRadius, FontWeights, FontSizes, Shadows } from '@/constants/theme';
 import { Typography } from '@/components/ui/Typography';
+import { useAuthStore } from '@/store/auth.store';
 
 const { height: SCREEN_HEIGHT } = Dimensions.get('window');
 const IS_SMALL = SCREEN_HEIGHT < 700;
@@ -20,6 +21,8 @@ export default function LandingScreen() {
   const router = useRouter();
   const scheme = useColorScheme() ?? 'dark';
   const theme  = Colors[scheme];
+  const sessionError = useAuthStore(s => s.sessionError);
+  const setSessionError = useAuthStore(s => s.setSessionError);
 
   // ── Staggered entrance animations ──────────────────────────────────────────
   const logoOpacity  = useRef(new Animated.Value(0)).current;
@@ -58,6 +61,19 @@ export default function LandingScreen() {
 
   return (
     <SafeAreaView style={[s.root, { backgroundColor: theme.background }]} edges={['top', 'bottom']}>
+      {/* Session error banner — shown when redirected from corrupted session */}
+      {sessionError && (
+        <View style={[s.errorBanner, { backgroundColor: `${Colors.warning}14`, borderBottomColor: `${Colors.warning}30` }]}>
+          <Ionicons name="warning-outline" size={14} color={Colors.warning} />
+          <Typography variant="caption" color={Colors.warning} style={{ flex: 1, lineHeight: 17 }}>
+            Tu sesión anterior no pudo restaurarse. Inicia sesión de nuevo.
+          </Typography>
+          <TouchableOpacity onPress={() => setSessionError(null)} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
+            <Ionicons name="close-outline" size={16} color={Colors.warning} />
+          </TouchableOpacity>
+        </View>
+      )}
+
       {/* Decorative background blobs */}
       <View pointerEvents="none" style={StyleSheet.absoluteFill}>
         <View style={[s.blob1, { backgroundColor: `${Colors.primary}0A` }]} />
@@ -171,6 +187,12 @@ const FEATURES = [
 
 const s = StyleSheet.create({
   root: { flex: 1 },
+
+  errorBanner: {
+    flexDirection: 'row', alignItems: 'center', gap: 8,
+    paddingHorizontal: Spacing.lg, paddingVertical: 10,
+    borderBottomWidth: StyleSheet.hairlineWidth,
+  },
 
   // Background decorative blobs
   blob1: {
