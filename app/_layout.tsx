@@ -275,7 +275,7 @@ function NavigationGuard() {
     const isAuthScreen    = pathname?.startsWith('/auth') ?? false;
     const isLanding       = pathname === '/landing';
     const isOnboarding    = pathname === '/onboarding';
-    const isResetPassword = pathname === '/auth/reset-password';
+    const isResetPassword = pathname === '/reset-password';
     const isAuthenticated = status === 'authenticated';
 
     // First-time users: show onboarding before anything else
@@ -415,7 +415,7 @@ export default function RootLayout() {
             options={{ animation: 'slide_from_right', headerShown: false }}
           />
           <Stack.Screen
-            name="auth/reset-password"
+            name="reset-password"
             options={{ animation: 'slide_from_right', headerShown: false }}
           />
         </Stack>
