@@ -29,6 +29,7 @@ export default function ForgotPasswordScreen() {
   const [sent, setSent]       = useState(false);
   const [loading, setLoading] = useState(false);
   const [emailError, setEmailError] = useState<string | null>(null);
+  const [apiError, setApiError]     = useState<string | null>(null);
 
   const shake = useRef(new Animated.Value(0)).current;
 
@@ -44,6 +45,7 @@ export default function ForgotPasswordScreen() {
 
   async function handleSubmit() {
     setEmailError(null);
+    setApiError(null);
     if (!email.trim()) {
       setEmailError('Ingresa tu correo electrónico');
       triggerShake();
@@ -56,9 +58,15 @@ export default function ForgotPasswordScreen() {
     }
     if (Platform.OS !== 'web') Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     setLoading(true);
-    await resetPasswordSupabase(email.trim());
+    const result = await resetPasswordSupabase(email.trim());
     setLoading(false);
-    setSent(true);
+    if (result.success) {
+      if (Platform.OS !== 'web') Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+      setSent(true);
+    } else {
+      setApiError(result.error ?? 'Error al enviar. Intenta de nuevo.');
+      triggerShake();
+    }
   }
 
   return (
@@ -84,19 +92,8 @@ export default function ForgotPasswordScreen() {
                 ¿Olvidaste tu contraseña?
               </Typography>
               <Typography variant="body" secondary style={{ textAlign: 'center', marginTop: 6, lineHeight: 22 }}>
-                Ingresa tu correo y te enviaremos{'\n'}instrucciones cuando conectemos el servidor.
+                Ingresa tu correo y te enviaremos{'\n'}un enlace para restablecer tu contraseña.
               </Typography>
-            </View>
-
-            {/* Local mode notice */}
-            <View style={[s.infoCard, { backgroundColor: `${Colors.info}0E`, borderColor: `${Colors.info}28` }]}>
-              <Ionicons name="information-circle-outline" size={18} color={Colors.info} />
-              <View style={{ flex: 1, gap: 2 }}>
-                <Typography variant="label" color={Colors.info}>Modo local activo</Typography>
-                <Typography variant="caption" muted>
-                  El restablecimiento por email estará disponible en Fase 5 con backend conectado.
-                </Typography>
-              </View>
             </View>
 
             {/* Email field */}
@@ -131,6 +128,15 @@ export default function ForgotPasswordScreen() {
               )}
             </Animated.View>
 
+            {apiError && (
+              <View style={[s.apiErrorBox, { backgroundColor: `${Colors.error}0E`, borderColor: `${Colors.error}28` }]}>
+                <Ionicons name="alert-circle-outline" size={16} color={Colors.error} />
+                <Typography variant="caption" color={Colors.error} style={{ flex: 1, lineHeight: 18 }}>
+                  {apiError}
+                </Typography>
+              </View>
+            )}
+
             <TouchableOpacity
               style={[
                 s.primaryBtn,
@@ -147,25 +153,7 @@ export default function ForgotPasswordScreen() {
                 <Ionicons name="send-outline" size={16} color="#fff" />
               )}
               <Typography style={s.primaryBtnText}>
-                {loading ? 'Procesando…' : 'Continuar'}
-              </Typography>
-            </TouchableOpacity>
-
-            {/* Divider */}
-            <View style={s.separatorRow}>
-              <View style={[s.separatorLine, { backgroundColor: theme.border }]} />
-              <Typography variant="caption" muted style={{ paddingHorizontal: 12 }}>o</Typography>
-              <View style={[s.separatorLine, { backgroundColor: theme.border }]} />
-            </View>
-
-            <TouchableOpacity
-              style={[s.secondaryBtn, { borderColor: Colors.primary }]}
-              onPress={() => router.replace('/auth/register' as never)}
-              activeOpacity={0.8}
-            >
-              <Ionicons name="person-add-outline" size={16} color={Colors.primary} />
-              <Typography style={{ color: Colors.primary, fontWeight: FontWeights.semibold, fontSize: FontSizes.sm }}>
-                Crear cuenta nueva
+                {loading ? 'Enviando…' : 'Enviar enlace'}
               </Typography>
             </TouchableOpacity>
           </>
@@ -176,33 +164,24 @@ export default function ForgotPasswordScreen() {
               <Ionicons name="checkmark-circle" size={56} color={Colors.success} />
             </View>
             <Typography variant="h3" style={{ color: theme.text, marginTop: 20, textAlign: 'center' }}>
-              ¡Solicitud registrada!
+              Revisa tu correo
             </Typography>
             <Typography variant="body" secondary style={{ textAlign: 'center', marginTop: 8, lineHeight: 22 }}>
-              Cuando conectemos el servidor en Fase 5, recibirás instrucciones en{' '}
+              Te enviamos un enlace de recuperación a{'\n'}
               <Typography variant="body" color={Colors.primary} style={{ fontWeight: FontWeights.semibold }}>
                 {email}
               </Typography>
             </Typography>
 
-            <View style={[s.infoCard, { backgroundColor: `${Colors.info}0E`, borderColor: `${Colors.info}28`, marginTop: 24 }]}>
-              <Ionicons name="bulb-outline" size={16} color={Colors.info} />
+            <View style={[s.infoCard, { backgroundColor: `${Colors.success}0E`, borderColor: `${Colors.success}28`, marginTop: 24 }]}>
+              <Ionicons name="information-circle-outline" size={16} color={Colors.success} />
               <Typography variant="caption" muted style={{ flex: 1, lineHeight: 18 }}>
-                Por ahora, crea una cuenta nueva con el mismo correo para continuar usando la app sin perder tu historial local.
+                Abre el enlace desde tu móvil para restablecer tu contraseña. Revisa también la carpeta de spam.
               </Typography>
             </View>
 
             <TouchableOpacity
-              style={[s.primaryBtn, { backgroundColor: Colors.primary, marginTop: 24, width: '100%' }]}
-              onPress={() => router.replace('/auth/register' as never)}
-              activeOpacity={0.85}
-            >
-              <Ionicons name="person-add-outline" size={16} color="#fff" />
-              <Typography style={s.primaryBtnText}>Crear cuenta nueva</Typography>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              style={[s.secondaryBtn, { borderColor: theme.border, marginTop: 10, width: '100%' }]}
+              style={[s.secondaryBtn, { borderColor: theme.border, marginTop: 24, width: '100%' }]}
               onPress={() => router.replace('/auth/login' as never)}
               activeOpacity={0.8}
             >
@@ -254,8 +233,10 @@ const s = StyleSheet.create({
   },
   primaryBtnText: { color: '#fff', fontWeight: FontWeights.semibold, fontSize: FontSizes.md },
 
-  separatorRow: { flexDirection: 'row', alignItems: 'center', marginTop: 20, marginBottom: 4 },
-  separatorLine: { flex: 1, height: StyleSheet.hairlineWidth },
+  apiErrorBox: {
+    flexDirection: 'row', alignItems: 'flex-start', gap: 8,
+    padding: 12, borderRadius: BorderRadius.md, borderWidth: 1, marginTop: 12,
+  },
 
   secondaryBtn: {
     flexDirection: 'row', alignItems: 'center', justifyContent: 'center',

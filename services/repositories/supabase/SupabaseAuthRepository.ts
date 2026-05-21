@@ -1,3 +1,4 @@
+import * as Linking from 'expo-linking';
 import { supabase } from '@/services/supabase/client';
 import type { IAuthRepository } from '../interfaces';
 import type {
@@ -177,8 +178,10 @@ export class SupabaseAuthRepository implements IAuthRepository {
 
   async resetPassword(email: string): Promise<{ success: boolean; error?: string }> {
     try {
+      const redirectTo = Linking.createURL('auth/reset-password');
       const { error } = await supabase.auth.resetPasswordForEmail(
-        email.trim().toLowerCase()
+        email.trim().toLowerCase(),
+        { redirectTo }
       );
       if (error) return { success: false, error: error.message };
       return { success: true };

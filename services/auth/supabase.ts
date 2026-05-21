@@ -4,6 +4,7 @@
  * These helpers can be used directly for password reset, OAuth prep, diagnostics.
  */
 
+import * as Linking from 'expo-linking';
 import { supabase, supabaseConfig } from '@/services/supabase/client';
 import type { AuthCredentials, AuthResult, RegisterData, AuthError } from '@/types/user';
 import type { PasswordResetResult } from './auth.service';
@@ -55,8 +56,10 @@ export async function logoutSupabase(): Promise<void> {
 
 export async function resetPasswordSupabase(email: string): Promise<PasswordResetResult> {
   try {
+    const redirectTo = Linking.createURL('auth/reset-password');
     const { error } = await supabase.auth.resetPasswordForEmail(
-      email.trim().toLowerCase()
+      email.trim().toLowerCase(),
+      { redirectTo }
     );
     if (error) return { success: false, error: error.message };
     return { success: true };

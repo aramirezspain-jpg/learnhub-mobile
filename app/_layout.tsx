@@ -109,6 +109,7 @@ const loadStyles = StyleSheet.create({
 
 function AppBootstrap({ children }: { children: React.ReactNode }) {
   const db = useSQLiteContext();
+  const router = useRouter();
   const setCourses = useCoursesStore(s => s.setCourses);
   const setLevels = useCoursesStore(s => s.setLevels);
   const setInitialized = useCoursesStore(s => s.setInitialized);
@@ -188,7 +189,8 @@ function AppBootstrap({ children }: { children: React.ReactNode }) {
         'SELECT value FROM app_settings WHERE key = ?',
         ['onboardingCompleted']
       );
-      setOnboardingCompleted(onboardingRow?.value === 'true');
+      const onboardingDone = onboardingRow?.value === 'true';
+      setOnboardingCompleted(onboardingDone);
 
       // Auth session check — Supabase (or local SQLite) depending on SUPABASE_ENABLED
       const authRepo = createAuthRepository(db);
@@ -232,6 +234,13 @@ function AppBootstrap({ children }: { children: React.ReactNode }) {
         await NotificationService.setBadge(newAnns.length);
       }
 
+      // Pre-navigate before revealing UI — eliminates flash of wrong screen
+      if (!onboardingDone) {
+        router.replace('/onboarding' as never);
+      } else if (!authUser) {
+        router.replace('/landing' as never);
+      }
+
       setDbReady();
     };
 
@@ -240,6 +249,7 @@ function AppBootstrap({ children }: { children: React.ReactNode }) {
       setAuthStatus('local');
       setSessionError('datos incompletos — recuperación local activa');
       setOnboardingCompleted(false);
+      router.replace('/onboarding' as never);
       setDbReady();
     });
   }, []);
@@ -265,6 +275,7 @@ function NavigationGuard() {
     const isAuthScreen    = pathname?.startsWith('/auth') ?? false;
     const isLanding       = pathname === '/landing';
     const isOnboarding    = pathname === '/onboarding';
+    const isResetPassword = pathname === '/auth/reset-password';
     const isAuthenticated = status === 'authenticated';
 
     // First-time users: show onboarding before anything else
@@ -279,8 +290,8 @@ function NavigationGuard() {
       return;
     }
 
-    // Authenticated users skip landing and onboarding
-    if (isAuthenticated && (isLanding || isOnboarding)) {
+    // Authenticated users skip landing and onboarding (but stay on reset-password flow)
+    if (isAuthenticated && (isLanding || isOnboarding) && !isResetPassword) {
       router.replace('/(tabs)');
     }
   }, [status, dbReady, onboardingCompleted]);
@@ -401,6 +412,10 @@ export default function RootLayout() {
           />
           <Stack.Screen
             name="auth/forgot-password"
+            options={{ animation: 'slide_from_right', headerShown: false }}
+          />
+          <Stack.Screen
+            name="auth/reset-password"
             options={{ animation: 'slide_from_right', headerShown: false }}
           />
         </Stack>
