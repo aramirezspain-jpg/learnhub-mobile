@@ -32,6 +32,7 @@ import { useUserProfileStore } from '@/store/userProfile.store';
 import { SessionProvider } from '@/contexts/session';
 import { Colors, FontWeights } from '@/constants/theme';
 import { useSQLiteContext } from 'expo-sqlite';
+import * as Linking from 'expo-linking';
 
 // ─── Branded loading screen ──────────────────────────────────────────────────
 function LoadingScreen({ scheme }: { scheme: 'dark' | 'light' }) {
@@ -235,7 +236,14 @@ function AppBootstrap({ children }: { children: React.ReactNode }) {
       }
 
       // Pre-navigate before revealing UI — eliminates flash of wrong screen
-      if (!onboardingDone) {
+      // If the app was cold-launched via the password-reset deep link, go there first
+      // regardless of auth/onboarding state so the token in the URL fragment is preserved.
+      const initialUrl = await Linking.getInitialURL();
+      const isResetLink = typeof initialUrl === 'string' && initialUrl.includes('reset-password');
+
+      if (isResetLink) {
+        router.replace('/reset-password' as never);
+      } else if (!onboardingDone) {
         router.replace('/onboarding' as never);
       } else if (!authUser) {
         router.replace('/landing' as never);
@@ -279,13 +287,14 @@ function NavigationGuard() {
     const isAuthenticated = status === 'authenticated';
 
     // First-time users: show onboarding before anything else
-    if (!onboardingCompleted && !isOnboarding) {
+    // (password-reset deep link bypasses onboarding — token must be consumed first)
+    if (!onboardingCompleted && !isOnboarding && !isResetPassword) {
       router.replace('/onboarding');
       return;
     }
 
-    // Unauthenticated users can only see landing and auth screens
-    if (!isAuthenticated && !isAuthScreen && !isLanding && !isOnboarding) {
+    // Unauthenticated users: only landing, auth screens, and reset-password are allowed
+    if (!isAuthenticated && !isAuthScreen && !isLanding && !isOnboarding && !isResetPassword) {
       router.replace('/landing');
       return;
     }
